@@ -19,6 +19,12 @@ curl -s -L --output /etc/jq 'https://github.com/stedolan/jq/releases/download/jq
 chown root.root /etc/jq
 chmod a+x /etc/jq
 
+apt-get install -y golang-go
+mkdir ~vagrant/.gopath
+chown vagrant:vagrant ~vagrant/.gopath
+echo 'export GOPATH=$HOME/.gopath' >> ~vagrant/.profile
+echo 'PATH="$GOPATH/bin:$PATH"' >> ~vagrant/.profile
+
 # instructions from https://cloud.google.com/sdk/#debubu
 export CLOUD_SDK_REPO=cloud-sdk-`lsb_release -c -s`
 echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list
