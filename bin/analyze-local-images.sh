@@ -25,8 +25,6 @@ fi
 
 DOCKER_IMAGE=${1:-}
 
-set -x
-
 docker pull simonsdave/clair-database:latest
 docker run \
     --name clair-database \
