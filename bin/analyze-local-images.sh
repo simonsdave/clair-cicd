@@ -59,6 +59,6 @@ docker run \
     quay.io/coreos/clair:latest \
     -config=/config/config.yaml
 
-"$GOPATH/bin/analyze-local-images" $DOCKER_IMAGE
+analyze-local-images $DOCKER_IMAGE
 
 exit 0
