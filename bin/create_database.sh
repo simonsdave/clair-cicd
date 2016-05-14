@@ -35,14 +35,14 @@ DOCKERHUB_PASSWORD=${3:-}
 
 CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-database:$TAG
 
-sudo docker pull postgres:9.5.2
+docker pull postgres:9.5.2
 
 CLAIR_DATABASE_CONTAINER_NAME=clair-database
 
-sudo docker kill $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null || true
-sudo docker rm $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null || true
+docker kill $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null || true
+docker rm $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null || true
 
-sudo docker \
+docker \
     run \
     --name $CLAIR_DATABASE_CONTAINER_NAME \
     -e 'PGDATA=/var/lib/postgresql/data-non-volume' \
@@ -53,7 +53,7 @@ sudo docker \
 echo -n 'Waiting for postgres to start '
 for i in $(seq 1 10)
 do
-    sudo docker exec $CLAIR_DATABASE_CONTAINER_NAME sh -c 'echo "\list" | psql -U postgres' >& /dev/null
+    docker exec $CLAIR_DATABASE_CONTAINER_NAME sh -c 'echo "\list" | psql -U postgres' >& /dev/null
     if [ $? == 0 ]; then
         break
     fi
@@ -62,7 +62,7 @@ do
 done
 echo '.'
 
-sudo docker \
+docker \
     exec \
     $CLAIR_DATABASE_CONTAINER_NAME \
     sh -c 'echo "create database clair" | psql -U postgres'
@@ -84,16 +84,16 @@ sed \
     -e 's|source:|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
     "$CLAIR_CONFIG_YAML"
 
-sudo docker \
+docker \
     pull \
     quay.io/coreos/clair:latest
 
 CLAIR_CONTAINER_NAME=clair
 
-sudo docker kill $CLAIR_CONTAINER_NAME >& /dev/null || true
-sudo docker rm $CLAIR_CONTAINER_NAME >& /dev/null || true
+docker kill $CLAIR_CONTAINER_NAME >& /dev/null || true
+docker rm $CLAIR_CONTAINER_NAME >& /dev/null || true
 
-sudo docker \
+docker \
     run \
     -d \
     --name $CLAIR_CONTAINER_NAME \
@@ -107,7 +107,7 @@ sudo docker \
 echo -n 'Waiting for vulnerabilities database update to finish '
 while true
 do
-    sudo docker logs $CLAIR_CONTAINER_NAME | grep "updater: update finished" >& /dev/null
+    docker logs $CLAIR_CONTAINER_NAME | grep "updater: update finished" >& /dev/null
     if [ $? == 0 ]; then
         break
     fi
@@ -116,12 +116,12 @@ do
 done
 echo ''
 
-sudo docker kill $CLAIR_CONTAINER_NAME
-sudo docker rm $CLAIR_CONTAINER_NAME
+docker kill $CLAIR_CONTAINER_NAME
+docker rm $CLAIR_CONTAINER_NAME
 
-sudo docker rmi $CLAIR_DATABASE_IMAGE_NAME >& /dev/null
+docker rmi $CLAIR_DATABASE_IMAGE_NAME >& /dev/null
 
-sudo docker \
+docker \
     commit \
     --change 'ENV PGDATA /var/lib/postgresql/data-non-volume' \
     --change='CMD ["postgres"]' \
@@ -131,14 +131,14 @@ sudo docker \
     $CLAIR_DATABASE_IMAGE_NAME
 
 if [ "$DOCKERHUB_EMAIL" != "" ]; then
-    sudo docker login \
+    docker login \
         --email="$DOCKERHUB_EMAIL" \
         --username="$DOCKERHUB_USERNAME" \
         --password="$DOCKERHUB_PASSWORD"
-    sudo docker push $CLAIR_DATABASE_IMAGE_NAME
+    docker push $CLAIR_DATABASE_IMAGE_NAME
 fi
 
-sudo docker kill $CLAIR_DATABASE_CONTAINER_NAME
-sudo docker rm $CLAIR_DATABASE_CONTAINER_NAME
+docker kill $CLAIR_DATABASE_CONTAINER_NAME
+docker rm $CLAIR_DATABASE_CONTAINER_NAME
 
 exit 0
