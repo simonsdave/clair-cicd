@@ -39,14 +39,14 @@ docker pull postgres:9.5.2
 
 CLAIR_DATABASE_CONTAINER_NAME=clair-database
 
-docker kill $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null || true
-docker rm $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null || true
+docker kill $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null
+docker rm $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null
 
 docker \
     run \
     --name $CLAIR_DATABASE_CONTAINER_NAME \
     -e 'PGDATA=/var/lib/postgresql/data-non-volume' \
-    -p 127.0.0.1:5432:5432 \
+    -p 9000:5432 \
     -d \
     postgres:9.5.2
 
@@ -81,7 +81,7 @@ curl \
 # http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
 sed \
     -i \
-    -e 's|source:|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
+    -e 's|source:|source: postgresql://postgres@clair-database:9000/clair?sslmode=disable|g' \
     "$CLAIR_CONFIG_YAML"
 
 docker \
