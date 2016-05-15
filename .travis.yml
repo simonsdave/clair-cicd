@@ -9,4 +9,5 @@ install:
   - sudo usermod -aG docker $USER
   - go get -u github.com/coreos/clair/contrib/analyze-local-images
 script:
+  - sudo netstat
   - ./bin/create_database.sh -v $DOCKERHUB_USERNAME $DOCKERHUB_EMAIL $DOCKERHUB_PASSWORD
