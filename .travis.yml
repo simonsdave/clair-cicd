@@ -1,0 +1,12 @@
+language: go
+go:
+  - 1.2
+sudo: required
+dist: trusty
+install:
+  - sudo apt-get install -y docker.io
+  - sudo sed -i -e 's|DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock"|DOCKER_OPTS="-H tcp://172.17.42.1:2375 -H unix:///var/run/docker.sock"|g' /etc/default/docker
+  - sudo usermod -aG docker $USER
+  - go get -u github.com/coreos/clair/contrib/analyze-local-images
+script:
+  - ./bin/create_database.sh -v $DOCKERHUB_USERNAME $DOCKERHUB_EMAIL $DOCKERHUB_PASSWORD
