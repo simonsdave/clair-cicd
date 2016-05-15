@@ -46,7 +46,7 @@ docker \
     run \
     --name $CLAIR_DATABASE_CONTAINER_NAME \
     -e 'PGDATA=/var/lib/postgresql/data-non-volume' \
-    -p 5432:5432 \
+    -p 127.0.0.1:5432:5432 \
     -d \
     postgres:9.5.2
 
