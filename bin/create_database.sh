@@ -175,17 +175,26 @@ docker \
     --change='EXPOSE 5432' \
     --change='ENTRYPOINT ["/docker-entrypoint.sh"]' \
     $CLAIR_DATABASE_CONTAINER_NAME \
-    $CLAIR_DATABASE_IMAGE_NAME
+    $CLAIR_DATABASE_IMAGE_NAME \
+    > /dev/null
 
 if [ "$DOCKERHUB_EMAIL" != "" ]; then
+    echo "logging in to dockerhub"
     docker login \
         --email="$DOCKERHUB_EMAIL" \
         --username="$DOCKERHUB_USERNAME" \
-        --password="$DOCKERHUB_PASSWORD"
-    docker push $CLAIR_DATABASE_IMAGE_NAME
+        --password="$DOCKERHUB_PASSWORD" \
+    > /dev/null
+    echo "logged in to dockerhub"
+
+    echo "pushing vulnerabilities database ($CLAIR_DATABASE_IMAGE_NAME) to dockerhub"
+    docker push $CLAIR_DATABASE_IMAGE_NAME > /dev/null
+    echo "pushed vulnerabilities database to dockerhub"
 fi
 
-docker kill $CLAIR_DATABASE_CONTAINER_NAME
-docker rm $CLAIR_DATABASE_CONTAINER_NAME
+docker kill $CLAIR_DATABASE_CONTAINER_NAME > /dev/null
+docker rm $CLAIR_DATABASE_CONTAINER_NAME > /dev/null
+
+echo "done!"
 
 exit 0
