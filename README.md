@@ -32,7 +32,7 @@ ie. security is important
 their risk profile is understood
 * inserted into the CI/CD pipeline, Clair can be an effective
 foundation for providing an automated assessment of a Docker image's
-vulnerabilities before the image was pushed to a Docker registry
+vulnerabilities before the image is pushed to a Docker registry
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
 between code commit and automated (CD) deployment begins rolling
 out a change
