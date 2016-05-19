@@ -36,3 +36,17 @@ vulnerabilities before the image is pushed to a Docker registry
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
 between code commit and automated (CD) deployment begins rolling
 out a change
+
+## Using
+
+### Generating a Vulnerabities Report
+
+```bash
+>curl \
+    -s \
+    -L \
+    -o analyze-local-images.sh \
+    https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/analyze-local-images.sh
+>chmod a+x analyze-local-images.sh
+>./analyze-local-images.sh -v owner/repo:tag
+```
