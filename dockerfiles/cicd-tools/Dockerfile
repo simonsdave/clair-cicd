@@ -32,4 +32,4 @@ ENV PATH=$PATH:/.gopath/bin
 RUN go get -u github.com/coreos/clair/contrib/analyze-local-images
 
 ADD analyze-local-images.sh /usr/local/bin/analyze-local-images.sh
-ADD summarize-analyze-local-images-results.py /usr/local/bin/summarize-analyze-local-images-results.py
+ADD assess-image-risk.py /usr/local/bin/assess-image-risk.py 
