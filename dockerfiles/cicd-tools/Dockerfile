@@ -27,13 +27,9 @@ RUN apt-get install -y git
 RUN apt-get install -y golang-go
 RUN mkdir /.gopath
 ENV GOPATH /.gopath
-RUN echo $PATH
 ENV PATH=$PATH:/.gopath/bin
-RUN echo $PATH
 
 RUN go get -u github.com/coreos/clair/contrib/analyze-local-images
-
-RUN apt-get install -y curl
 
 ADD analyze-local-images.sh /usr/local/bin/analyze-local-images.sh
 ADD summarize-analyze-local-images-results.py /usr/local/bin/summarize-analyze-local-images-results.py
