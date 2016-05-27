@@ -36,6 +36,12 @@ USERNAME=${1:-}
 EMAIL=${2:-}
 PASSWORD=${3:-}
 
+"$SCRIPT_DIR_NAME/database/build-docker-image.sh" \
+    -t "$TAG" \
+    "$USERNAME" \
+    "$EMAIL" \
+    "$PASSWORD"
+
 "$SCRIPT_DIR_NAME/cicd-tools/build-docker-image.sh" \
     -t "$TAG" \
     "$USERNAME" \
