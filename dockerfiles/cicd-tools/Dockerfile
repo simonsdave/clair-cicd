@@ -20,16 +20,13 @@ MAINTAINER Dave Simons
 
 RUN apt-get update -y
 
+# assess-image-risk.sh needs the docker client
 RUN apt-get install -y docker.io
 
-# git req'd by go otherwise 'go get' fails
-RUN apt-get install -y git
-RUN apt-get install -y golang-go
-RUN mkdir /.gopath
-ENV GOPATH /.gopath
-ENV PATH=$PATH:/.gopath/bin
+# assess-image-risk.sh needs curl
+RUN apt-get install -y curl
 
-RUN go get -u github.com/coreos/clair/contrib/analyze-local-images
-
-ADD analyze-local-images.sh /usr/local/bin/analyze-local-images.sh
+ADD clair-layers-template-no-parent.json /usr/local/bin/clair-layers-template-no-parent.json
+ADD clair-layers-template-with-parent.json /usr/local/bin/clair-layers-template-with-parent.json
+ADD assess-image-risk.sh /usr/local/bin/assess-image-risk.sh
 ADD assess-image-risk.py /usr/local/bin/assess-image-risk.py 

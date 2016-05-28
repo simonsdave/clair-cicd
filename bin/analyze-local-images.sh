@@ -83,7 +83,7 @@ echo_if_verbose "starting clair container '$CLAIR_CONTAINER'"
 docker run \
     -d \
     --name $CLAIR_CONTAINER \
-    -p 6060:6060 \
+    --expose 6060 \
     --link $CLAIR_DATABASE_CONTAINER:clair-database \
     -v /tmp:/tmp \
     -v $CLAIR_CONFIG_DIR:/config \
@@ -96,32 +96,14 @@ if [ $? != 0 ]; then
 fi
 echo_if_verbose "successfully started clair container '$CLAIR_CONTAINER'"
 
-#
-# if it's not already around, grab the script to does the actual analysis
-#
-#   if [ ! -x analyze-local-images ]; then
-#       go get -u github.com/coreos/clair/contrib/analyze-local-images
-#   fi
-
-#
-# setup done! time to run the analysis
-#
-# Options:
-#  -color="auto": Colorize the output (always, auto, never)
-#  -endpoint="http://127.0.0.1:6060": Address to Clair API
-#  -minimum-severity="Negligible": Minimum severity of vulnerabilities to show (Unknown, Negligible, Low, Medium, High, Critical, Defcon1)
-#  -my-address="127.0.0.1": Address from the point of view of Clair
-#
-# analyze-local-images $DOCKER_IMAGE_TO_ANALYZE
-
 docker \
     run \
     --rm \
-    -p 6060:6060 \
+    --link $CLAIR_CONTAINER:clair \
     -v /tmp:/tmp \
     -v /var/run/docker.sock:/var/run/docker.sock \
     simonsdave/clair-cicd-tools \
-    analyze-local-images.sh -v $DOCKER_IMAGE_TO_ANALYZE
+    assess-image-risk.sh -v $DOCKER_IMAGE_TO_ANALYZE
 
 echo "=============================================="
 docker logs $CLAIR_CONTAINER
@@ -139,54 +121,3 @@ docker kill $CLAIR_DATABASE_CONTAINER > /dev/null
 docker rm $CLAIR_DATABASE_CONTAINER > /dev/null
 
 exit 0
-
-#=======================================================
-
-set -x
-docker \
-    run \
-    --rm \
-    -v /tmp:/tmp \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    --link $CLAIR_CONTAINER:clair \
-    simonsdave/clair-cicd-tools \
-    analyze-local-images.sh -v $DOCKER_IMAGE_TO_ANALYZE
-set +x
-
-#=======================================================
-echo "=============================================="
-docker logs $CLAIR_CONTAINER
-echo "=============================================="
-docker logs $CLAIR_DATABASE_CONTAINER
-echo "=============================================="
-
-#=======================================================
-docker \
-    run \
-    --rm \
-    -v /tmp:/tmp \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    --link $CLAIR_CONTAINER:clair \
-    simonsdave/clair-cicd-tools \
-    /usr/local/bin/hyperclair --config /usr/local/bin/hyperclair.yml --log-level info push --local $DOCKER_IMAGE_TO_ANALYZE
-docker \
-    run \
-    --rm \
-    -v /tmp:/tmp \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    --link $CLAIR_CONTAINER:clair \
-    simonsdave/clair-cicd-tools \
-    /usr/local/bin/hyperclair --config /usr/local/bin/hyperclair.yml --log-level info analyse --local $DOCKER_IMAGE_TO_ANALYZE
-
-#=======================================================
-set -x
-docker \
-    run \
-    --rm \
-    -v /tmp:/tmp \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    --link $CLAIR_CONTAINER:clair \
-    simonsdave/clair-cicd-tools \
-    analyze-local-images.sh -v $DOCKER_IMAGE_TO_ANALYZE
-set +x
-#=======================================================

@@ -1,0 +1,8 @@
+{
+  "Layer": {
+    "Name": "%NAME%",
+    "Path": "%PATH%",
+    "ParentName": "%PARENTNAME%",
+    "Format": "Docker"
+  }
+}
