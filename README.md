@@ -46,7 +46,7 @@ out a change
     -s \
     -L \
     -o analyze-local-images.sh \
-    https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/analyze-local-images.sh
->chmod a+x analyze-local-images.sh
->./analyze-local-images.sh -v owner/repo:tag
+    https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh
+>chmod a+x assess-image-risk.sh
+>./assess-image-risk.sh -v owner/repo:tag
 ```
