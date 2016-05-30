@@ -105,7 +105,6 @@ if __name__ == '__main__':
         for feature in features:
             vulnerabilities = feature.get('Vulnerabilities', [])
             for vulnerability in vulnerabilities:
-                print vulnerability
                 Vulnerability(vulnerability['Name'], vulnerability['Severity'])
 
     for severity in Vulnerability.vulnerabilities_by_severity.keys():
