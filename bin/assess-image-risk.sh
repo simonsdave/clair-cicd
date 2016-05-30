@@ -14,6 +14,7 @@ echo_if_verbose() {
 #
 
 VERBOSE=0
+VERBOSE_FLAG=""
 
 while true
 do
@@ -22,6 +23,7 @@ do
         -v)
             shift
             VERBOSE=1
+            VERBOSE_FLAG=-v
             ;;
         *)
             break
@@ -38,6 +40,7 @@ DOCKER_IMAGE_TO_ANALYZE=${1:-}
 
 CLAIR_DATABASE_IMAGE=simonsdave/clair-database:latest
 CLAIR_IMAGE=quay.io/coreos/clair:latest
+CLAIR_CICD_TOOLS_IMAGE=simonsdave/clair-cicd-tools:latest
 
 echo_if_verbose "pulling clair database image '$CLAIR_DATABASE_IMAGE'"
 docker pull $CLAIR_DATABASE_IMAGE > /dev/null
@@ -96,20 +99,22 @@ if [ $? != 0 ]; then
 fi
 echo_if_verbose "successfully started clair container '$CLAIR_CONTAINER'"
 
+echo_if_verbose "pulling clair ci/cd tools image '$CLAIR_CICD_TOOLS_IMAGE'"
+docker pull $CLAIR_CICD_TOOLS_IMAGE > /dev/null
+if [ $? != 0 ]; then
+    echo "error pulling clair image '$CLAIR_CICD_TOOLS_IMAGE'" >&2
+    exit 1
+fi
+echo_if_verbose "successfully pulled clair ci/cd tools image"
+
 docker \
     run \
     --rm \
     --link $CLAIR_CONTAINER:clair \
     -v /tmp:/tmp \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    simonsdave/clair-cicd-tools \
-    assess-image-risk.sh -v $DOCKER_IMAGE_TO_ANALYZE
-
-echo "=============================================="
-docker logs $CLAIR_CONTAINER
-echo "=============================================="
-docker logs $CLAIR_DATABASE_CONTAINER
-echo "=============================================="
+    $CLAIR_CICD_TOOLS_IMAGE \
+    assess-image-risk.sh $VERBOSE_FLAG $DOCKER_IMAGE_TO_ANALYZE
 
 #
 # cleanup ...
