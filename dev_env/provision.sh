@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# this script provisions a development environment
+# this script provisions the project's development environment
 #
 
 set -e
@@ -16,9 +16,9 @@ apt-get install -y git
 
 timedatectl set-timezone EST
 
-curl -s -L --output /etc/jq 'https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64'
-chown root.root /etc/jq
-chmod a+x /etc/jq
+curl -s -L --output /usr/local/bin/jq 'https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64'
+chown root.root /usr/local/bin/jq
+chmod a+x /usr/local/bin/jq
 
 apt-get install -y python-virtualenv
 apt-get install -y python-dev
