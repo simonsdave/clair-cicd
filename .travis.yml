@@ -4,8 +4,15 @@ python:
 sudo: required
 dist: trusty
 install:
+  - source cfg4dev
+  - pip install coveralls
   - sudo apt-get install -y docker.io
   - sudo sed -i -e 's|DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock"|DOCKER_OPTS="-H tcp://172.17.42.1:2375 -H unix:///var/run/docker.sock"|g' /etc/default/docker
   - sudo usermod -aG docker $USER
 script:
+  - pep8
+  - flake8
+  - nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
+  - coveralls || true
+  - python setup.py sdist --formats=gztar
   - ./dockerfiles/build-docker-images.sh -v $DOCKERHUB_USERNAME $DOCKERHUB_EMAIL $DOCKERHUB_PASSWORD
