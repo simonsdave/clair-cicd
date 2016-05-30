@@ -32,14 +32,18 @@ fi
 
 DOCKER_IMAGE=${1:-}
 
+echo_if_verbose "saving docker image '$DOCKER_IMAGE'"
 DOCKER_IMAGE_EXPLODED_TAR_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" > /dev/null
-docker save $DOCKER_IMAGE | tar xv
+docker save $DOCKER_IMAGE | tar xv > /dev/null
 popd > /dev/null
+echo_if_verbose "successfully saved docker image '$DOCKER_IMAGE'"
 
 PREVIOUS_LAYER=""
 for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE | tac)
 do
+    echo_if_verbose "creating clair layer '$LAYER'"
+
     BODY=$(mktemp 2> /dev/null || mktemp -t DAS)
 
     if [ "$PREVIOUS_LAYER" == "" ]; then
@@ -55,21 +59,25 @@ do
     cat "$BODY_TEMPLATE" | sed -f "$SED_SCRIPT" > "$BODY"
     rm "$SED_SCRIPT"
 
-    curl \
+    HTTP_STATUS_CODE=$(curl \
         -s \
+        -o /dev/null \
         -X POST \
         -H 'Content-Type: application/json' \
+        -w '%{http_code}' \
         --data-binary @"$BODY" \
-        http://clair:6060/v1/layers
+        http://clair:6060/v1/layers)
+    if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "201" ]; then
+        echo "error creating clair layer '$LAYER'" >&2
+        exit 1
+    fi
 
     PREVIOUS_LAYER=$LAYER
 
     rm "$BODY"
+
+    echo_if_verbose "successfully created clair layer '$LAYER'"
 done
 
-for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE)
-do
-    curl -s http://clair:6060/v1/layers/$LAYER?vulnerabilities
-done
-
-exit 0
+"$SCRIPT_DIR_NAME/assess-image-risk.py" "http://172.17.42.1:2375" "http://clair:6060" "$DOCKER_IMAGE"
+exit $?
