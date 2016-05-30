@@ -20,11 +20,8 @@ curl -s -L --output /etc/jq 'https://github.com/stedolan/jq/releases/download/jq
 chown root.root /etc/jq
 chmod a+x /etc/jq
 
-apt-get install -y golang-go
-mkdir ~vagrant/.gopath
-chown vagrant:vagrant ~vagrant/.gopath
-echo 'export GOPATH=$HOME/.gopath' >> ~vagrant/.profile
-echo 'PATH="$GOPATH/bin:$PATH"' >> ~vagrant/.profile
+apt-get install -y python-virtualenv
+apt-get install -y python-dev
 
 # instructions from https://cloud.google.com/sdk/#debubu
 export CLOUD_SDK_REPO=cloud-sdk-`lsb_release -c -s`
