@@ -20,7 +20,7 @@ configure_dev_env()
         pip install --process-dependency-links --requirement "$PWD/requirements.txt"
     fi
 
-    export PATH=$PATH:"$PWD/bin"
+    export PATH="$PWD/bin":$PATH
     export PYTHONPATH="$PWD"
 
     return 0
