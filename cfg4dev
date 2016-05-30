@@ -1,0 +1,29 @@
+configure_dev_env()
+{
+    if [ ! -f "$PWD/requirements.txt" ]; then
+        echo "Must source this script from project's root directory"
+        return 1
+    fi
+
+    if [ -d "$PWD/env" ]; then
+        source "$PWD/env/bin/activate"
+    else
+        virtualenv env
+        if [ $? != 0 ]; then
+            echo "error creating virtualenv"
+            return 1
+        fi
+        source "$PWD/env/bin/activate"
+
+        pip install pip==1.5.6
+
+        pip install --process-dependency-links --requirement "$PWD/requirements.txt"
+    fi
+
+    export PATH=$PATH:"$PWD/bin"
+    export PYTHONPATH="$PWD"
+
+    return 0
+}
+
+configure_dev_env

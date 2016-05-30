@@ -1,0 +1,7 @@
+*.pyc
+dist
+env
+clair_cicd.egg-info
+.coverage
+coverage_report
+.DS_Store
