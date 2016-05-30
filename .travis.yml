@@ -16,4 +16,4 @@ script:
   - nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
   - coveralls || true
   - python setup.py sdist --formats=gztar
-  - ./dockerfiles/build-docker-images.sh -v $DOCKERHUB_USERNAME $DOCKERHUB_EMAIL $DOCKERHUB_PASSWORD
+  - if [ "$TRAVIS_BRANCH" == "master" ] || [ "$TRAVIS_TAG" != "" ]; then ./dockerfiles/build-docker-images.sh -v -t "$TRAVIS_TAG" $DOCKERHUB_USERNAME $DOCKERHUB_EMAIL $DOCKERHUB_PASSWORD; fi
