@@ -26,6 +26,12 @@ RUN apt-get install -y docker.io
 # assess-image-risk.sh needs curl
 RUN apt-get install -y curl
 
+# basic stuff to get python going
+RUN apt-get install -y python
+RUN apt-get install -y python-dev
+RUN apt-get install -y python-pip
+RUN pip install pip==1.5.6
+
 ADD clair-layers-template-no-parent.json /usr/local/bin/clair-layers-template-no-parent.json
 ADD clair-layers-template-with-parent.json /usr/local/bin/clair-layers-template-with-parent.json
 ADD assess-image-risk.sh /usr/local/bin/assess-image-risk.sh
