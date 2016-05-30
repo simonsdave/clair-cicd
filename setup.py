@@ -25,7 +25,7 @@ from setuptools import setup
 reg_ex_pattern = r"__version__\s*=\s*['\"](?P<version>[^'\"]*)['\"]"
 reg_ex = re.compile(reg_ex_pattern)
 version = ""
-with open('clair-cicd/__init__.py', 'r') as fd:
+with open('clair_cicd/__init__.py', 'r') as fd:
     for line in fd:
         match = reg_ex.match(line)
         if match:
@@ -37,7 +37,7 @@ if not version:
 setup(
     name='clair-cicd',
     packages=[
-        'clair-cicd',
+        'clair_cicd',
     ],
     scripts=[
         'bin/assess-image-risk.sh',
