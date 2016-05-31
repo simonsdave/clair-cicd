@@ -1,0 +1,42 @@
+{
+    "ignoreSevertiesAtOrBelow": "low",
+    "vulnerabilities": [
+        {
+            "cveId": "CVE-2016-99999",
+            "production": {
+                "externallyFacing": {
+                    "whitelist": true,
+                    "reason": "bla bla bla"
+                },
+                "touchesCardHolderData": {
+                    "whitelist": true
+                },
+                "touchesPII": {
+                    "whitelist": false,
+                    "reason": "just gotta deal with this one"
+                }
+            }
+        },
+        {
+            "cveId": "CVE-2016-88888",
+            "production": {
+                "touchesCardHolderData": {
+                    "whitelist": false
+                }
+            },
+            "development": {
+                "externallyFacing": {
+                    "whitelist": true,
+                    "reason": "bla bla bla"
+                },
+                "touchesCardHolderData": {
+                    "whitelist": true
+                },
+                "touchesPII": {
+                    "whitelist": true,
+                    "reason": "will deal with it later"
+                }
+            }
+        }
+    ]
+}
