@@ -17,6 +17,7 @@ docker \
 """
 
 import httplib
+import json
 import os
 import sys
 import urllib
@@ -39,16 +40,15 @@ class Vulnerability(object):
 
     vulnerabilities_by_severity = {}
 
-    def __init__(self, cve_id, severity):
+    def __init__(self, vulnerability):
         object.__init__(self)
+
+        self.vulnerability = vulnerability
 
         cls = type(self)
 
-        if cve_id in cls.vulnerabilities_by_cve_id:
+        if self.cve_id in cls.vulnerabilities_by_cve_id:
             return
-
-        self.cve_id = cve_id
-        self.severity = severity
 
         cls.vulnerabilities.append(self)
 
@@ -60,6 +60,14 @@ class Vulnerability(object):
 
     def __str__(self):
         return self.cve_id
+
+    @property
+    def cve_id(self):
+        return self.vulnerability['Name']
+
+    @property
+    def severity(self):
+        return self.vulnerability['Severity']
 
 
 if __name__ == '__main__':
@@ -105,9 +113,17 @@ if __name__ == '__main__':
         for feature in features:
             vulnerabilities = feature.get('Vulnerabilities', [])
             for vulnerability in vulnerabilities:
-                Vulnerability(vulnerability['Name'], vulnerability['Severity'])
+                Vulnerability(vulnerability)
 
     for severity in Vulnerability.vulnerabilities_by_severity.keys():
-        print '%s - %d' % (severity, len(Vulnerability.vulnerabilities_by_severity[severity]))
+        print '%s - %d' % (
+            severity,
+            len(Vulnerability.vulnerabilities_by_severity[severity]),
+        )
+
+    for vulnerability in Vulnerability.vulnerabilities:
+        print '-' * 50
+        print vulnerability.cve_id
+        print json.dumps(vulnerability.vulnerability, indent=2)
 
     sys.exit(0)
