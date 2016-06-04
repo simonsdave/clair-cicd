@@ -18,7 +18,6 @@ docker \
 import httplib
 import json
 import optparse
-import os
 import sys
 import urllib
 
@@ -26,8 +25,6 @@ import requests
 
 
 class Vulnerability(object):
-
-    vulnerabilities = []
 
     vulnerabilities_by_cve_id = {}
 
@@ -40,16 +37,12 @@ class Vulnerability(object):
 
         cls = type(self)
 
-        if self.cve_id in cls.vulnerabilities_by_cve_id:
-            return
+        if self.cve_id not in cls.vulnerabilities_by_cve_id:
+            cls.vulnerabilities_by_cve_id[self.cve_id] = self
 
-        cls.vulnerabilities.append(self)
-
-        cls.vulnerabilities_by_cve_id[self.cve_id] = self
-
-        if self.severity not in cls.vulnerabilities_by_severity:
-            cls.vulnerabilities_by_severity[self.severity] = []
-        cls.vulnerabilities_by_severity[self.severity].append(self)
+            if self.severity not in cls.vulnerabilities_by_severity:
+                cls.vulnerabilities_by_severity[self.severity] = []
+            cls.vulnerabilities_by_severity[self.severity].append(self)
 
     def __str__(self):
         return self.cve_id
@@ -100,35 +93,30 @@ class CommandLineParser(optparse.OptionParser):
         return (clo, cla)
 
 
-if __name__ == '__main__':
+class Layer(object):
 
-    clp = CommandLineParser()
-    (clo, cla) = clp.parse_args()
+    def __init__(self, id):
+        object.__init__(self)
 
-    url = '%s/images/%s/history' % (
-        clo.docker_remote_api_endpoint,
-        urllib.quote_plus(cla[0]),
-    )
-    response = requests.get(url)
-    if response.status_code != httplib.OK:
-        msg = "Couldn't get image history for '%s' (%s)\n" % (
-            cla[0],
-            response.status_code,
-        )
-        sys.stderr.write(msg)
-        sys.exit(1)
+        self.id = id
 
-    layers = [layer['Id'] for layer in response.json()]
+        self._vulnerabilities_loaded = False
 
-    for layer in layers:
+    def __str__(self):
+        return self.id
+
+    def load_vulnerabilities(self):
+        assert not self._vulnerabilities_loaded
+        self._vulnerabilities_loaded = True
+
         url = '%s/v1/layers/%s?vulnerabilities' % (
             clo.clair_endpoint,
-            layer,
+            self.id,
         )
         response = requests.get(url)
         if response.status_code != httplib.OK:
             msg = "Couldn't get vulnerabilities for layer '%s' (%s)\n" % (
-                layer,
+                self.id,
                 response.status_code,
             )
             sys.stderr.write(msg)
@@ -140,13 +128,48 @@ if __name__ == '__main__':
             for vulnerability in vulnerabilities:
                 Vulnerability(vulnerability)
 
+
+class Layers(list):
+
+    def __init__(self, docker_image):
+        list.__init__(self)
+
+        self.docker_image = docker_image
+
+        url = '%s/images/%s/history' % (
+            clo.docker_remote_api_endpoint,
+            urllib.quote_plus(self.docker_image),
+        )
+        response = requests.get(url)
+        if response.status_code != httplib.OK:
+            msg = "Couldn't get image history for '%s' (%s)\n" % (
+                self.docker_image,
+                response.status_code,
+            )
+            sys.stderr.write(msg)
+            sys.exit(1)
+
+        for layer in response.json():
+            self.append(Layer(layer['Id']))
+
+
+if __name__ == '__main__':
+
+    clp = CommandLineParser()
+    (clo, cla) = clp.parse_args()
+
+    docker_image = cla[0]
+
+    for layer in Layers(docker_image):
+        layer.load_vulnerabilities()
+
     for severity in Vulnerability.vulnerabilities_by_severity.keys():
         print '%s - %d' % (
             severity,
             len(Vulnerability.vulnerabilities_by_severity[severity]),
         )
 
-    for vulnerability in Vulnerability.vulnerabilities:
+    for vulnerability in Vulnerability.vulnerabilities_by_cve_id.values():
         print '-' * 50
         print vulnerability.cve_id
         print json.dumps(vulnerability.vulnerability, indent=2)
