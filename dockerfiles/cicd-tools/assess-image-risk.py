@@ -15,13 +15,10 @@ docker \
     assess-image-risk.py --drapi http://172.17.42.1:2375 --clair http://clair:6060 simonsdave/ecs-services:latest
 """
 
-import httplib
 import json
 import optparse
+import os
 import sys
-import urllib
-
-import requests
 
 
 class Vulnerability(object):
@@ -95,10 +92,10 @@ class CommandLineParser(optparse.OptionParser):
 
 class Layer(object):
 
-    def __init__(self, id):
+    def __init__(self, filename):
         object.__init__(self)
 
-        self.id = id
+        self.filename = filename
 
         self._vulnerabilities_loaded = False
 
@@ -109,48 +106,21 @@ class Layer(object):
         assert not self._vulnerabilities_loaded
         self._vulnerabilities_loaded = True
 
-        url = '%s/v1/layers/%s?vulnerabilities' % (
-            clo.clair_endpoint,
-            self.id,
-        )
-        response = requests.get(url)
-        if response.status_code != httplib.OK:
-            msg = "Couldn't get vulnerabilities for layer '%s' (%s)\n" % (
-                self.id,
-                response.status_code,
-            )
-            sys.stderr.write(msg)
-            sys.exit(1)
-
-        features = response.json().get('Layer', {}).get('Features', [])
-        for feature in features:
-            vulnerabilities = feature.get('Vulnerabilities', [])
-            for vulnerability in vulnerabilities:
-                Vulnerability(vulnerability)
+        with open(self.filename) as fp:
+            features = json.load(fp).get('Layer', {}).get('Features', [])
+            for feature in features:
+                vulnerabilities = feature.get('Vulnerabilities', [])
+                for vulnerability in vulnerabilities:
+                    Vulnerability(vulnerability)
 
 
 class Layers(list):
 
-    def __init__(self, docker_image):
+    def __init__(self, directory):
         list.__init__(self)
 
-        self.docker_image = docker_image
-
-        url = '%s/images/%s/history' % (
-            clo.docker_remote_api_endpoint,
-            urllib.quote_plus(self.docker_image),
-        )
-        response = requests.get(url)
-        if response.status_code != httplib.OK:
-            msg = "Couldn't get image history for '%s' (%s)\n" % (
-                self.docker_image,
-                response.status_code,
-            )
-            sys.stderr.write(msg)
-            sys.exit(1)
-
-        for layer in response.json():
-            self.append(Layer(layer['Id']))
+        for filename in os.listdir(directory):
+            self.append(Layer(os.path.join(directory, filename)))
 
 
 if __name__ == '__main__':
@@ -158,9 +128,7 @@ if __name__ == '__main__':
     clp = CommandLineParser()
     (clo, cla) = clp.parse_args()
 
-    docker_image = cla[0]
-
-    for layer in Layers(docker_image):
+    for layer in Layers(cla[0]):
         layer.load_vulnerabilities()
 
     for severity in Vulnerability.vulnerabilities_by_severity.keys():

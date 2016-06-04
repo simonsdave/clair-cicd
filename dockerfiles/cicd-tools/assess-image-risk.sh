@@ -70,10 +70,23 @@ do
 
     PREVIOUS_LAYER=$LAYER
 
-    rm "$BODY"
-
     echo_if_verbose "successfully created clair layer '$LAYER'"
 done
 
-"$SCRIPT_DIR_NAME/assess-image-risk.py" --drapi "$DOCKER_REMOTE_API_ENDPOINT" --clair "$CLAIR_ENDPOINT" "$DOCKER_IMAGE"
+VULNERABILTIES_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
+
+for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE | tac)
+do
+    HTTP_STATUS_CODE=$(curl \
+        -s \
+        -o "$VULNERABILTIES_DIR/$LAYER" \
+        -w '%{http_code}' \
+        "$CLAIR_ENDPOINT/v1/layers/$LAYER?vulnerabilities")
+    if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "200" ]; then
+        echo "error getting vulnerabilities for layer '$LAYER'" >&2
+        exit 1
+    fi
+done
+
+"$SCRIPT_DIR_NAME/assess-image-risk.py" "$VULNERABILTIES_DIR"
 exit $?
