@@ -32,7 +32,5 @@ RUN apt-get install -y python-dev
 RUN apt-get install -y python-pip
 RUN pip install pip==1.5.6
 
-ADD clair-layers-template-no-parent.json /usr/local/bin/clair-layers-template-no-parent.json
-ADD clair-layers-template-with-parent.json /usr/local/bin/clair-layers-template-with-parent.json
 ADD assess-image-risk.sh /usr/local/bin/assess-image-risk.sh
 ADD assess-image-risk.py /usr/local/bin/assess-image-risk.py 

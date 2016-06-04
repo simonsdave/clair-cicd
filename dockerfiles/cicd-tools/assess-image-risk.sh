@@ -32,6 +32,9 @@ fi
 
 DOCKER_IMAGE=${1:-}
 
+CLAIR_ENDPOINT=http://clair:6060
+DOCKER_REMOTE_API_ENDPOINT=http://172.17.42.1:2375
+
 echo_if_verbose "saving docker image '$DOCKER_IMAGE'"
 DOCKER_IMAGE_EXPLODED_TAR_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" > /dev/null
@@ -47,17 +50,10 @@ do
     BODY=$(mktemp 2> /dev/null || mktemp -t DAS)
 
     if [ "$PREVIOUS_LAYER" == "" ]; then
-        BODY_TEMPLATE=$SCRIPT_DIR_NAME/clair-layers-template-with-parent.json
+        echo "{\"Layer\": {\"Name\": \"$LAYER\", \"Path\": \"$DOCKER_IMAGE_EXPLODED_TAR_DIR/$LAYER/layer.tar\", \"Format\": \"Docker\"}}" > "$BODY"
     else
-        BODY_TEMPLATE=$SCRIPT_DIR_NAME/clair-layers-template-with-parent.json
+        echo "{\"Layer\": {\"Name\": \"$LAYER\", \"Path\": \"$DOCKER_IMAGE_EXPLODED_TAR_DIR/$LAYER/layer.tar\", \"ParentName\": \"$PREVIOUS_LAYER\", \"Format\": \"Docker\"}}" > "$BODY"
     fi
-
-    SED_SCRIPT=$(mktemp 2> /dev/null || mktemp -t DAS)
-    echo "s|%NAME%|$LAYER|g" >> "$SED_SCRIPT"
-    echo "s|%PATH%|$DOCKER_IMAGE_EXPLODED_TAR_DIR/$LAYER/layer.tar|g" >> "$SED_SCRIPT"
-    echo "s|%PARENTNAME%|$PREVIOUS_LAYER|g" >> "$SED_SCRIPT"
-    cat "$BODY_TEMPLATE" | sed -f "$SED_SCRIPT" > "$BODY"
-    rm "$SED_SCRIPT"
 
     HTTP_STATUS_CODE=$(curl \
         -s \
@@ -66,7 +62,7 @@ do
         -H 'Content-Type: application/json' \
         -w '%{http_code}' \
         --data-binary @"$BODY" \
-        http://clair:6060/v1/layers)
+        $CLAIR_ENDPOINT/v1/layers)
     if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "201" ]; then
         echo "error creating clair layer '$LAYER'" >&2
         exit 1
@@ -79,5 +75,5 @@ do
     echo_if_verbose "successfully created clair layer '$LAYER'"
 done
 
-"$SCRIPT_DIR_NAME/assess-image-risk.py" --drapi "http://172.17.42.1:2375" --clair "http://clair:6060" "$DOCKER_IMAGE"
+"$SCRIPT_DIR_NAME/assess-image-risk.py" --drapi "$DOCKER_REMOTE_API_ENDPOINT" --clair "$CLAIR_ENDPOINT" "$DOCKER_IMAGE"
 exit $?
