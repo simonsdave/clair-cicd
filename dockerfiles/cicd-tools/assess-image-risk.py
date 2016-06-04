@@ -11,25 +11,18 @@ docker \
     --link clair-52d5afeb97ad0757:clair \
     -v /tmp:/tmp \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -v $PWD:/dave \
     simonsdave/clair-cicd-tools \
-    assess-image-risk.py http://172.17.42.1:2375 http://clair:6060 simonsdave/ecs-services:latest
+    assess-image-risk.py --drapi http://172.17.42.1:2375 --clair http://clair:6060 simonsdave/ecs-services:latest
 """
 
 import httplib
 import json
+import optparse
 import os
 import sys
 import urllib
 
 import requests
-
-
-def _usage():
-    """Write a high level usage message to stderr."""
-    fmt = 'usage: %s <docker endpoint> <clair endpoint> <image>\n'
-    msg = fmt % os.path.split(sys.argv[0])[1]
-    sys.stderr.write(msg)
 
 
 class Vulnerability(object):
@@ -70,24 +63,56 @@ class Vulnerability(object):
         return self.vulnerability['Severity']
 
 
+class CommandLineParser(optparse.OptionParser):
+
+    def __init__(self):
+
+        optparse.OptionParser.__init__(
+            self,
+            'usage: %prog [options] <docker image>',
+            description='cli to analyze results of Clair identified vulnerabilities')
+
+        default = 'http://172.17.42.1:2375'
+        help = 'drapi - default = %s' % default
+        self.add_option(
+            '--drapi',
+            action='store',
+            dest='docker_remote_api_endpoint',
+            default=default,
+            type='string',
+            help=help)
+
+        default = 'http://clair:6060'
+        help = 'clair - default = %s' % default
+        self.add_option(
+            '--clair',
+            action='store',
+            dest='clair_endpoint',
+            default=default,
+            type='string',
+            help=help)
+
+    def parse_args(self, *args, **kwargs):
+        (clo, cla) = optparse.OptionParser.parse_args(self, *args, **kwargs)
+        if len(cla) != 1:
+            self.error('no docker image')
+
+        return (clo, cla)
+
+
 if __name__ == '__main__':
 
-    if len(sys.argv) != 4:
-        _usage()
-        sys.exit(1)
-
-    docker_remote_api_endpoint = sys.argv[1]
-    clair_endpoint = sys.argv[2]
-    docker_image = sys.argv[3]
+    clp = CommandLineParser()
+    (clo, cla) = clp.parse_args()
 
     url = '%s/images/%s/history' % (
-        docker_remote_api_endpoint,
-        urllib.quote_plus(docker_image),
+        clo.docker_remote_api_endpoint,
+        urllib.quote_plus(cla[0]),
     )
     response = requests.get(url)
     if response.status_code != httplib.OK:
         msg = "Couldn't get image history for '%s' (%s)\n" % (
-            docker_image,
+            cla[0],
             response.status_code,
         )
         sys.stderr.write(msg)
@@ -97,7 +122,7 @@ if __name__ == '__main__':
 
     for layer in layers:
         url = '%s/v1/layers/%s?vulnerabilities' % (
-            clair_endpoint,
+            clo.clair_endpoint,
             layer,
         )
         response = requests.get(url)

@@ -79,5 +79,5 @@ do
     echo_if_verbose "successfully created clair layer '$LAYER'"
 done
 
-"$SCRIPT_DIR_NAME/assess-image-risk.py" "http://172.17.42.1:2375" "http://clair:6060" "$DOCKER_IMAGE"
+"$SCRIPT_DIR_NAME/assess-image-risk.py" --drapi "http://172.17.42.1:2375" --clair "http://clair:6060" "$DOCKER_IMAGE"
 exit $?
