@@ -38,10 +38,16 @@ fi
 
 DOCKER_IMAGE_TO_ANALYZE=${1:-}
 
+#
+# general configuration
+#
 CLAIR_DATABASE_IMAGE=simonsdave/clair-database:latest
 CLAIR_IMAGE=quay.io/coreos/clair:latest
 CLAIR_CICD_TOOLS_IMAGE=simonsdave/clair-cicd-tools:latest
 
+#
+# pull image and spin up clair database
+#
 echo_if_verbose "pulling clair database image '$CLAIR_DATABASE_IMAGE'"
 docker pull $CLAIR_DATABASE_IMAGE > /dev/null
 if [ $? != 0 ]; then
@@ -59,6 +65,9 @@ if [ $? != 0 ]; then
 fi
 echo_if_verbose "successfully started clair database container"
 
+#
+# pull image and spin up clair
+#
 CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 CLAIR_CONFIG_YAML=$CLAIR_CONFIG_DIR/config.yaml
 
@@ -99,6 +108,73 @@ if [ $? != 0 ]; then
 fi
 echo_if_verbose "successfully started clair container '$CLAIR_CONTAINER'"
 
+CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $CLAIR_CONTAINER):6060
+
+#
+#
+#
+echo_if_verbose "saving docker image '$DOCKER_IMAGE_TO_ANALYZE'"
+DOCKER_IMAGE_EXPLODED_TAR_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
+pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" > /dev/null
+docker save $DOCKER_IMAGE_TO_ANALYZE | tar xv > /dev/null
+popd > /dev/null
+echo_if_verbose "successfully saved docker image '$DOCKER_IMAGE_TO_ANALYZE'"
+
+#
+#
+#
+PREVIOUS_LAYER=""
+for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | tac)
+do
+    echo_if_verbose "creating clair layer '$LAYER'"
+
+    BODY=$(mktemp 2> /dev/null || mktemp -t DAS)
+
+    if [ "$PREVIOUS_LAYER" == "" ]; then
+        echo "{\"Layer\": {\"Name\": \"$LAYER\", \"Path\": \"$DOCKER_IMAGE_EXPLODED_TAR_DIR/$LAYER/layer.tar\", \"Format\": \"Docker\"}}" > "$BODY"
+    else
+        echo "{\"Layer\": {\"Name\": \"$LAYER\", \"Path\": \"$DOCKER_IMAGE_EXPLODED_TAR_DIR/$LAYER/layer.tar\", \"ParentName\": \"$PREVIOUS_LAYER\", \"Format\": \"Docker\"}}" > "$BODY"
+    fi
+
+    HTTP_STATUS_CODE=$(curl \
+        -s \
+        -o /dev/null \
+        -X POST \
+        -H 'Content-Type: application/json' \
+        -w '%{http_code}' \
+        --data-binary @"$BODY" \
+        $CLAIR_ENDPOINT/v1/layers)
+    if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "201" ]; then
+        echo "error creating clair layer '$LAYER'" >&2
+        exit 1
+    fi
+
+    PREVIOUS_LAYER=$LAYER
+
+    echo_if_verbose "successfully created clair layer '$LAYER'"
+done
+
+#
+#
+#
+VULNERABILTIES_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
+
+for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | tac)
+do
+    HTTP_STATUS_CODE=$(curl \
+        -s \
+        -o "$VULNERABILTIES_DIR/$LAYER" \
+        -w '%{http_code}' \
+        "$CLAIR_ENDPOINT/v1/layers/$LAYER?vulnerabilities")
+    if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "200" ]; then
+        echo "error getting vulnerabilities for layer '$LAYER'" >&2
+        exit 1
+    fi
+done
+
+#
+# pull and spin up ci/cd tools
+#
 echo_if_verbose "pulling clair ci/cd tools image '$CLAIR_CICD_TOOLS_IMAGE'"
 docker pull $CLAIR_CICD_TOOLS_IMAGE > /dev/null
 if [ $? != 0 ]; then
@@ -107,22 +183,29 @@ if [ $? != 0 ]; then
 fi
 echo_if_verbose "successfully pulled clair ci/cd tools image"
 
+CLAIR_CICD_TOOLS_CONTAINER=clair-cicd-tools-$(openssl rand -hex 8)
 docker \
     run \
-    --rm \
-    --link $CLAIR_CONTAINER:clair \
-    -v /tmp:/tmp \
-    -v /var/run/docker.sock:/var/run/docker.sock \
+    --name $CLAIR_CICD_TOOLS_CONTAINER \
+    -v "$VULNERABILTIES_DIR":/vulnerabilities \
     $CLAIR_CICD_TOOLS_IMAGE \
-    assess-image-risk.sh $VERBOSE_FLAG $DOCKER_IMAGE_TO_ANALYZE
+    assess-image-risk.py $VERBOSE_FLAG /vulnerabilities
+
+EXIT_CODE=$(docker inspect --format '{{ .State.ExitCode }}' $CLAIR_CICD_TOOLS_CONTAINER)
 
 #
-# cleanup ...
+# a little bit of cleanup
 #
+docker kill $CLAIR_CICD_TOOLS_CONTAINER > /dev/null
+docker rm $CLAIR_CICD_TOOLS_CONTAINER > /dev/null
+
 docker kill $CLAIR_CONTAINER > /dev/null
 docker rm $CLAIR_CONTAINER > /dev/null
 
 docker kill $CLAIR_DATABASE_CONTAINER > /dev/null
 docker rm $CLAIR_DATABASE_CONTAINER > /dev/null
 
-exit 0
+#
+# we're all done:-)
+#
+exit $EXIT_CODE

@@ -20,17 +20,12 @@ MAINTAINER Dave Simons
 
 RUN apt-get update -y
 
-# assess-image-risk.sh needs the docker client
-RUN apt-get install -y docker.io
-
 # assess-image-risk.sh needs curl
 RUN apt-get install -y curl
 
 # basic stuff to get python going
 RUN apt-get install -y python
-RUN apt-get install -y python-dev
 RUN apt-get install -y python-pip
 RUN pip install pip==1.5.6
 
-ADD assess-image-risk.sh /usr/local/bin/assess-image-risk.sh
 ADD assess-image-risk.py /usr/local/bin/assess-image-risk.py 
