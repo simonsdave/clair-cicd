@@ -40,7 +40,7 @@ setup(
         'clair_cicd',
     ],
     scripts=[
-        'dockerfiles/cicd-tools/assess-vulnerabilities.py',
+        'bin/assess-vulnerabilities.py',
     ],
     install_requires=[
         "jsonschema==2.5.1",

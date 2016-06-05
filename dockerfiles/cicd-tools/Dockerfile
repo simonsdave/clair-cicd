@@ -4,7 +4,11 @@
 #
 # to run the image
 #
-#   docker run -v /tmp:/tmp simonsdave/clair-cicd-tools analyze-local-images -v
+#   docker \
+#       run \
+#       -v $PWD/vulnerabilities:/vulnerabilities \
+#       simonsdave/clair-cicd-tools \
+#       assess-vulnerabilities.py -v /vulnerabilities
 #
 # for testing/debugging
 #
@@ -20,12 +24,13 @@ MAINTAINER Dave Simons
 
 RUN apt-get update -y
 
-# assess-image-risk.sh needs curl
-RUN apt-get install -y curl
-
 # basic stuff to get python going
 RUN apt-get install -y python
 RUN apt-get install -y python-pip
 RUN pip install pip==1.5.6
 
-ADD assess-vulnerabilities.py /usr/local/bin/assess-vulnerabilities.py
+COPY package.tar.gz /tmp/package.tar.gz
+
+RUN pip install --process-dependency-links /tmp/package.tar.gz
+
+RUN rm /tmp/package.tar.gz
