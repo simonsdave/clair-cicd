@@ -41,6 +41,8 @@ out a change
 ## Key Concepts
 
 * vulnerabilities
+* docker image
+* static vulnerability analysis
 * vulnerability whitelist
 * service profile
 
@@ -60,7 +62,7 @@ service's CI script.
 Part of the CI script's responsibility is to build
 ```username/repo:tag``` and then push ```username/repo:tag```
 to a docker registry.
-The single line of code should appear after
+The single line of ```clair-cicd``` code should appear after
 ```username/repo:tag``` is built but
 before ```username/repo:tag``` is pushed to a docker registry.
 In this simple case, ```assess-image-risk.sh``` returns a zero
@@ -72,16 +74,32 @@ ie. the build should fail before ```username/repo:tag```
 is pushed to a docker registry.
 
 ```bash
-curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s "username/repo:tag"
+curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s -- "username/repo:tag"
 ```
 
 ### Adding a Vulnerability Whitelist
 
-What if a high vulnerability existed in
-a tool that was part of ou wanted ```assess-image-risk.sh```
-to fail
+Consider this scenario:
 
-* security analyst defines vulnerability whitelist
+* a high severity vulnerability exists
+in a command line utility that's part of ```username/repo:tag```
+* you have a 100% confidence that the utility will never be used
+
+Following the steps described in the previous section
+would result in the CI process failing because the high severity
+vulnerability would be detected. But this failure seems
+inappropriate given the knowledge that the command line
+tool with the vulnerability would never be used.
+Enter ```clair-cicd's``` whitelists.
+
+Whitelists are json documents which allow security analysts
+to influence ```clair-cicd's``` vulnerability assessment.
+Whitelist expectations:
+
+* maintained by security analyst **not** service engineer
+* checked into source code control and appropriate change
+management process used to make changes (code reviews, feature
+branches, etc)
 
 ### Adding a Service Profile
 
@@ -91,6 +109,7 @@ to fail
 
 Assumptions/requirements:
 
+* bash & curl are available
 * docker daemon is installed and running
 * docker remote API is running on ```http://172.17.42.1:2375```
 * all testing and dev has been done on Ubuntu 14.04 so no promises about other
@@ -98,15 +117,23 @@ platforms (feedback on this would be very helpful)
 
 There are 4 moving pieces:
 
-1. ```assess-image-risk.sh``` is bash script which does all
+1. ```assess-image-risk.sh``` is bash script which does
 the heavy lifting to co-ordinate
 the interaction of the 3 other moving pieces
 1. the [Clair](https://github.com/coreos/clair) service which
-is packaged inside the docker image [quay.io/coreos/clair:latest]()
+is packaged inside the docker image [quay.io/coreos/clair:latest](https://quay.io/repository/coreos/clair?tag=latest)
 1. [Clair's](https://github.com/coreos/clair) vulnerability database
-which is packaged inside the docker image [simonsdave/clair-database:latest]().
-A [Travis Cron Job](https://docs.travis-ci.com/user/cron-jobs/)
-is used to rebuild [simonsdave/clair-database:latest]() daily to ensure
-the vulnerability database is kept current.
-1. a set of scripts Python and Bash scripts packaged in the
-[simonsdave/clair-cicd-tools:latest]() docker image
+which is packaged inside the docker image
+[simonsdave/clair-database:latest](https://hub.docker.com/r/simonsdave/clair-database/) -
+a [Travis Cron Job](https://docs.travis-ci.com/user/cron-jobs/)
+is used to rebuild
+[simonsdave/clair-database:latest](https://hub.docker.com/r/simonsdave/clair-database/)
+daily to ensure
+the vulnerability database is kept current
+1. a set of Python and Bash vulnerability analysis scripts packaged in the
+[simonsdave/clair-cicd-tools:latest](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
+docker image
+
+## References
+
+* [FIVE SECRETS AND TWO COMMON “GOTCHAS” OF VULNERABILITY SCANNING](https://www.kennasecurity.com/resources/secrets-gotchas-of-vuln-scanning)
