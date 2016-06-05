@@ -28,4 +28,4 @@ RUN apt-get install -y python
 RUN apt-get install -y python-pip
 RUN pip install pip==1.5.6
 
-ADD assess-image-risk.py /usr/local/bin/assess-image-risk.py 
+ADD assess-vulnerabilities.py /usr/local/bin/assess-vulnerabilities.py
