@@ -62,24 +62,12 @@ class CommandLineParser(optparse.OptionParser):
             'usage: %prog [options] <docker image>',
             description='cli to analyze results of Clair identified vulnerabilities')
 
-        default = 'http://172.17.42.1:2375'
-        help = 'drapi - default = %s' % default
+        help = 'verbose - default = false'
         self.add_option(
-            '--drapi',
-            action='store',
-            dest='docker_remote_api_endpoint',
-            default=default,
-            type='string',
-            help=help)
-
-        default = 'http://clair:6060'
-        help = 'clair - default = %s' % default
-        self.add_option(
-            '--clair',
-            action='store',
-            dest='clair_endpoint',
-            default=default,
-            type='string',
+            '--verbose',
+            '-v',
+            action='store_false',
+            dest='verbose',
             help=help)
 
     def parse_args(self, *args, **kwargs):
