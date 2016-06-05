@@ -12,6 +12,28 @@ import os
 import sys
 
 
+class Whitelist(object):
+
+    def __init__(self, filename):
+        object.__init__(self)
+
+        self.filename = filename
+
+        if self.filename:
+            try:
+                with open(self.filename) as fp:
+                    self.whitelist = json.load(fp)
+                    # :TODO: validate whitelist with jsonschema
+            except Exception:
+                msg = "Could not read whitelist from '%s'\n" % self.filename
+                sys.stderr.write(msg)
+                sys.exit(1)
+
+    @property
+    def ignoreSevertiesAtOrBelow(self):
+        return self.whitelist('ignoreSevertiesAtOrBelow', 'Medium')
+
+
 class Vulnerability(object):
 
     vulnerabilities_by_cve_id = {}
@@ -44,6 +66,44 @@ class Vulnerability(object):
         return self.vulnerability['Severity']
 
 
+class Layer(object):
+
+    def __init__(self, filename):
+        object.__init__(self)
+
+        self.filename = filename
+
+        self._vulnerabilities_loaded = False
+
+    def __str__(self):
+        return self.id
+
+    def load_vulnerabilities(self):
+        assert not self._vulnerabilities_loaded
+        self._vulnerabilities_loaded = True
+
+        try:
+            with open(self.filename) as fp:
+                features = json.load(fp).get('Layer', {}).get('Features', [])
+                for feature in features:
+                    vulnerabilities = feature.get('Vulnerabilities', [])
+                    for vulnerability in vulnerabilities:
+                        Vulnerability(vulnerability)
+        except Exception:
+            msg = "Could not read vulnerabilities from '%s'\n" % self.filename
+            sys.stderr.write(msg)
+            sys.exit(1)
+
+
+class Layers(list):
+
+    def __init__(self, directory):
+        list.__init__(self)
+
+        for filename in os.listdir(directory):
+            self.append(Layer(os.path.join(directory, filename)))
+
+
 class CommandLineParser(optparse.OptionParser):
 
     def __init__(self):
@@ -61,6 +121,17 @@ class CommandLineParser(optparse.OptionParser):
             dest='verbose',
             help=help)
 
+        default = None
+        help = 'whitelist - default = %s' % default
+        self.add_option(
+            '--whitelist',
+            '--wl',
+            action='store',
+            dest='whitelist',
+            default=default,
+            type='string',
+            help=help)
+
     def parse_args(self, *args, **kwargs):
         (clo, cla) = optparse.OptionParser.parse_args(self, *args, **kwargs)
         if len(cla) != 1:
@@ -69,43 +140,12 @@ class CommandLineParser(optparse.OptionParser):
         return (clo, cla)
 
 
-class Layer(object):
-
-    def __init__(self, filename):
-        object.__init__(self)
-
-        self.filename = filename
-
-        self._vulnerabilities_loaded = False
-
-    def __str__(self):
-        return self.id
-
-    def load_vulnerabilities(self):
-        assert not self._vulnerabilities_loaded
-        self._vulnerabilities_loaded = True
-
-        with open(self.filename) as fp:
-            features = json.load(fp).get('Layer', {}).get('Features', [])
-            for feature in features:
-                vulnerabilities = feature.get('Vulnerabilities', [])
-                for vulnerability in vulnerabilities:
-                    Vulnerability(vulnerability)
-
-
-class Layers(list):
-
-    def __init__(self, directory):
-        list.__init__(self)
-
-        for filename in os.listdir(directory):
-            self.append(Layer(os.path.join(directory, filename)))
-
-
 if __name__ == '__main__':
 
     clp = CommandLineParser()
     (clo, cla) = clp.parse_args()
+
+    wl = Whitelist(clo.whitelist)
 
     for layer in Layers(cla[0]):
         layer.load_vulnerabilities()

@@ -40,9 +40,10 @@ setup(
         'clair_cicd',
     ],
     scripts=[
-        'bin/assess-image-risk.sh',
+        'dockerfiles/cicd-tools/assess-vulnerabilities.py',
     ],
     install_requires=[
+        "jsonschema==2.5.1",
     ],
     dependency_links=[
     ],
