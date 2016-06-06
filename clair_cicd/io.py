@@ -5,16 +5,17 @@ import sys
 from models import Whitelist
 from models import Vulnerability
 
+
 def read_whitelist(filename):
 
     if not filename:
         return Whitelist({})
 
     try:
-        with open(self.filename) as fp:
+        with open(filename) as fp:
             whitelist = Whitelist(json.load(fp))
     except Exception:
-        msg = "Could not read whitelist from '%s'\n" % self.filename
+        msg = "Could not read whitelist from '%s'\n" % filename
         sys.stderr.write(msg)
         sys.exit(1)
 

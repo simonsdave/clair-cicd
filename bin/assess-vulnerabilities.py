@@ -8,7 +8,6 @@ exceed an acceptable threshold.
 
 import json
 import optparse
-import os
 import sys
 
 from clair_cicd import io
