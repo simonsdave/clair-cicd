@@ -11,97 +11,7 @@ import optparse
 import os
 import sys
 
-
-class Whitelist(object):
-
-    def __init__(self, filename):
-        object.__init__(self)
-
-        self.filename = filename
-
-        if self.filename:
-            try:
-                with open(self.filename) as fp:
-                    self.whitelist = json.load(fp)
-                    # :TODO: validate whitelist with jsonschema
-            except Exception:
-                msg = "Could not read whitelist from '%s'\n" % self.filename
-                sys.stderr.write(msg)
-                sys.exit(1)
-
-    @property
-    def ignoreSevertiesAtOrBelow(self):
-        return self.whitelist('ignoreSevertiesAtOrBelow', 'Medium')
-
-
-class Vulnerability(object):
-
-    vulnerabilities_by_cve_id = {}
-
-    vulnerabilities_by_severity = {}
-
-    def __init__(self, vulnerability):
-        object.__init__(self)
-
-        self.vulnerability = vulnerability
-
-        cls = type(self)
-
-        if self.cve_id not in cls.vulnerabilities_by_cve_id:
-            cls.vulnerabilities_by_cve_id[self.cve_id] = self
-
-            if self.severity not in cls.vulnerabilities_by_severity:
-                cls.vulnerabilities_by_severity[self.severity] = []
-            cls.vulnerabilities_by_severity[self.severity].append(self)
-
-    def __str__(self):
-        return self.cve_id
-
-    @property
-    def cve_id(self):
-        return self.vulnerability['Name']
-
-    @property
-    def severity(self):
-        return self.vulnerability['Severity']
-
-
-class Layer(object):
-
-    def __init__(self, filename):
-        object.__init__(self)
-
-        self.filename = filename
-
-        self._vulnerabilities_loaded = False
-
-    def __str__(self):
-        return self.id
-
-    def load_vulnerabilities(self):
-        assert not self._vulnerabilities_loaded
-        self._vulnerabilities_loaded = True
-
-        try:
-            with open(self.filename) as fp:
-                features = json.load(fp).get('Layer', {}).get('Features', [])
-                for feature in features:
-                    vulnerabilities = feature.get('Vulnerabilities', [])
-                    for vulnerability in vulnerabilities:
-                        Vulnerability(vulnerability)
-        except Exception:
-            msg = "Could not read vulnerabilities from '%s'\n" % self.filename
-            sys.stderr.write(msg)
-            sys.exit(1)
-
-
-class Layers(list):
-
-    def __init__(self, directory):
-        list.__init__(self)
-
-        for filename in os.listdir(directory):
-            self.append(Layer(os.path.join(directory, filename)))
+from clair_cicd import io
 
 
 class CommandLineParser(optparse.OptionParser):
@@ -145,25 +55,14 @@ if __name__ == '__main__':
     clp = CommandLineParser()
     (clo, cla) = clp.parse_args()
 
-    wl = Whitelist(clo.whitelist)
-
-    for layer in Layers(cla[0]):
-        layer.load_vulnerabilities()
+    whitelist = io.read_whitelist(clo.whitelist)
+    vulnerabilities = io.read_vulnerabilities(cla[0])
 
     if clo.verbose:
         indent = '-' * 50
 
-        print indent
-
-        for severity in Vulnerability.vulnerabilities_by_severity.keys():
-            print '%s - %d' % (
-                severity,
-                len(Vulnerability.vulnerabilities_by_severity[severity]),
-            )
-
-        for vulnerability in Vulnerability.vulnerabilities_by_cve_id.values():
+        for vulnerability in vulnerabilities:
             print indent
-            print vulnerability.cve_id
             print json.dumps(vulnerability.vulnerability, indent=2)
 
         print indent

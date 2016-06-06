@@ -171,6 +171,8 @@ do
         exit 1
     fi
 done
+echo $VULNERABILTIES_DIR
+exit 0
 
 #
 # pull and spin up ci/cd tools
