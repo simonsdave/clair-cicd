@@ -1,3 +1,27 @@
+class Severity(object):
+
+    severity_as_strs = [
+        'negligible',
+        'low',
+        'medium',
+        'high',
+    ]
+
+    def __init__(self, severity_as_str):
+        object.__init__(self)
+
+        self.severity = type(self).severity_as_strs.index(severity_as_str.strip().lower())
+
+    def __hash__(self):
+        return self.severity
+
+    def __lt__(self, other):
+        return self.severity < other.severity
+
+    def __le__(self, other):
+        return self.severity <= other.severity
+
+
 class Whitelist(object):
 
     def __init__(self, whitelist):
@@ -7,7 +31,7 @@ class Whitelist(object):
 
     @property
     def ignoreSevertiesAtOrBelow(self):
-        return self.whitelist('ignoreSevertiesAtOrBelow', 'Medium')
+        return Severity(self.whitelist.get('ignoreSevertiesAtOrBelow', 'Medium'))
 
 
 class Vulnerability(object):
@@ -26,4 +50,4 @@ class Vulnerability(object):
 
     @property
     def severity(self):
-        return self.vulnerability['Severity']
+        return Severity(self.vulnerability['Severity'])
