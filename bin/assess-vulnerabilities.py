@@ -66,4 +66,8 @@ if __name__ == '__main__':
 
         print indent
 
+    for vulnerability in vulnerabilities:
+        if whitelist.ignoreSevertiesAtOrBelow < vulnerability.severity:
+            sys.exit(1)
+
     sys.exit(0)
