@@ -2,6 +2,7 @@ import unittest
 
 from ..models import Severity
 
+
 class SeverityTestCase(unittest.TestCase):
 
     def test_hash(self):
