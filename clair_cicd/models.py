@@ -50,4 +50,7 @@ class Vulnerability(object):
 
     @property
     def severity(self):
+        # "Severity":"Low","Metadata":{"NVD":{"CVSSv2":{"Score":1.9,"Vectors":"AV:L/AC:M/Au:N/C:N/I:N"}}}
+        # use Severity if it exists otherwise uses Score where low = 0.0-3.9,
+        # medium = 4.0-6.9, high = 7.0-10.0
         return Severity(self.vulnerability['Severity'])
