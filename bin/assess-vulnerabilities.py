@@ -11,6 +11,7 @@ import optparse
 import sys
 
 from clair_cicd import io
+from clair_cicd.assessor import VulnerabilitiesRiskAssessor
 
 
 class CommandLineParser(optparse.OptionParser):
@@ -55,7 +56,8 @@ if __name__ == '__main__':
     (clo, cla) = clp.parse_args()
 
     whitelist = io.read_whitelist(clo.whitelist)
-    vulnerabilities = io.read_vulnerabilities(cla[0])
+    vulnerabilities_directory = cla[0]
+    vulnerabilities = io.read_vulnerabilities(vulnerabilities_directory)
 
     if clo.verbose:
         indent = '-' * 50
@@ -66,8 +68,5 @@ if __name__ == '__main__':
 
         print indent
 
-    for vulnerability in vulnerabilities:
-        if whitelist.ignoreSevertiesAtOrBelow < vulnerability.severity:
-            sys.exit(1)
-
-    sys.exit(0)
+    vra = VulnerabilitiesRiskAssessor(clo.verbose, whitelist, vulnerabilities)
+    sys.exit(0 if vra.assess() else 1)
