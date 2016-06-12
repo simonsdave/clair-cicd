@@ -2,6 +2,11 @@
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
+TAC=$(where tac)
+if [ "$TAC" == "" ]; then
+    TAC="tail -r"
+fi
+
 echo_if_verbose() {
     if [ 1 -eq ${VERBOSE:-0} ]; then
         echo "$(date "+%Y-%m-%d %k:%M:%S") ${1:-}"
@@ -124,7 +129,7 @@ echo_if_verbose "successfully saved docker image '$DOCKER_IMAGE_TO_ANALYZE'"
 #
 #
 PREVIOUS_LAYER=""
-for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | tac)
+for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | $TAC)
 do
     echo_if_verbose "creating clair layer '$LAYER'"
 
@@ -159,7 +164,7 @@ done
 #
 VULNERABILTIES_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 
-for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | tac)
+for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | $TAC)
 do
     HTTP_STATUS_CODE=$(curl \
         -s \
