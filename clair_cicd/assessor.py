@@ -13,6 +13,7 @@ class VulnerabilitiesRiskAssessor(object):
         """
         for vulnerability in self.vulnerabilities:
             if self.whitelist.ignoreSevertiesAtOrBelow < vulnerability.severity:
+                # :TODO: add code to check whitelist for vulnerability
                 return False
 
         return True
