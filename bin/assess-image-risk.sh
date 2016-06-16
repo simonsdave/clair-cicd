@@ -2,7 +2,7 @@
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
-TAC=$(where tac)
+TAC=$(which tac)
 if [ "$TAC" == "" ]; then
     TAC="tail -r"
 fi
