@@ -38,8 +38,10 @@ DOCKERHUB_EMAIL=${2:-}
 DOCKERHUB_PASSWORD=${3:-}
 
 CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-database:$TAG
-CLAIR_IMAGE_NAME=quay.io/coreos/clair:latest
-CLAIR_CONTAINER_NAME=clair
+# https://quay.io/repository/coreos/clair?tab=tags
+CLAIR_IMAGE_NAME=quay.io/coreos/clair:v1.2.2
+CLAIR_CONTAINER_NAME=clair-$(openssl rand -hex 8)
+CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
 DATABASE_SERVER_DOCKER_IMAGE=postgres:9.5.2
 
@@ -53,13 +55,7 @@ fi
 
 echo "successfully pulled database server docker image"
 
-CLAIR_DATABASE_CONTAINER_NAME=clair-database
-
-echo "starting database server"
-
-docker kill $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null
-docker rm $CLAIR_DATABASE_CONTAINER_NAME >& /dev/null
-
+echo "starting database server container '$CLAIR_DATABASE_CONTAINER_NAME'"
 docker \
     run \
     --name $CLAIR_DATABASE_CONTAINER_NAME \
@@ -67,15 +63,12 @@ docker \
     -d \
     $DATABASE_SERVER_DOCKER_IMAGE \
     > /dev/null
+echo "successfully started database server container"
 
-echo -n "waiting for database server to start "
+echo -n "waiting for database server in container '$CLAIR_DATABASE_CONTAINER_NAME' to start "
 for i in $(seq 1 10)
 do
-    docker \
-        exec \
-        $CLAIR_DATABASE_CONTAINER_NAME \
-        sh -c 'echo "\list" | psql -U postgres' \
-        >& /dev/null
+    docker logs $CLAIR_DATABASE_CONTAINER_NAME |& grep "database system is ready to accept connections" > /dev/null
     if [ $? == 0 ]; then
         break
     fi
@@ -94,23 +87,36 @@ docker \
     sh -c 'echo "create database clair" | psql -U postgres' \
     > /dev/null
 
+# docker \
+#     exec \
+#     $CLAIR_DATABASE_CONTAINER_NAME \
+#     sh -c 'echo "\list" | psql -U postgres' | \
+#     grep '^\s*clair' \
+#     > /dev/null
+# if [ $? != 0 ]; then
+#     echo "error creating database" >&2
+#     exit 1
+# fi
+
+echo "successfully created database"
+
+#
+# get clair running
+#
+echo "pulling clair image '$CLAIR_IMAGE_NAME'"
 docker \
-    exec \
-    $CLAIR_DATABASE_CONTAINER_NAME \
-    sh -c 'echo "\list" | psql -U postgres' | \
-    grep '^\s*clair' \
+    pull \
+    $CLAIR_IMAGE_NAME \
     > /dev/null
 if [ $? != 0 ]; then
-    echo "error creating database" >&2
+    echo "error pulling clair image '$CLAIR_IMAGE_NAME'" >&2
     exit 1
 fi
+echo "pulled clair image '$CLAIR_IMAGE_NAME'"
 
 #
 # create clair configuration that will point clair @ the database we just created
 #
-
-echo "successfully created database"
-
 CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 CLAIR_CONFIG_YAML=$CLAIR_CONFIG_DIR/config.yaml
 
@@ -131,25 +137,18 @@ sed \
 
 echo "created clair configuration"
 
-docker \
-    pull \
-    $CLAIR_IMAGE_NAME \
-    > /dev/null
-
-docker kill $CLAIR_CONTAINER_NAME >& /dev/null
-docker rm $CLAIR_CONTAINER_NAME >& /dev/null
-
+echo "creating clair container '$CLAIR_CONTAINER_NAME'"
 docker \
     run \
     -d \
     --name $CLAIR_CONTAINER_NAME \
-    -p 6060-6061:6060-6061 \
     --link $CLAIR_DATABASE_CONTAINER_NAME:clair-database \
     -v /tmp:/tmp \
     -v $CLAIR_CONFIG_DIR:/config \
     $CLAIR_IMAGE_NAME \
     -config=/config/config.yaml \
     > /dev/null
+echo "successfully created clair container"
 
 echo -n "Waiting for vulnerabilities database update to finish "
 while true
