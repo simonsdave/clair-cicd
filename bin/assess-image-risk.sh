@@ -47,7 +47,8 @@ DOCKER_IMAGE_TO_ANALYZE=${1:-}
 # general configuration
 #
 CLAIR_DATABASE_IMAGE=simonsdave/clair-database:latest
-CLAIR_IMAGE=quay.io/coreos/clair:latest
+# https://quay.io/repository/coreos/clair?tab=tags
+CLAIR_IMAGE=quay.io/coreos/clair:v1.2.2
 CLAIR_CICD_TOOLS_IMAGE=simonsdave/clair-cicd-tools:latest
 
 #
@@ -75,6 +76,7 @@ echo_if_verbose "successfully started clair database container"
 #
 CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 CLAIR_CONFIG_YAML=$CLAIR_CONFIG_DIR/config.yaml
+echo_if_verbose "clair configuration in '$CLAIR_CONFIG_YAML'"
 
 curl \
     -s \
@@ -105,7 +107,7 @@ docker run \
     -v /tmp:/tmp \
     -v $CLAIR_CONFIG_DIR:/config \
     $CLAIR_IMAGE \
-    -log-level=debug -config=/config/config.yaml \
+    -log-level=info -config=/config/config.yaml \
     > /dev/null
 if [ $? != 0 ]; then
     echo "error starting clair container '$CLAIR_CONTAINER'" >&2
