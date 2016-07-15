@@ -1,6 +1,7 @@
 class Severity(object):
 
-    severity_as_strs = [
+    # these labels need to be in order of increasing severity
+    _severity_as_strs = [
         'negligible',
         'low',
         'medium',
@@ -10,7 +11,7 @@ class Severity(object):
     def __init__(self, severity_as_str):
         object.__init__(self)
 
-        self.severity = type(self).severity_as_strs.index(severity_as_str.strip().lower())
+        self.severity = type(self)._severity_as_strs.index(severity_as_str.strip().lower())
 
     def __hash__(self):
         return self.severity
@@ -21,6 +22,12 @@ class Severity(object):
     def __le__(self, other):
         return self.severity <= other.severity
 
+    def __eq__(self, other):
+        return self.severity == other.severity
+
+    def __nq__(self, other):
+        return self.severity != other.severity
+
 
 class Whitelist(object):
 
@@ -30,7 +37,7 @@ class Whitelist(object):
         self.whitelist = whitelist
 
     @property
-    def ignoreSevertiesAtOrBelow(self):
+    def ignore_severties_at_or_below(self):
         return Severity(self.whitelist.get('ignoreSevertiesAtOrBelow', 'Medium'))
 
 

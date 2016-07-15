@@ -1,6 +1,7 @@
 import unittest
 
 from ..models import Severity
+from ..models import Whitelist
 
 
 class SeverityTestCase(unittest.TestCase):
@@ -19,3 +20,15 @@ class SeverityTestCase(unittest.TestCase):
         self.assertTrue(Severity('medium') <= Severity('medium'))
         self.assertFalse(Severity('high') <= Severity('low'))
         self.assertTrue(Severity('low') <= Severity('high'))
+
+
+class WhitelistTestCase(unittest.TestCase):
+
+    def test_ctr(self):
+        wl = {}
+        whitelist = Whitelist(wl)
+        self.assertTrue(whitelist.whitelist == wl)
+
+    def test_default_ignore_severties_at_or_below(self):
+        whitelist = Whitelist({})
+        self.assertTrue(whitelist.ignore_severties_at_or_below == Severity('medium'))
