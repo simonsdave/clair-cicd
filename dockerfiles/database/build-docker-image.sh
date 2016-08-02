@@ -39,7 +39,8 @@ DOCKERHUB_PASSWORD=${3:-}
 
 CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-database:$TAG
 # https://quay.io/repository/coreos/clair?tab=tags
-CLAIR_IMAGE_NAME=quay.io/coreos/clair:v1.2.3
+CLAIR_BRANCH=v1.2.3
+CLAIR_IMAGE_NAME=quay.io/coreos/clair:$CLAIR_BRANCH
 CLAIR_CONTAINER_NAME=clair-$(openssl rand -hex 8)
 CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
@@ -126,7 +127,7 @@ curl \
     -s \
     -o "$CLAIR_CONFIG_YAML" \
     -L \
-    https://raw.githubusercontent.com/coreos/clair/v1.2.3/config.example.yaml
+    https://raw.githubusercontent.com/coreos/clair/$CLAIR_BRANCH/config.example.yaml
 
 # postgres connection string details
 # http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
