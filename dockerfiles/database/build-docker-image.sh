@@ -157,6 +157,14 @@ do
     if [ $? == 0 ]; then
         break
     fi
+
+    docker logs $CLAIR_CONTAINER_NAME | grep "updater: an error occured" >& /dev/null
+    if [ $? == 0 ]; then
+        echo ""
+        echo "error during vulnerabilities database update" >&2
+        exit 1
+    fi
+
     echo -n "."
     sleep 15
 done
