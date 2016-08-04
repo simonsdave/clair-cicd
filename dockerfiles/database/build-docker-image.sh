@@ -82,22 +82,30 @@ echo "successfully started database server"
 
 echo "creating database"
 
-docker \
-    exec \
-    $CLAIR_DATABASE_CONTAINER_NAME \
-    sh -c 'echo "create database clair" | psql -U postgres' \
-    > /dev/null
+MAX_NUM_DATABASE_CREATE_ATTEMPTS=10
+for i in $(seq 1 $MAX_NUM_DATABASE_CREATE_ATTEMPTS)
+do
+    docker \
+        exec \
+        $CLAIR_DATABASE_CONTAINER_NAME \
+        sh -c 'echo "create database clair" | psql -U postgres' \
+        >& /dev/null
 
-# docker \
-#     exec \
-#     $CLAIR_DATABASE_CONTAINER_NAME \
-#     sh -c 'echo "\list" | psql -U postgres' | \
-#     grep '^\s*clair' \
-#     > /dev/null
-# if [ $? != 0 ]; then
-#     echo "error creating database" >&2
-#     exit 1
-# fi
+    docker \
+        exec \
+         $CLAIR_DATABASE_CONTAINER_NAME \
+         sh -c 'echo "\list" | psql -U postgres' |& \
+         grep '^\s*clair' >& dave.txt
+    if [ $? == 0 ]; then
+         break
+    fi
+
+    sleep 3
+done
+if [ $i == $MAX_NUM_DATABASE_CREATE_ATTEMPTS ]; then
+    echo "error creating database" >&2
+    exit 1
+fi
 
 echo "successfully created database"
 
