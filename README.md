@@ -16,9 +16,10 @@ and assessing images against known vulnerabilities.
 Integrating Clair into a CI/CD pipeline:
 
 1. can be complex (believe this is mostly a documentation challenge)
-1. create performance problems (building the Postgres vulnerabilities database is slow)
-1. once vulnerabilities are identified there's a lack of prescriptive
-guidance on how to act on the vulnerabilities report in an automated manner
+1. can create performance problems (building the Postgres vulnerabilities database is slow)
+1. in and of itself is insufficient from a risk assessment POV because once vulnerabilities
+are identified there's a lack of prescriptive guidance on how to act on
+the vulnerabilities report in an automated manner
 
 This repo was created to address each of the above problems.
 
@@ -31,12 +32,13 @@ pipeline should be focused on the automated generation, assessment
 and ultimately deployment of Docker images
 * understanding and assessing the risk profile of services is important
 ie. security is important
-* risk is assessed differently for *production* and *development* releases
+* risk is assessed differently for docker images that could find their
+way to *production* vs docker images that will only ever be used in *development*
 * Docker images should not be pushed to a Docker registry until
-their risk profile is understood
-* inserted into the CI/CD pipeline, Clair can be an effective
-foundation for providing an automated assessment of a Docker image's
-vulnerabilities before the image is pushed to a Docker registry
+their risk profile is understood (this is an important one)
+* inserted into the CI/CD pipeline, Clair can be a very effective
+foundation for the automated assessment of Docker image
+vulnerabilities
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
 between code commit and automated (CD) deployment begins rolling
 out a change
@@ -90,13 +92,14 @@ in a command line utility that's part of ```username/repo:tag```
 
 Following the steps described in the previous section
 would result in the CI process failing because the high severity
-vulnerability would be detected. But this failure seems
+vulnerability would be detected and ```assess-image-risk.sh```
+would return a non-zero exit status. But this failure seems
 inappropriate given the knowledge that the command line
 tool with the vulnerability would never be used.
 Enter ```clair-cicd's``` whitelists.
 
 Whitelists are json documents which allow security analysts
-to influence ```clair-cicd's``` vulnerability assessment.
+to influence ```assess-image-risk.sh``` vulnerability assessment.
 Whitelist expectations:
 
 * maintained by security analyst **not** service engineer
