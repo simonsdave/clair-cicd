@@ -34,11 +34,3 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
 
         vra = VulnerabilitiesRiskAssessor(verbose, whitelist, vulnerabilities)
         self.assertFalse(vra.assess())
-
-    def test_high_severity_vulnerabilities_should_assess_dirty(self):
-        verbose = True
-        whitelist = Whitelist({})
-        vulnerabilities = [Vulnerability({'Severity': 'High'})]
-
-        vra = VulnerabilitiesRiskAssessor(verbose, whitelist, vulnerabilities)
-        self.assertFalse(vra.assess())
