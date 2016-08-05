@@ -9,8 +9,7 @@ class VulnerabilitiesRiskAssessor(object):
 
     def assess(self):
         """Returns ```True``` if the risk is deemed acceptable
-        otherwise returns ```False```.
-        """
+        otherwise returns ```False```."""
         for vulnerability in self.vulnerabilities:
             if self.whitelist.ignore_severties_at_or_below < vulnerability.severity:
                 # :TODO: add code to check whitelist for vulnerability
