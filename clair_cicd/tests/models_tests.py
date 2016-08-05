@@ -21,6 +21,14 @@ class SeverityTestCase(unittest.TestCase):
         self.assertFalse(Severity('high') <= Severity('low'))
         self.assertTrue(Severity('low') <= Severity('high'))
 
+    def test_eq(self):
+        self.assertTrue(Severity('medium') == Severity('medium'))
+        self.assertFalse(Severity('high') == Severity('low'))
+
+    def test_ne(self):
+        self.assertTrue(Severity('high') != Severity('low'))
+        self.assertFalse(Severity('high') != Severity('high'))
+
 
 class WhitelistTestCase(unittest.TestCase):
 

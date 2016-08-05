@@ -14,7 +14,7 @@ class Severity(object):
         self.severity = type(self)._severity_as_strs.index(severity_as_str.strip().lower())
 
     def __hash__(self):
-        return self.severity
+        return hash(self.severity)
 
     def __lt__(self, other):
         return self.severity < other.severity
@@ -25,7 +25,7 @@ class Severity(object):
     def __eq__(self, other):
         return self.severity == other.severity
 
-    def __nq__(self, other):
+    def __ne__(self, other):
         return self.severity != other.severity
 
 
