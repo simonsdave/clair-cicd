@@ -44,6 +44,25 @@ class Whitelist(object):
 class Vulnerability(object):
 
     def __init__(self, vulnerability):
+        """'''vulnerability''' is expected to be a dictionary
+        of the form illustrated by the example below:
+
+            {
+              "Name": "CVE-2016-1238",
+              "NamespaceName": "ubuntu:14.04",
+              "Description": "something that could be long ...",
+              "Link": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-1238",
+              "Severity": "Medium",
+              "Metadata": {
+                "NVD": {
+                  "CVSSv2": {
+                    "Score": 7.2,
+                    "Vectors": "AV:L/AC:L/Au:N/C:C/I:C"
+                  }
+                }
+              }
+            }
+        """
         object.__init__(self)
 
         self.vulnerability = vulnerability
@@ -57,7 +76,6 @@ class Vulnerability(object):
 
     @property
     def severity(self):
-        # "Severity":"Low","Metadata":{"NVD":{"CVSSv2":{"Score":1.9,"Vectors":"AV:L/AC:M/Au:N/C:N/I:N"}}}
-        # use Severity if it exists otherwise uses Score where low = 0.0-3.9,
-        # medium = 4.0-6.9, high = 7.0-10.0
+        # use Severity if it exists otherwise uses Score
+        # where low = 0.0-3.9, medium = 4.0-6.9 & high = 7.0-10.0
         return Severity(self.vulnerability['Severity'])
