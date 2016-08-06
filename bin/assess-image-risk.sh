@@ -46,9 +46,13 @@ DOCKER_IMAGE_TO_ANALYZE=${1:-}
 #
 # general configuration
 #
+# :TODO: clair database version & clair version should match
 CLAIR_DATABASE_IMAGE=simonsdave/clair-database:latest
 # https://quay.io/repository/coreos/clair?tab=tags
-CLAIR_IMAGE=quay.io/coreos/clair:v1.2.2
+# :TODO: should not be hard coding version number here - where should this be read from?
+CLAIR_VERSION=v1.2.2
+CLAIR_IMAGE=quay.io/coreos/clair:$CLAIR_VERSION
+# :TODO: should not be latest version
 CLAIR_CICD_TOOLS_IMAGE=simonsdave/clair-cicd-tools:latest
 
 #
@@ -82,7 +86,7 @@ curl \
     -s \
     -o "$CLAIR_CONFIG_YAML" \
     -L \
-    https://raw.githubusercontent.com/coreos/clair/master/config.example.yaml
+    https://raw.githubusercontent.com/coreos/clair/$CLAIR_VERSION/config.example.yaml
 
 sed \
     -i \
@@ -143,16 +147,20 @@ do
         echo "{\"Layer\": {\"Name\": \"$LAYER\", \"Path\": \"$DOCKER_IMAGE_EXPLODED_TAR_DIR/$LAYER/layer.tar\", \"ParentName\": \"$PREVIOUS_LAYER\", \"Format\": \"Docker\"}}" > "$BODY"
     fi
 
+    # :TODO: might need to add a retry loop around this cURL statement as it
+    # seems to fail every now and again:-(
+    ERROR_OUTPUT=$(mktemp 2> /dev/null || mktemp -t DAS)
+
     HTTP_STATUS_CODE=$(curl \
         -s \
-        -o /dev/null \
+        -o "$ERROR_OUTPUT" \
         -X POST \
         -H 'Content-Type: application/json' \
         -w '%{http_code}' \
         --data-binary @"$BODY" \
         $CLAIR_ENDPOINT/v1/layers)
     if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "201" ]; then
-        echo "error creating clair layer '$LAYER'" >&2
+        echo "error creating clair layer '$LAYER' - see errors @ '$ERROR_OUTPUT'" >&2
         exit 1
     fi
 
@@ -166,6 +174,8 @@ done
 #
 VULNERABILTIES_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 
+echo_if_verbose "saving vulnerabilities to directory '$VULNERABILTIES_DIR'"
+
 for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | $TAC)
 do
     HTTP_STATUS_CODE=$(curl \
@@ -178,8 +188,6 @@ do
         exit 1
     fi
 done
-echo $VULNERABILTIES_DIR
-exit 0
 
 #
 # pull and spin up ci/cd tools
