@@ -1,6 +1,7 @@
 import unittest
 
 from ..models import Severity
+from ..models import Vulnerability
 from ..models import Whitelist
 
 
@@ -40,3 +41,35 @@ class WhitelistTestCase(unittest.TestCase):
     def test_default_ignore_severties_at_or_below(self):
         whitelist = Whitelist({})
         self.assertTrue(whitelist.ignore_severties_at_or_below == Severity('medium'))
+
+
+class VulnerabilityTestCase(unittest.TestCase):
+
+    def test_ctr(self):
+        vulnerability_dict = {}
+        vulnerability = Vulnerability(vulnerability_dict)
+        self.assertTrue(vulnerability_dict == vulnerability.vulnerability)
+
+    def test_cve_id(self):
+        cve_id = 'abc'
+        vulnerability_dict = {
+            'Name': cve_id,
+        }
+        vulnerability = Vulnerability(vulnerability_dict)
+        self.assertTrue(cve_id == vulnerability.cve_id)
+
+    def test_str(self):
+        cve_id = 'abc'
+        vulnerability_dict = {
+            'Name': cve_id,
+        }
+        vulnerability = Vulnerability(vulnerability_dict)
+        self.assertTrue(cve_id == str(vulnerability))
+
+    def test_severity(self):
+        severity = 'medium'
+        vulnerability_dict = {
+            'Severity': severity,
+        }
+        vulnerability = Vulnerability(vulnerability_dict)
+        self.assertTrue(Severity(severity) == vulnerability.severity)
