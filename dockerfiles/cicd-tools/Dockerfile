@@ -31,6 +31,6 @@ RUN pip install pip==1.5.6
 
 COPY package.tar.gz /tmp/package.tar.gz
 
-RUN pip install --process-dependency-links /tmp/package.tar.gz
+RUN pip install /tmp/package.tar.gz
 
 RUN rm /tmp/package.tar.gz
