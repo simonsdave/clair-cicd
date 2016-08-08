@@ -136,7 +136,7 @@ is used to rebuild
 [simonsdave/clair-database:latest](https://hub.docker.com/r/simonsdave/clair-database/)
 daily to ensure
 the vulnerability database is kept current
-1. a set of Python and Bash vulnerability analysis scripts packaged in the
+1. a set of Python and Bash risk analysis scripts packaged in the
 [simonsdave/clair-cicd-tools:latest](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
 docker image
 
