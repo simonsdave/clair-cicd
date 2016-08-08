@@ -10,6 +10,7 @@ import json
 import optparse
 import sys
 
+import clair_cicd
 from clair_cicd import io
 from clair_cicd.assessor import VulnerabilitiesRiskAssessor
 
@@ -21,7 +22,8 @@ class CommandLineParser(optparse.OptionParser):
         optparse.OptionParser.__init__(
             self,
             'usage: %prog [options] <docker image>',
-            description='cli to analyze results of Clair identified vulnerabilities')
+            description='cli to analyze results of Clair identified vulnerabilities',
+            version='%%prog %s' % clair_cicd.__version__)
 
         help = 'verbose - default = false'
         self.add_option(
