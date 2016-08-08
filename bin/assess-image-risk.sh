@@ -206,7 +206,7 @@ docker \
     --name $CLAIR_CICD_TOOLS_CONTAINER \
     -v "$VULNERABILTIES_DIR":/vulnerabilities \
     $CLAIR_CICD_TOOLS_IMAGE \
-    assess-vulnerabilities.py $VERBOSE_FLAG /vulnerabilities
+    assess-vulnerabilities-risk.py $VERBOSE_FLAG /vulnerabilities
 
 EXIT_CODE=$(docker inspect --format '{{ .State.ExitCode }}' $CLAIR_CICD_TOOLS_CONTAINER)
 

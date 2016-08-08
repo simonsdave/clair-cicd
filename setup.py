@@ -40,7 +40,7 @@ setup(
         'clair_cicd',
     ],
     scripts=[
-        'bin/assess-vulnerabilities.py',
+        'bin/assess-vulnerabilities-risk.py',
     ],
     install_requires=[
         "jsonschema==2.5.1",
