@@ -47,7 +47,7 @@ class CommandLineParser(optparse.OptionParser):
 
         optparse.OptionParser.__init__(
             self,
-            'usage: %prog [options] <docker image>',
+            'usage: %prog [options] <vulnerabilities directory>',
             description='cli to analyze results of Clair identified vulnerabilities',
             version='%%prog %s' % clair_cicd.__version__,
             option_class=CommandLineOption)
@@ -88,7 +88,8 @@ class CommandLineParser(optparse.OptionParser):
     def parse_args(self, *args, **kwargs):
         (clo, cla) = optparse.OptionParser.parse_args(self, *args, **kwargs)
         if len(cla) != 1:
-            self.error('no docker image')
+            sys.stderr.write(self.get_usage())
+            sys.exit(1)
 
         return (clo, cla)
 
