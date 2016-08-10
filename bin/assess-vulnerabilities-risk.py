@@ -116,6 +116,9 @@ if __name__ == '__main__':
     #
     #
     whitelist = io.read_whitelist(clo.whitelist)
+    if whitelines is None:
+        sys.exit(1)
+
     vulnerabilities_directory = cla[0]
     vulnerabilities = io.read_vulnerabilities(vulnerabilities_directory)
 

@@ -1,25 +1,39 @@
 import json
+import logging
 import os
 import sys
 
 from models import Whitelist
 from models import Vulnerability
 
+_logger = logging.getLogger(__name__)
+
 
 def read_whitelist(filename):
+    """Attempt to populate and return a ```Whitelist```
+    from the file pointed to by ```filename```.
 
-    if not filename:
+    If ```filename``` is ```None``` then an empty ```Whitelist```
+    is returned.
+
+    If any kind of error occurs ```None``` is returned.
+    """
+
+    if filename is None:
         return Whitelist({})
 
     try:
         with open(filename) as fp:
-            whitelist = Whitelist(json.load(fp))
-    except Exception:
-        msg = "Could not read whitelist from '%s'\n" % filename
-        sys.stderr.write(msg)
-        sys.exit(1)
+            try:
+                whitelist = Whitelist(json.load(fp))
+            except Exception as ex:
+                _logger.error("Could not read whitelist from '%s' - %s\n", filename, ex)
+                return None
+    except Exception as ex:
+        _logger.error("Could not read whitelist from '%s' - %s\n", filename, ex)
+        return None
 
-    # :TODO: validate whitelist with jsonschema
+    # :TODO: validate whitelist with jsonschema or done in Whitelist class
 
     return whitelist
 
