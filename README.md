@@ -116,8 +116,7 @@ branches, etc)
 Assumptions/requirements:
 
 * bash & curl are available
-* docker daemon is installed and running
-* docker remote API is running on ```http://172.17.42.1:2375```
+* docker is installed and running
 * all testing and dev has been done on Ubuntu 14.04 so no promises about other
 platforms (feedback on this would be very helpful)
 
