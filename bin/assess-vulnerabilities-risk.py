@@ -121,6 +121,8 @@ if __name__ == '__main__':
 
     vulnerabilities_directory = cla[0]
     vulnerabilities = io.read_vulnerabilities(vulnerabilities_directory)
+    if vulnerabilities is None:
+        sys.exit(2)
 
     if clo.verbose:
         indent = '-' * 50

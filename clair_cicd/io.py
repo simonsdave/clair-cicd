@@ -45,9 +45,8 @@ def read_vulnerabilities(directory):
     try:
         filenames = os.listdir(directory)
     except Exception:
-        msg = "Could not read vulnerabilities from directory '%s'\n" % directory
-        sys.stderr.write(msg)
-        sys.exit(1)
+        _logger.error("Could not read vulnerabilities from directory '%s'", directory)
+        return None
 
     for filename in filenames:
         absolute_filename = os.path.join(directory, filename)
@@ -61,8 +60,7 @@ def read_vulnerabilities(directory):
                         if vulnerability.cve_id not in vulnerabilities_by_cve_id:
                             vulnerabilities_by_cve_id[vulnerability.cve_id] = vulnerability
         except Exception:
-            msg = "Could not read vulnerabilities from '%s'\n" % absolute_filename
-            sys.stderr.write(msg)
-            sys.exit(1)
+            _logger.error("Could not read vulnerabilities from '%s'", absolute_filename)
+            return None
 
     return vulnerabilities_by_cve_id.values()

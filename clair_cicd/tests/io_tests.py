@@ -3,6 +3,7 @@ import tempfile
 import unittest
 
 from ..io import read_whitelist
+from ..io import read_vulnerabilities
 
 
 class ReadWhitelistTestCase(unittest.TestCase):
@@ -36,3 +37,11 @@ class ReadWhitelistTestCase(unittest.TestCase):
         self.assertIsNotNone(whitelist)
         self.assertIsNotNone(whitelist.whitelist)
         self.assertEqual(whitelist.whitelist, the_whitelist)
+
+
+class ReadVulnerabilitiesTestCase(unittest.TestCase):
+
+    def test_ctr(self):
+        directory = None
+        vulnerabilities = read_vulnerabilities(directory)
+        self.assertIsNone(vulnerabilities)
