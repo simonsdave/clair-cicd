@@ -23,8 +23,10 @@ do
             # the if statement below
             if [ "${1:-}" != "" ]; then
                 TAG_FLAG="-t ${1:-}"
-                shift
             fi
+            # the shift assumes the arg after the -t is always a
+            # tag name it just might be a zero length tag name
+            shift
             ;;
         *)
             break
@@ -32,7 +34,7 @@ do
     esac
 done
 
-if [ $# != 2 ] || [ $# != 3 ]; then
+if [ $# != 2 ] && [ $# != 3 ]; then
     echo "usage: `basename $0` [-v] [-t <tag>] <package-tar-gz> <username> [<password>]" >&2
     exit 1
 fi
