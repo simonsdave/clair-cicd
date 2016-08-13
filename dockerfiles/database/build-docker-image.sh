@@ -19,7 +19,7 @@ do
             ;;
         -t)
             shift
-            TAG=${1:-}
+            TAG=$1
             shift
             ;;
         *)
@@ -28,14 +28,13 @@ do
     esac
 done
 
-if [ $# != 1 ] && [ $# != 3 ]; then
-    echo "usage: `basename $0` [-v] [-t <tag>] <dockerhub-username> [<dockerhub-email> <dockerhub-password>]" >&2
+if [ $# != 1 ] && [ $# != 2 ]; then
+    echo "usage: `basename $0` [-v] [-t <tag>] <dockerhub-username> [<dockerhub-password>]" >&2
     exit 1
 fi
 
 DOCKERHUB_USERNAME=${1:-}
-DOCKERHUB_EMAIL=${2:-}
-DOCKERHUB_PASSWORD=${3:-}
+DOCKERHUB_PASSWORD=${2:-}
 
 CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-database:$TAG
 # https://quay.io/repository/coreos/clair?tab=tags
@@ -194,13 +193,9 @@ docker \
     $CLAIR_DATABASE_IMAGE_NAME \
     > /dev/null
 
-if [ "$DOCKERHUB_EMAIL" != "" ]; then
+if [ "$DOCKERHUB_PASSWORD" != "" ]; then
     echo "logging in to dockerhub"
-    docker login \
-        --email="$DOCKERHUB_EMAIL" \
-        --username="$DOCKERHUB_USERNAME" \
-        --password="$DOCKERHUB_PASSWORD" \
-    > /dev/null
+    docker login --username="$DOCKERHUB_USERNAME" --password="$DOCKERHUB_PASSWORD"
     echo "logged in to dockerhub"
 
     echo "pushing vulnerabilities database ($CLAIR_DATABASE_IMAGE_NAME) to dockerhub"

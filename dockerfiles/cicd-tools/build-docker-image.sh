@@ -6,7 +6,7 @@
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
 VERBOSE=0
-TAG=""
+TAG="latest"
 
 while true
 do
@@ -18,7 +18,7 @@ do
             ;;
         -t)
             shift
-            TAG=${1:-}
+            TAG=$1
             shift
             ;;
         *)
@@ -27,32 +27,31 @@ do
     esac
 done
 
-if [ $# != 2 ] && [ $# != 4 ]; then
-    echo "usage: `basename $0` [-v] [-t <tag>] <package-tar-gz> <username> [<email> <password>]" >&2
+if [ $# != 2 ] && [ $# != 3 ]; then
+    echo "usage: `basename $0` [-v] [-t <tag>] <package-tar-gz> <username> [<password>]" >&2
     exit 1
 fi
 
 PACKAGE_TAR_GZ=${1:-}
-USERNAME=${2:-}
-EMAIL=${3:-}
-PASSWORD=${4:-}
+DOCKERHUB_USERNAME=${2:-}
+DOCKERHUB_PASSWORD=${3:-}
 
 if [ ! -r "$PACKAGE_TAR_GZ" ]; then
     echo "can't find package @ '$PACKAGE_TAR_GZ'" >&2
     exit 1
 fi
 
-IMAGENAME=$USERNAME/clair-cicd-tools
-if [ "$TAG" != "" ]; then
-    IMAGENAME=$IMAGENAME:$TAG
-fi
+IMAGENAME=$DOCKERHUB_USERNAME/clair-cicd-tools:$TAG
 
 cp "$PACKAGE_TAR_GZ" "$SCRIPT_DIR_NAME/package.tar.gz"
 docker build -t $IMAGENAME "$SCRIPT_DIR_NAME"
 rm "$SCRIPT_DIR_NAME/package.tar.gz"
 
-if [ "$EMAIL" != "" ]; then
-    docker login --email="$EMAIL" --username="$USERNAME" --password="$PASSWORD"
+if [ "$DOCKERHUB_PASSWORD" != "" ]; then
+    echo "logging in to dockerhub"
+    docker login --username="$DOCKERHUB_USERNAME" --password="$DOCKERHUB_PASSWORD"
+    echo "logged in to dockerhub"
+
     docker push $IMAGENAME
 fi
 
