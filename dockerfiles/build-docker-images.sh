@@ -18,8 +18,13 @@ do
             ;;
         -t)
             shift
-            TAG_FLAG="-t ${1:-}"
-            shift
+            # this script can be called by travis which may pass
+            # a zero length tag argument and hence the need for
+            # the if statement below
+            if [ "${1:-}" != "" ]; then
+                TAG_FLAG="-t ${1:-}"
+                shift
+            fi
             ;;
         *)
             break
