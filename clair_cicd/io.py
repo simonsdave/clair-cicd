@@ -1,7 +1,6 @@
 import json
 import logging
 import os
-import sys
 
 from models import Whitelist
 from models import Vulnerability
