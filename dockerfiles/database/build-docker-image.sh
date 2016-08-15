@@ -4,8 +4,6 @@
 # image that runs postgres and contains a fully populated database
 # of current vulnerabilities.
 
-set -e
-
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
 VERBOSE=0
