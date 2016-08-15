@@ -3,6 +3,8 @@
 # This script builds all docker images
 #
 
+set -e
+
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
 VERBOSE_FLAG=""

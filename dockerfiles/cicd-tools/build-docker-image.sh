@@ -3,6 +3,8 @@
 # This script builds the clair-cicd-tools docker image
 #
 
+set -e
+
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
 VERBOSE=0
