@@ -117,7 +117,7 @@ branches, etc)
 
 Assumptions/requirements:
 
-* bash & curl are available
+* bash, curl & jq are installed and available
 * docker is installed and running
 * all testing and dev has been done on Ubuntu 14.04 so no promises about other
 platforms (feedback on this would be very helpful)

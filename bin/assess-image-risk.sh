@@ -2,11 +2,6 @@
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
-TAC=$(which tac)
-if [ "$TAC" == "" ]; then
-    TAC="tail -r"
-fi
-
 echo_if_verbose() {
     if [ 1 -eq ${VERBOSE:-0} ]; then
         echo "$(date "+%Y-%m-%d %k:%M:%S") ${1:-}"
@@ -17,7 +12,6 @@ echo_if_verbose() {
 #
 # parse command line arguments
 #
-
 VERBOSE=0
 VERBOSE_FLAG=""
 
@@ -28,7 +22,12 @@ do
         -v)
             shift
             VERBOSE=1
-            VERBOSE_FLAG=-v
+            VERBOSE_FLAG=--log=info
+            ;;
+        -vv)
+            shift
+            VERBOSE=1
+            VERBOSE_FLAG=--log=debug
             ;;
         *)
             break
@@ -37,7 +36,7 @@ do
 done
 
 if [ $# != 1 ]; then
-    echo "usage: `basename $0` [-v] <docker image id>" >&2
+    echo "usage: `basename $0` [-v|-vv] <docker image id>" >&2
     exit 1
 fi
 
@@ -111,7 +110,8 @@ docker run \
     -v /tmp:/tmp \
     -v $CLAIR_CONFIG_DIR:/config \
     $CLAIR_IMAGE \
-    -log-level=info -config=/config/config.yaml \
+    -log-level=info \
+    -config=/config/config.yaml \
     > /dev/null
 if [ $? != 0 ]; then
     echo "error starting clair container '$CLAIR_CONTAINER'" >&2
@@ -124,18 +124,19 @@ CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }
 #
 #
 #
-echo_if_verbose "saving docker image '$DOCKER_IMAGE_TO_ANALYZE'"
 DOCKER_IMAGE_EXPLODED_TAR_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
+echo_if_verbose "saving docker image '$DOCKER_IMAGE_TO_ANALYZE' to '$DOCKER_IMAGE_EXPLODED_TAR_DIR'"
 pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" > /dev/null
 docker save $DOCKER_IMAGE_TO_ANALYZE | tar xv > /dev/null
 popd > /dev/null
+LAYERS=$(cat $DOCKER_IMAGE_EXPLODED_TAR_DIR/manifest.json | jq ".[0].Layers[]" | sed -e 's|"||g' | sed -e 's|/layer.tar$||g')
 echo_if_verbose "successfully saved docker image '$DOCKER_IMAGE_TO_ANALYZE'"
 
 #
 #
 #
 PREVIOUS_LAYER=""
-for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | $TAC)
+for LAYER in $LAYERS
 do
     echo_if_verbose "creating clair layer '$LAYER'"
 
@@ -176,7 +177,7 @@ VULNERABILTIES_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 
 echo_if_verbose "saving vulnerabilities to directory '$VULNERABILTIES_DIR'"
 
-for LAYER in $(docker history -q --no-trunc $DOCKER_IMAGE_TO_ANALYZE | $TAC)
+for LAYER in $LAYERS
 do
     HTTP_STATUS_CODE=$(curl \
         -s \
@@ -213,14 +214,14 @@ EXIT_CODE=$(docker inspect --format '{{ .State.ExitCode }}' $CLAIR_CICD_TOOLS_CO
 #
 # a little bit of cleanup
 #
-docker kill $CLAIR_CICD_TOOLS_CONTAINER > /dev/null
-docker rm $CLAIR_CICD_TOOLS_CONTAINER > /dev/null
+docker kill $CLAIR_CICD_TOOLS_CONTAINER >& /dev/null
+docker rm $CLAIR_CICD_TOOLS_CONTAINER >& /dev/null
 
-docker kill $CLAIR_CONTAINER > /dev/null
-docker rm $CLAIR_CONTAINER > /dev/null
+docker kill $CLAIR_CONTAINER >& /dev/null
+docker rm $CLAIR_CONTAINER >& /dev/null
 
-docker kill $CLAIR_DATABASE_CONTAINER > /dev/null
-docker rm $CLAIR_DATABASE_CONTAINER > /dev/null
+docker kill $CLAIR_DATABASE_CONTAINER >& /dev/null
+docker rm $CLAIR_DATABASE_CONTAINER >& /dev/null
 
 #
 # we're all done:-)
