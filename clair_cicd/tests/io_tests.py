@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 
@@ -42,6 +43,22 @@ class ReadWhitelistTestCase(unittest.TestCase):
 class ReadVulnerabilitiesTestCase(unittest.TestCase):
 
     def test_ctr(self):
-        directory = None
-        vulnerabilities = read_vulnerabilities(directory)
+        directory_name = None
+        vulnerabilities = read_vulnerabilities(directory_name)
         self.assertIsNone(vulnerabilities)
+
+    def test_error_reading_vulnerabilities_because_of_file_with_invalid_json(self):
+        directory_name = tempfile.mkdtemp()
+        with open(os.path.join(directory_name, 'dave.json'), 'w+') as fp:
+            fp.write('{')
+        vulnerabilities = read_vulnerabilities(directory_name)
+        self.assertIsNone(vulnerabilities)
+
+    def test_happy_path(self):
+        directory_name = os.path.join(
+            os.path.dirname(__file__),
+            'vulnerabilities',
+            'all-good')
+        vulnerabilities = read_vulnerabilities(directory_name)
+        self.assertIsNotNone(vulnerabilities)
+        self.assertTrue(1 < len(vulnerabilities))
