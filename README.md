@@ -127,18 +127,18 @@ There are 4 moving pieces:
 1. ```assess-image-risk.sh``` is bash script which does
 the heavy lifting to co-ordinate
 the interaction of the 3 other moving pieces
-1. the [Clair](https://github.com/coreos/clair) service which
-is packaged inside the docker image [quay.io/coreos/clair:latest](https://quay.io/repository/coreos/clair?tag=latest)
+1. [Clair](https://github.com/coreos/clair) which
+is packaged inside the docker image [quay.io/coreos/clair](https://quay.io/repository/coreos/clair)
 1. [Clair's](https://github.com/coreos/clair) vulnerability database
 which is packaged inside the docker image
-[simonsdave/clair-database:latest](https://hub.docker.com/r/simonsdave/clair-database/) -
+[simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) -
 a [Travis Cron Job](https://docs.travis-ci.com/user/cron-jobs/)
 is used to rebuild
-[simonsdave/clair-database:latest](https://hub.docker.com/r/simonsdave/clair-database/)
+[simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/)
 daily to ensure
 the vulnerability database is kept current
 1. a set of Python and Bash risk analysis scripts packaged in the
-[simonsdave/clair-cicd-tools:latest](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
+[simonsdave/clair-cicd-tools](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
 docker image
 
 ## References
