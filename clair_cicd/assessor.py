@@ -1,9 +1,8 @@
 class VulnerabilitiesRiskAssessor(object):
 
-    def __init__(self, verbose, whitelist, vulnerabilities):
+    def __init__(self, whitelist, vulnerabilities):
         object.__init__(self)
 
-        self.verbose = verbose
         self.whitelist = whitelist
         self.vulnerabilities = vulnerabilities
 

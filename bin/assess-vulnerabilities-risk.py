@@ -18,6 +18,9 @@ from clair_cicd import io
 from clair_cicd.assessor import VulnerabilitiesRiskAssessor
 
 
+_logger = logging.getLogger(__name__)
+
+
 def _check_logging_level(option, opt, value):
     """Type checking function for command line parser's 'logginglevel' type."""
     reg_ex_pattern = "^(DEBUG|INFO|WARNING|ERROR|CRITICAL|FATAL)$"
@@ -51,14 +54,6 @@ class CommandLineParser(optparse.OptionParser):
             description='cli to analyze results of Clair identified vulnerabilities',
             version='%%prog %s' % clair_cicd.__version__,
             option_class=CommandLineOption)
-
-        help = 'verbose - default = false'
-        self.add_option(
-            '--verbose',
-            '-v',
-            action='store_true',
-            dest='verbose',
-            help=help)
 
         default = None
         help = 'whitelist - default = %s' % default
@@ -113,7 +108,7 @@ if __name__ == '__main__':
         '%(levelname)5s %(module)s:%(lineno)d %(message)s')
 
     #
-    #
+    # read all the various bits we need into memory
     #
     whitelist = io.read_whitelist(clo.whitelist)
     if whitelist is None:
@@ -124,14 +119,16 @@ if __name__ == '__main__':
     if vulnerabilities is None:
         sys.exit(2)
 
-    if clo.verbose:
-        indent = '-' * 50
+    #
+    # can be helpful for debugging
+    #
+    for vulnerability in vulnerabilities:
+        _logger.debug('-' * 50)
+        _logger.debug(json.dumps(vulnerability.vulnerability, indent=2))
+    _logger.debug('-' * 50)
 
-        for vulnerability in vulnerabilities:
-            print indent
-            print json.dumps(vulnerability.vulnerability, indent=2)
-
-        print indent
-
-    vra = VulnerabilitiesRiskAssessor(clo.verbose, whitelist, vulnerabilities)
+    #
+    # this is what it's all been leading up to:-)
+    #
+    vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
     sys.exit(0 if vra.assess() else 1)
