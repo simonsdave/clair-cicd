@@ -144,3 +144,4 @@ docker image
 ## References
 
 * [FIVE SECRETS AND TWO COMMON “GOTCHAS” OF VULNERABILITY SCANNING](https://www.kennasecurity.com/resources/secrets-gotchas-of-vuln-scanning)
+* [26 Jul '16 - Injecting security into Continuous Delivery](https://www.oreilly.com/learning/injecting-security-into-continuous-delivery)
