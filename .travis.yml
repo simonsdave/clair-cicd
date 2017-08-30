@@ -18,6 +18,7 @@ install:
 script:
   - pep8
   - flake8
+  - shellcheck --version
   - shellcheck $(find . -name \*.sh | grep -v \.\/env)
   - nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
   - coveralls || true
