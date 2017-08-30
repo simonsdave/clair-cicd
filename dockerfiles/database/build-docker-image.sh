@@ -4,22 +4,14 @@
 # image that runs postgres and contains a fully populated database
 # of current vulnerabilities.
 
-SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
-
-VERBOSE=0
-TAG="latest"
+TAG=latest
 
 while true
 do
-    OPTION=`echo ${1:-} | awk '{print tolower($0)}'`
-    case "$OPTION" in
-        -v)
-            shift
-            VERBOSE=1
-            ;;
+    case "${1,,}" in
         -t)
             shift
-            TAG=$1
+            TAG=${1:-latest}
             shift
             ;;
         *)
@@ -29,7 +21,7 @@ do
 done
 
 if [ $# != 1 ] && [ $# != 2 ]; then
-    echo "usage: `basename $0` [-v] [-t <tag>] <dockerhub-username> [<dockerhub-password>]" >&2
+    echo "usage: $(basename "$0") [-t <tag>] <dockerhub-username> [<dockerhub-password>]" >&2
     exit 1
 fi
 
@@ -58,7 +50,7 @@ echo "successfully pulled database server docker image"
 echo "starting database server container '$CLAIR_DATABASE_CONTAINER_NAME'"
 docker \
     run \
-    --name $CLAIR_DATABASE_CONTAINER_NAME \
+    --name "$CLAIR_DATABASE_CONTAINER_NAME" \
     -e 'PGDATA=/var/lib/postgresql/data-non-volume' \
     -d \
     $DATABASE_SERVER_DOCKER_IMAGE \
@@ -68,7 +60,7 @@ echo "successfully started database server container"
 echo -n "waiting for database server in container '$CLAIR_DATABASE_CONTAINER_NAME' to start "
 for i in $(seq 1 10)
 do
-    docker logs $CLAIR_DATABASE_CONTAINER_NAME |& grep "database system is ready to accept connections" > /dev/null
+    docker logs "$CLAIR_DATABASE_CONTAINER_NAME" |& grep "database system is ready to accept connections" > /dev/null
     if [ $? == 0 ]; then
         break
     fi
@@ -86,13 +78,13 @@ for i in $(seq 1 $MAX_NUM_DATABASE_CREATE_ATTEMPTS)
 do
     docker \
         exec \
-        $CLAIR_DATABASE_CONTAINER_NAME \
+        "$CLAIR_DATABASE_CONTAINER_NAME" \
         sh -c 'echo "create database clair" | psql -U postgres' \
         >& /dev/null
 
     docker \
         exec \
-         $CLAIR_DATABASE_CONTAINER_NAME \
+         "$CLAIR_DATABASE_CONTAINER_NAME" \
          sh -c 'echo "\list" | psql -U postgres' |& \
          grep '^\s*clair' >& dave.txt
     if [ $? == 0 ]; then
@@ -101,7 +93,7 @@ do
 
     sleep 3
 done
-if [ $i == $MAX_NUM_DATABASE_CREATE_ATTEMPTS ]; then
+if [ "$i" == "$MAX_NUM_DATABASE_CREATE_ATTEMPTS" ]; then
     echo "error creating database" >&2
     exit 1
 fi
@@ -149,11 +141,11 @@ echo "creating clair container '$CLAIR_CONTAINER_NAME'"
 docker \
     run \
     -d \
-    --name $CLAIR_CONTAINER_NAME \
-    --link $CLAIR_DATABASE_CONTAINER_NAME:clair-database \
+    --name "$CLAIR_CONTAINER_NAME" \
+    --link "$CLAIR_DATABASE_CONTAINER_NAME":clair-database \
     -v /tmp:/tmp \
-    -v $CLAIR_CONFIG_DIR:/config \
-    $CLAIR_IMAGE_NAME \
+    -v "$CLAIR_CONFIG_DIR":/config \
+    "$CLAIR_IMAGE_NAME" \
     -config=/config/config.yaml \
     > /dev/null
 echo "successfully created clair container"
@@ -161,12 +153,12 @@ echo "successfully created clair container"
 echo -n "Waiting for vulnerabilities database update to finish "
 while true
 do
-    docker logs $CLAIR_CONTAINER_NAME | grep "updater: update finished" >& /dev/null
+    docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null
     if [ $? == 0 ]; then
         break
     fi
 
-    docker logs $CLAIR_CONTAINER_NAME | grep "updater: an error occured" >& /dev/null
+    docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null
     if [ $? == 0 ]; then
         echo ""
         echo "error during vulnerabilities database update" >&2
@@ -178,10 +170,10 @@ do
 done
 echo ""
 
-docker kill $CLAIR_CONTAINER_NAME > /dev/null
-docker rm $CLAIR_CONTAINER_NAME > /dev/null
+docker kill "$CLAIR_CONTAINER_NAME" > /dev/null
+docker rm "$CLAIR_CONTAINER_NAME" > /dev/null
 
-docker rmi $CLAIR_DATABASE_IMAGE_NAME >& /dev/null
+docker rmi "$CLAIR_DATABASE_IMAGE_NAME" >& /dev/null
 
 docker \
     commit \
@@ -189,8 +181,8 @@ docker \
     --change='CMD ["postgres"]' \
     --change='EXPOSE 5432' \
     --change='ENTRYPOINT ["/docker-entrypoint.sh"]' \
-    $CLAIR_DATABASE_CONTAINER_NAME \
-    $CLAIR_DATABASE_IMAGE_NAME \
+    "$CLAIR_DATABASE_CONTAINER_NAME" \
+    "$CLAIR_DATABASE_IMAGE_NAME" \
     > /dev/null
 
 if [ "$DOCKERHUB_PASSWORD" != "" ]; then
@@ -199,12 +191,12 @@ if [ "$DOCKERHUB_PASSWORD" != "" ]; then
     echo "logged in to dockerhub"
 
     echo "pushing vulnerabilities database ($CLAIR_DATABASE_IMAGE_NAME) to dockerhub"
-    docker push $CLAIR_DATABASE_IMAGE_NAME > /dev/null
+    docker push "$CLAIR_DATABASE_IMAGE_NAME" > /dev/null
     echo "pushed vulnerabilities database to dockerhub"
 fi
 
-docker kill $CLAIR_DATABASE_CONTAINER_NAME > /dev/null
-docker rm $CLAIR_DATABASE_CONTAINER_NAME > /dev/null
+docker kill "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
+docker rm "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
 
 echo "done!"
 

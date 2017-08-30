@@ -7,20 +7,14 @@ set -e
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
-VERBOSE=0
-TAG="latest"
+TAG=latest
 
 while true
 do
-    OPTION=`echo ${1:-} | awk '{print tolower($0)}'`
-    case "$OPTION" in
-        -v)
-            shift
-            VERBOSE=1
-            ;;
+    case "${1,,}" in
         -t)
             shift
-            TAG=$1
+            TAG=${1:-latest}
             shift
             ;;
         *)
@@ -30,7 +24,7 @@ do
 done
 
 if [ $# != 2 ] && [ $# != 3 ]; then
-    echo "usage: `basename $0` [-v] [-t <tag>] <package-tar-gz> <username> [<password>]" >&2
+    echo "usage: $(basename "$0") [-t <tag>] <package-tar-gz> <username> [<password>]" >&2
     exit 1
 fi
 
@@ -46,7 +40,7 @@ fi
 IMAGENAME=$DOCKERHUB_USERNAME/clair-cicd-tools:$TAG
 
 cp "$PACKAGE_TAR_GZ" "$SCRIPT_DIR_NAME/package.tar.gz"
-docker build -t $IMAGENAME "$SCRIPT_DIR_NAME"
+docker build -t "$IMAGENAME" "$SCRIPT_DIR_NAME"
 rm "$SCRIPT_DIR_NAME/package.tar.gz"
 
 if [ "$DOCKERHUB_PASSWORD" != "" ]; then
@@ -54,7 +48,7 @@ if [ "$DOCKERHUB_PASSWORD" != "" ]; then
     docker login --username="$DOCKERHUB_USERNAME" --password="$DOCKERHUB_PASSWORD"
     echo "logged in to dockerhub"
 
-    docker push $IMAGENAME
+    docker push "$IMAGENAME"
 fi
 
 exit 0

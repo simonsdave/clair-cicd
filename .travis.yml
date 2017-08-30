@@ -1,6 +1,12 @@
 language: python
 python:
   - '2.7'
+addons:
+  apt:
+    sources:
+      - debian-sid
+    packages:
+      - shellcheck
 sudo: required
 dist: trusty
 install:
@@ -12,6 +18,8 @@ install:
 script:
   - pep8
   - flake8
+  - find . -name \*.sh
+  - shellcheck $(find . -name \*.sh)
   - nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
   - coveralls || true
   - python setup.py sdist --formats=gztar

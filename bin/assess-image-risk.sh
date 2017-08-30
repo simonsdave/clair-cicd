@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
-
 echo_if_verbose() {
-    if [ 1 -eq ${VERBOSE:-0} ]; then
+    if [ "1" -eq "${VERBOSE:-0}" ]; then
         echo "$(date "+%Y-%m-%d %k:%M:%S") ${1:-}"
     fi
     return 0
@@ -17,8 +15,7 @@ VERBOSE_FLAG=""
 
 while true
 do
-    OPTION=`echo ${1:-} | awk '{print tolower($0)}'`
-    case "$OPTION" in
+    case "${1,,}" in
         -v)
             shift
             VERBOSE=1
@@ -36,7 +33,7 @@ do
 done
 
 if [ $# != 1 ]; then
-    echo "usage: `basename $0` [-v|-vv] <docker image id>" >&2
+    echo "usage: $(basename "$0") [-v|-vv] <docker image id>" >&2
     exit 1
 fi
 
@@ -67,7 +64,7 @@ echo_if_verbose "successfully pulled clair database image"
 
 CLAIR_DATABASE_CONTAINER=clair-db-$(openssl rand -hex 8)
 echo_if_verbose "starting clair database container '$CLAIR_DATABASE_CONTAINER'"
-docker run --name $CLAIR_DATABASE_CONTAINER -d $CLAIR_DATABASE_IMAGE > /dev/null
+docker run --name "$CLAIR_DATABASE_CONTAINER" -d "$CLAIR_DATABASE_IMAGE" > /dev/null
 if [ $? != 0 ]; then
     echo "error starting clair database container '$CLAIR_DATABASE_CONTAINER'" >&2
     exit 1
@@ -104,12 +101,12 @@ CLAIR_CONTAINER=clair-$(openssl rand -hex 8)
 echo_if_verbose "starting clair container '$CLAIR_CONTAINER'"
 docker run \
     -d \
-    --name $CLAIR_CONTAINER \
+    --name "$CLAIR_CONTAINER" \
     --expose 6060 \
-    --link $CLAIR_DATABASE_CONTAINER:clair-database \
+    --link "$CLAIR_DATABASE_CONTAINER":clair-database \
     -v /tmp:/tmp \
-    -v $CLAIR_CONFIG_DIR:/config \
-    $CLAIR_IMAGE \
+    -v "$CLAIR_CONFIG_DIR":/config \
+    "$CLAIR_IMAGE" \
     -log-level=info \
     -config=/config/config.yaml \
     > /dev/null
@@ -119,7 +116,7 @@ if [ $? != 0 ]; then
 fi
 echo_if_verbose "successfully started clair container '$CLAIR_CONTAINER'"
 
-CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $CLAIR_CONTAINER):6060
+CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$CLAIR_CONTAINER"):6060
 
 #
 #
@@ -127,9 +124,9 @@ CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }
 DOCKER_IMAGE_EXPLODED_TAR_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 echo_if_verbose "saving docker image '$DOCKER_IMAGE_TO_ANALYZE' to '$DOCKER_IMAGE_EXPLODED_TAR_DIR'"
 pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" > /dev/null
-docker save $DOCKER_IMAGE_TO_ANALYZE | tar xv > /dev/null
+docker save "$DOCKER_IMAGE_TO_ANALYZE" | tar xv > /dev/null
 popd > /dev/null
-LAYERS=$(cat $DOCKER_IMAGE_EXPLODED_TAR_DIR/manifest.json | jq ".[0].Layers[]" | sed -e 's|"||g' | sed -e 's|/layer.tar$||g')
+LAYERS=$(jq ".[0].Layers[]" < "$DOCKER_IMAGE_EXPLODED_TAR_DIR/manifest.json" | sed -e 's|"||g' | sed -e 's|/layer.tar$||g')
 echo_if_verbose "successfully saved docker image '$DOCKER_IMAGE_TO_ANALYZE'"
 
 #
@@ -159,7 +156,7 @@ do
         -H 'Content-Type: application/json' \
         -w '%{http_code}' \
         --data-binary @"$BODY" \
-        $CLAIR_ENDPOINT/v1/layers)
+        "$CLAIR_ENDPOINT/v1/layers")
     if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "201" ]; then
         echo "error creating clair layer '$LAYER' - see errors @ '$ERROR_OUTPUT'" >&2
         exit 1
@@ -194,7 +191,7 @@ done
 # pull and spin up ci/cd tools
 #
 echo_if_verbose "pulling clair ci/cd tools image '$CLAIR_CICD_TOOLS_IMAGE'"
-docker pull $CLAIR_CICD_TOOLS_IMAGE > /dev/null
+docker pull "$CLAIR_CICD_TOOLS_IMAGE" > /dev/null
 if [ $? != 0 ]; then
     echo "error pulling clair image '$CLAIR_CICD_TOOLS_IMAGE'" >&2
     exit 1
@@ -204,26 +201,26 @@ echo_if_verbose "successfully pulled clair ci/cd tools image"
 CLAIR_CICD_TOOLS_CONTAINER=clair-cicd-tools-$(openssl rand -hex 8)
 docker \
     run \
-    --name $CLAIR_CICD_TOOLS_CONTAINER \
+    --name "$CLAIR_CICD_TOOLS_CONTAINER" \
     -v "$VULNERABILTIES_DIR":/vulnerabilities \
-    $CLAIR_CICD_TOOLS_IMAGE \
+    "$CLAIR_CICD_TOOLS_IMAGE" \
     assess-vulnerabilities-risk.py $VERBOSE_FLAG /vulnerabilities
 
-EXIT_CODE=$(docker inspect --format '{{ .State.ExitCode }}' $CLAIR_CICD_TOOLS_CONTAINER)
+EXIT_CODE=$(docker inspect --format '{{ .State.ExitCode }}' "$CLAIR_CICD_TOOLS_CONTAINER")
 
 #
 # a little bit of cleanup
 #
-docker kill $CLAIR_CICD_TOOLS_CONTAINER >& /dev/null
-docker rm $CLAIR_CICD_TOOLS_CONTAINER >& /dev/null
+docker kill "$CLAIR_CICD_TOOLS_CONTAINER" >& /dev/null
+docker rm "$CLAIR_CICD_TOOLS_CONTAINER" >& /dev/null
 
-docker kill $CLAIR_CONTAINER >& /dev/null
-docker rm $CLAIR_CONTAINER >& /dev/null
+docker kill "$CLAIR_CONTAINER" >& /dev/null
+docker rm "$CLAIR_CONTAINER" >& /dev/null
 
-docker kill $CLAIR_DATABASE_CONTAINER >& /dev/null
-docker rm $CLAIR_DATABASE_CONTAINER >& /dev/null
+docker kill "$CLAIR_DATABASE_CONTAINER" >& /dev/null
+docker rm "$CLAIR_DATABASE_CONTAINER" >& /dev/null
 
 #
 # we're all done:-)
 #
-exit $EXIT_CODE
+exit "$EXIT_CODE"
