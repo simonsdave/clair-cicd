@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
 
-echo -n "$(tput bold)"
-echo -n "github username> "
-echo -n "$(tput sgr0)"
-read FOR_VAGRANT_GITHUB_USERNAME
+if [ $# != 4 ]; then
+    echo "usage: $(basename "$0") <github username> <github email> <github public key> <github private key>" >&2
+    exit 1
+fi
 
-echo -n "$(tput bold)"
-echo -n "github email> "
-echo -n "$(tput sgr0)"
-read FOR_VAGRANT_GITHUB_EMAIL
-
-VAGRANT_GITHUB_USERNAME=$FOR_VAGRANT_GITHUB_USERNAME VAGRANT_GITHUB_EMAIL=$FOR_VAGRANT_GITHUB_EMAIL vagrant up
-
-exit 0
+curl -s https://raw.githubusercontent.com/simonsdave/dev-env/master/ubuntu/trusty/create_dev_env.sh | bash -s -- "$@"
+exit $?
