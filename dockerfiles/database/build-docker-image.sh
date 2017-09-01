@@ -39,8 +39,7 @@ DATABASE_SERVER_DOCKER_IMAGE=postgres:9.5.2
 
 echo "pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE"
 
-docker pull $DATABASE_SERVER_DOCKER_IMAGE >& /dev/null
-if [ $? != 0 ]; then
+if ! docker pull $DATABASE_SERVER_DOCKER_IMAGE >& /dev/null; then
     echo "error pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE" >&2
     exit 1
 fi
@@ -60,8 +59,7 @@ echo "successfully started database server container"
 echo -n "waiting for database server in container '$CLAIR_DATABASE_CONTAINER_NAME' to start "
 for i in $(seq 1 10)
 do
-    docker logs "$CLAIR_DATABASE_CONTAINER_NAME" |& grep "database system is ready to accept connections" > /dev/null
-    if [ $? == 0 ]; then
+    if ! docker logs "$CLAIR_DATABASE_CONTAINER_NAME" |& grep "database system is ready to accept connections" > /dev/null; then
         break
     fi
     echo -n "."
@@ -82,12 +80,12 @@ do
         sh -c 'echo "create database clair" | psql -U postgres' \
         >& /dev/null
 
-    docker \
+    if ! docker \
         exec \
          "$CLAIR_DATABASE_CONTAINER_NAME" \
          sh -c 'echo "\list" | psql -U postgres' |& \
-         grep '^\s*clair' >& dave.txt
-    if [ $? == 0 ]; then
+         grep '^\s*clair' >& dave.txt;
+    then
          break
     fi
 
@@ -104,17 +102,11 @@ echo "successfully created database"
 # get clair running
 #
 echo "pulling clair image '$CLAIR_IMAGE_NAME'"
-docker \
-    pull \
-    $CLAIR_IMAGE_NAME \
-    > /dev/null
-if [ $? != 0 ]; then
+if ! docker pull $CLAIR_IMAGE_NAME > /dev/null; then
     echo "error pulling clair image '$CLAIR_IMAGE_NAME'" >&2
     exit 1
 fi
 echo "pulled clair image '$CLAIR_IMAGE_NAME'"
-
-#
 # create clair configuration that will point clair @ the database we just created
 #
 CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
@@ -138,7 +130,7 @@ sed \
 echo "created clair configuration"
 
 echo "creating clair container '$CLAIR_CONTAINER_NAME'"
-docker \
+if ! docker \
     run \
     -d \
     --name "$CLAIR_CONTAINER_NAME" \
@@ -147,19 +139,21 @@ docker \
     -v "$CLAIR_CONFIG_DIR":/config \
     "$CLAIR_IMAGE_NAME" \
     -config=/config/config.yaml \
-    > /dev/null
+    > /dev/null;
+then
+    echo "error creating clair container '$CLAIR_CONTAINER_NAME'" >&2
+    exit 1
+fi
 echo "successfully created clair container"
 
 echo -n "Waiting for vulnerabilities database update to finish "
 while true
 do
-    docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null
-    if [ $? == 0 ]; then
+    if ! docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null; then
         break
     fi
 
-    docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null
-    if [ $? == 0 ]; then
+    if ! docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null; then
         echo ""
         echo "error during vulnerabilities database update" >&2
         exit 1

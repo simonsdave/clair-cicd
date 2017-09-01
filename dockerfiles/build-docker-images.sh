@@ -7,7 +7,7 @@ set -e
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
-TAG_FLAG=""
+TAG=latest
 
 while true
 do
@@ -17,11 +17,10 @@ do
             # this script can be called by travis which may pass
             # a zero length tag argument and hence the need for
             # the if statement below
-            if [ "${1:-}" != "" ]; then
-                TAG_FLAG="-t ${1:-}"
-            fi
-            # the shift assumes the arg after the -t is always a
-            # tag name it just might be a zero length tag name
+            TAG=${1:-latest}
+
+            # this shift assumes the arg after the -t is always a
+            # tag name even if it might be a zero length tag name
             shift
             ;;
         *)
@@ -40,20 +39,14 @@ DOCKERHUB_USERNAME=${2:-}
 DOCKERHUB_PASSWORD=${3:-}
 
 "$SCRIPT_DIR_NAME/cicd-tools/build-docker-image.sh" \
-    "$TAG_FLAG" \
+    -t "$TAG" \
     "$PACKAGE_TAR_GZ" \
     "$DOCKERHUB_USERNAME" \
     "$DOCKERHUB_PASSWORD"
-if [ $? != 0 ]; then
-    exit 1
-fi
 
 "$SCRIPT_DIR_NAME/database/build-docker-image.sh" \
-    "$TAG_FLAG" \
+    -t "$TAG" \
     "$DOCKERHUB_USERNAME" \
     "$DOCKERHUB_PASSWORD"
-if [ $? != 0 ]; then
-    exit 1
-fi
 
 exit 0

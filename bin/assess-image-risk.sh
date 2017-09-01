@@ -55,8 +55,7 @@ CLAIR_CICD_TOOLS_IMAGE=simonsdave/clair-cicd-tools:latest
 # pull image and spin up clair database
 #
 echo_if_verbose "pulling clair database image '$CLAIR_DATABASE_IMAGE'"
-docker pull $CLAIR_DATABASE_IMAGE > /dev/null
-if [ $? != 0 ]; then
+if ! docker pull $CLAIR_DATABASE_IMAGE > /dev/null; then
     echo "error pulling clair database image '$CLAIR_DATABASE_IMAGE'" >&2
     exit 1
 fi
@@ -64,8 +63,7 @@ echo_if_verbose "successfully pulled clair database image"
 
 CLAIR_DATABASE_CONTAINER=clair-db-$(openssl rand -hex 8)
 echo_if_verbose "starting clair database container '$CLAIR_DATABASE_CONTAINER'"
-docker run --name "$CLAIR_DATABASE_CONTAINER" -d "$CLAIR_DATABASE_IMAGE" > /dev/null
-if [ $? != 0 ]; then
+if ! docker run --name "$CLAIR_DATABASE_CONTAINER" -d "$CLAIR_DATABASE_IMAGE" > /dev/null; then
     echo "error starting clair database container '$CLAIR_DATABASE_CONTAINER'" >&2
     exit 1
 fi
@@ -90,8 +88,7 @@ sed \
     "$CLAIR_CONFIG_YAML"
 
 echo_if_verbose "pulling clair image '$CLAIR_IMAGE'"
-docker pull $CLAIR_IMAGE > /dev/null
-if [ $? != 0 ]; then
+if ! docker pull $CLAIR_IMAGE > /dev/null; then 
     echo "error pulling clair image '$CLAIR_IMAGE'" >&2
     exit 1
 fi
@@ -99,7 +96,7 @@ echo_if_verbose "successfully pulled clair image"
 
 CLAIR_CONTAINER=clair-$(openssl rand -hex 8)
 echo_if_verbose "starting clair container '$CLAIR_CONTAINER'"
-docker run \
+if ! docker run \
     -d \
     --name "$CLAIR_CONTAINER" \
     --expose 6060 \
@@ -109,8 +106,8 @@ docker run \
     "$CLAIR_IMAGE" \
     -log-level=info \
     -config=/config/config.yaml \
-    > /dev/null
-if [ $? != 0 ]; then
+    > /dev/null;
+then
     echo "error starting clair container '$CLAIR_CONTAINER'" >&2
     exit 1
 fi
@@ -123,9 +120,9 @@ CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }
 #
 DOCKER_IMAGE_EXPLODED_TAR_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 echo_if_verbose "saving docker image '$DOCKER_IMAGE_TO_ANALYZE' to '$DOCKER_IMAGE_EXPLODED_TAR_DIR'"
-pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" > /dev/null
+pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" || echo "only here to avoid shellcheck's SC2164" > /dev/null
 docker save "$DOCKER_IMAGE_TO_ANALYZE" | tar xv > /dev/null
-popd > /dev/null
+popd || echo "only here to avoid shellcheck's SC2164" > /dev/null
 LAYERS=$(jq ".[0].Layers[]" < "$DOCKER_IMAGE_EXPLODED_TAR_DIR/manifest.json" | sed -e 's|"||g' | sed -e 's|/layer.tar$||g')
 echo_if_verbose "successfully saved docker image '$DOCKER_IMAGE_TO_ANALYZE'"
 
@@ -149,15 +146,17 @@ do
     # seems to fail every now and again:-(
     ERROR_OUTPUT=$(mktemp 2> /dev/null || mktemp -t DAS)
 
-    HTTP_STATUS_CODE=$(curl \
+    if ! HTTP_STATUS_CODE=$(curl \
         -s \
         -o "$ERROR_OUTPUT" \
         -X POST \
         -H 'Content-Type: application/json' \
         -w '%{http_code}' \
         --data-binary @"$BODY" \
-        "$CLAIR_ENDPOINT/v1/layers")
-    if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "201" ]; then
+        "$CLAIR_ENDPOINT/v1/layers") \
+        || \
+        [ "$HTTP_STATUS_CODE" != "201" ];
+    then
         echo "error creating clair layer '$LAYER' - see errors @ '$ERROR_OUTPUT'" >&2
         exit 1
     fi
@@ -176,12 +175,14 @@ echo_if_verbose "saving vulnerabilities to directory '$VULNERABILTIES_DIR'"
 
 for LAYER in $LAYERS
 do
-    HTTP_STATUS_CODE=$(curl \
+    if ! HTTP_STATUS_CODE=$(curl \
         -s \
         -o "$VULNERABILTIES_DIR/$LAYER" \
         -w '%{http_code}' \
-        "$CLAIR_ENDPOINT/v1/layers/$LAYER?vulnerabilities")
-    if [ $? != 0 ] || [ "$HTTP_STATUS_CODE" != "200" ]; then
+        "$CLAIR_ENDPOINT/v1/layers/$LAYER?vulnerabilities") \
+        || \
+        [ "$HTTP_STATUS_CODE" != "200" ];
+    then
         echo "error getting vulnerabilities for layer '$LAYER'" >&2
         exit 1
     fi
@@ -191,8 +192,7 @@ done
 # pull and spin up ci/cd tools
 #
 echo_if_verbose "pulling clair ci/cd tools image '$CLAIR_CICD_TOOLS_IMAGE'"
-docker pull "$CLAIR_CICD_TOOLS_IMAGE" > /dev/null
-if [ $? != 0 ]; then
+if ! docker pull "$CLAIR_CICD_TOOLS_IMAGE" > /dev/null; then
     echo "error pulling clair image '$CLAIR_CICD_TOOLS_IMAGE'" >&2
     exit 1
 fi
