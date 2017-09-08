@@ -85,7 +85,8 @@ do
         exec \
          "$CLAIR_DATABASE_CONTAINER_NAME" \
          sh -c 'echo "\list" | psql -U postgres' |& \
-         grep '^\s*clair' >& dave.txt;
+         grep '^\s*clair' \
+         >& /dev/null;
     then
          break
     fi
