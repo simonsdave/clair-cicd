@@ -41,10 +41,27 @@ Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-27-generic x86_64)
 vagrant@vagrant-ubuntu-trusty-64:~$
 ```
 
-Clone the ecs repo.
+Start the ssh-agent in the background.
 
 ```bash
-vagrant@vagrant-ubuntu-trusty-64:~$ git clone https://github.com/simonsdave/clair-database.git
+~> eval "$(ssh-agent -s)"
+Agent pid 25657
+~>
+```
+
+Add SSH private key for github to the ssh-agent
+
+```bash
+~> ssh-add ~/.ssh/id_rsa_github
+Enter passphrase for /home/vagrant/.ssh/id_rsa_github:
+Identity added: /home/vagrant/.ssh/id_rsa_github (/home/vagrant/.ssh/id_rsa_github)
+~>
+```
+
+Clone the repo.
+
+```bash
+vagrant@vagrant-ubuntu-trusty-64:~$ git clone git@github.com:simonsdave/clair-cicd.git
 Cloning into 'clair-database'...
 remote: Counting objects: 3, done.
 remote: Compressing objects: 100% (2/2), done.
@@ -55,4 +72,36 @@ vagrant@vagrant-ubuntu-trusty-64:~$ cd clair-database/
 vagrant@vagrant-ubuntu-trusty-64:~/clair-database$
 ```
 
-All done:-)
+Configure the dev environment
+
+```bash
+~> cd clair-cicd/
+~/clair-cicd> source cfg4dev
+New python executable in env/bin/python
+Installing setuptools, pip...done.
+.
+.
+.
+Cleaning up...
+(env)~/clair-cicd>
+```
+
+Run unit tests
+
+```bash
+(env)~/clair-cicd> nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
+.......................
+Name                     Stmts   Miss Branch BrPart  Cover
+----------------------------------------------------------
+clair_cicd/__init__.py       1      0      0      0   100%
+clair_cicd/assessor.py      10      0      4      0   100%
+clair_cicd/io.py            42      0     10      1    98%
+clair_cicd/models.py        31      0      0      0   100%
+----------------------------------------------------------
+TOTAL                       84      0     14      1    99%
+----------------------------------------------------------------------
+Ran 23 tests in 0.031s
+
+OK
+(env)~/clair-cicd>
+```
