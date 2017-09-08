@@ -3,6 +3,7 @@
 # this script automates the process of building a postgress docker
 # image that runs postgres and contains a fully populated database
 # of current vulnerabilities.
+#
 
 TAG=latest
 
@@ -67,7 +68,7 @@ do
 done
 echo ''
 
-echo "successfully started database server"
+echo "successfully started database server from docker image '$DATABASE_SERVER_DOCKER_IMAGE'"
 
 echo "creating database"
 
@@ -80,7 +81,7 @@ do
         sh -c 'echo "create database clair" | psql -U postgres' \
         >& /dev/null
 
-    if ! docker \
+    if docker \
         exec \
          "$CLAIR_DATABASE_CONTAINER_NAME" \
          sh -c 'echo "\list" | psql -U postgres' |& \
@@ -107,6 +108,8 @@ if ! docker pull $CLAIR_IMAGE_NAME > /dev/null; then
     exit 1
 fi
 echo "pulled clair image '$CLAIR_IMAGE_NAME'"
+
+#
 # create clair configuration that will point clair @ the database we just created
 #
 CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
@@ -146,14 +149,14 @@ then
 fi
 echo "successfully created clair container"
 
-echo -n "Waiting for vulnerabilities database update to finish "
+echo -n "waiting for vulnerabilities database update to finish "
 while true
 do
-    if ! docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null; then
+    if docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null; then
         break
     fi
 
-    if ! docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null; then
+    if docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null; then
         echo ""
         echo "error during vulnerabilities database update" >&2
         exit 1
