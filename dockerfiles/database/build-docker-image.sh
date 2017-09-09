@@ -6,7 +6,7 @@
 #
 
 ts() {
-    echo $(date "+%Y-%m-%d %k:%M:%S")
+    date "+%Y-%m-%d %k:%M:%S"
 }
 
 ts_echo() {
