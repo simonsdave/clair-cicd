@@ -3,6 +3,25 @@
 # this script automates the process of building a postgress docker
 # image that runs postgres and contains a fully populated database
 # of current vulnerabilities.
+#
+
+ts() {
+    date "+%Y-%m-%d %k:%M:%S"
+}
+
+ts_echo() {
+    if [ "${1:-}" == "-n" ]; then
+        echo -n "$(ts) ${2:-}"
+    else
+        echo "$(ts) ${1:-}"
+    fi
+    return 0
+}
+
+ts_echo_stderr() {
+    echo "$(ts) ${1:-}" >&2
+    return 0
+}
 
 TAG=latest
 
@@ -37,16 +56,16 @@ CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
 DATABASE_SERVER_DOCKER_IMAGE=postgres:9.5.2
 
-echo "pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE"
+ts_echo "pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE"
 
 if ! docker pull $DATABASE_SERVER_DOCKER_IMAGE >& /dev/null; then
-    echo "error pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE" >&2
+    ts_echo_stderr "error pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE"
     exit 1
 fi
 
-echo "successfully pulled database server docker image"
+ts_echo "successfully pulled database server docker image"
 
-echo "starting database server container '$CLAIR_DATABASE_CONTAINER_NAME'"
+ts_echo "starting database server container '$CLAIR_DATABASE_CONTAINER_NAME'"
 docker \
     run \
     --name "$CLAIR_DATABASE_CONTAINER_NAME" \
@@ -54,9 +73,9 @@ docker \
     -d \
     $DATABASE_SERVER_DOCKER_IMAGE \
     > /dev/null
-echo "successfully started database server container"
+ts_echo "successfully started database server container"
 
-echo -n "waiting for database server in container '$CLAIR_DATABASE_CONTAINER_NAME' to start "
+ts_echo -n "waiting for database server in container '$CLAIR_DATABASE_CONTAINER_NAME' to start "
 for i in $(seq 1 10)
 do
     if ! docker logs "$CLAIR_DATABASE_CONTAINER_NAME" |& grep "database system is ready to accept connections" > /dev/null; then
@@ -67,9 +86,9 @@ do
 done
 echo ''
 
-echo "successfully started database server"
+ts_echo "successfully started database server from docker image '$DATABASE_SERVER_DOCKER_IMAGE'"
 
-echo "creating database"
+ts_echo -n "creating database "
 
 MAX_NUM_DATABASE_CREATE_ATTEMPTS=10
 for i in $(seq 1 $MAX_NUM_DATABASE_CREATE_ATTEMPTS)
@@ -80,39 +99,45 @@ do
         sh -c 'echo "create database clair" | psql -U postgres' \
         >& /dev/null
 
-    if ! docker \
+    if docker \
         exec \
          "$CLAIR_DATABASE_CONTAINER_NAME" \
          sh -c 'echo "\list" | psql -U postgres' |& \
-         grep '^\s*clair' >& dave.txt;
+         grep '^\s*clair' \
+         >& /dev/null;
     then
-         break
+        echo ""
+        break
     fi
+
+    echo -n "."
 
     sleep 3
 done
 if [ "$i" == "$MAX_NUM_DATABASE_CREATE_ATTEMPTS" ]; then
-    echo "error creating database" >&2
+    ts_echo "error creating database"
     exit 1
 fi
 
-echo "successfully created database"
+ts_echo "successfully created database"
 
 #
 # get clair running
 #
-echo "pulling clair image '$CLAIR_IMAGE_NAME'"
+ts_echo "pulling clair image '$CLAIR_IMAGE_NAME'"
 if ! docker pull $CLAIR_IMAGE_NAME > /dev/null; then
-    echo "error pulling clair image '$CLAIR_IMAGE_NAME'" >&2
+    ts_echo_stderr "error pulling clair image '$CLAIR_IMAGE_NAME'"
     exit 1
 fi
-echo "pulled clair image '$CLAIR_IMAGE_NAME'"
+ts_echo "pulled clair image '$CLAIR_IMAGE_NAME'"
+
+#
 # create clair configuration that will point clair @ the database we just created
 #
 CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 CLAIR_CONFIG_YAML=$CLAIR_CONFIG_DIR/config.yaml
 
-echo "creating clair configuration @ '$CLAIR_CONFIG_YAML'"
+ts_echo "creating clair configuration @ '$CLAIR_CONFIG_YAML'"
 
 curl \
     -s \
@@ -127,9 +152,9 @@ sed \
     -e 's|source:|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
     "$CLAIR_CONFIG_YAML"
 
-echo "created clair configuration"
+ts_echo "created clair configuration"
 
-echo "creating clair container '$CLAIR_CONTAINER_NAME'"
+ts_echo "creating clair container '$CLAIR_CONTAINER_NAME'"
 if ! docker \
     run \
     -d \
@@ -141,21 +166,21 @@ if ! docker \
     -config=/config/config.yaml \
     > /dev/null;
 then
-    echo "error creating clair container '$CLAIR_CONTAINER_NAME'" >&2
+    ts_echo_stderr "error creating clair container '$CLAIR_CONTAINER_NAME'"
     exit 1
 fi
-echo "successfully created clair container"
+ts_echo "successfully created clair container"
 
-echo -n "Waiting for vulnerabilities database update to finish "
+ts_echo -n "waiting for vulnerabilities database update to finish "
 while true
 do
-    if ! docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null; then
+    if docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null; then
         break
     fi
 
-    if ! docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null; then
+    if docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null; then
         echo ""
-        echo "error during vulnerabilities database update" >&2
+        ts_echo_stderr "error during vulnerabilities database update"
         exit 1
     fi
 
@@ -180,18 +205,18 @@ docker \
     > /dev/null
 
 if [ "$DOCKERHUB_PASSWORD" != "" ]; then
-    echo "logging in to dockerhub"
+    ts_echo "logging in to dockerhub"
     docker login --username="$DOCKERHUB_USERNAME" --password="$DOCKERHUB_PASSWORD"
-    echo "logged in to dockerhub"
+    ts_echo "logged in to dockerhub"
 
-    echo "pushing vulnerabilities database ($CLAIR_DATABASE_IMAGE_NAME) to dockerhub"
+    ts_echo "pushing vulnerabilities database ($CLAIR_DATABASE_IMAGE_NAME) to dockerhub"
     docker push "$CLAIR_DATABASE_IMAGE_NAME" > /dev/null
-    echo "pushed vulnerabilities database to dockerhub"
+    ts_echo "pushed vulnerabilities database to dockerhub"
 fi
 
 docker kill "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
 docker rm "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
 
-echo "done!"
+ts_echo "done!"
 
 exit 0
