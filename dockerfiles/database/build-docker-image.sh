@@ -5,6 +5,8 @@
 # of current vulnerabilities.
 #
 
+# :TODO: really don't like the way these timestamp(ts) echo functions
+# are implemented. Has to be a cleaner way to code these.
 ts() {
     date "+%Y-%m-%d %k:%M:%S"
 }
