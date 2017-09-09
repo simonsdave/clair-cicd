@@ -125,7 +125,8 @@ if __name__ == '__main__':
     for vulnerability in vulnerabilities:
         _logger.debug('-' * 50)
         _logger.debug(json.dumps(vulnerability.vulnerability, indent=2))
-    _logger.debug('-' * 50)
+    if vulnerabilities:
+        _logger.debug('-' * 50)
 
     #
     # this is what it's all been leading up to:-)
