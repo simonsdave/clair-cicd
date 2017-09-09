@@ -120,13 +120,9 @@ if __name__ == '__main__':
         sys.exit(2)
 
     #
-    # can be helpful for debugging
+    # can be super useful for debugging
     #
-    for vulnerability in vulnerabilities:
-        _logger.debug('-' * 50)
-        _logger.debug(json.dumps(vulnerability.vulnerability, indent=2))
-    if vulnerabilities:
-        _logger.debug('-' * 50)
+    _logger.debug(json.dumps(vulnerabilities))
 
     #
     # this is what it's all been leading up to:-)

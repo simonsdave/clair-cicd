@@ -41,9 +41,9 @@ class Whitelist(object):
         return Severity(self.whitelist.get('ignoreSevertiesAtOrBelow', 'Medium'))
 
 
-class Vulnerability(object):
+class Vulnerability(dict):
 
-    def __init__(self, vulnerability):
+    def __init__(self, *args, **kwargs):
         """'''vulnerability''' is expected to be a dictionary
         of the form illustrated by the example below:
 
@@ -63,19 +63,17 @@ class Vulnerability(object):
               }
             }
         """
-        object.__init__(self)
-
-        self.vulnerability = vulnerability
+        dict.__init__(self, *args, **kwargs)
 
     def __str__(self):
         return self.cve_id
 
     @property
     def cve_id(self):
-        return self.vulnerability['Name']
+        return self['Name']
 
     @property
     def severity(self):
         # use Severity if it exists otherwise uses Score
         # where low = 0.0-3.9, medium = 4.0-6.9 & high = 7.0-10.0
-        return Severity(self.vulnerability['Severity'])
+        return Severity(self['Severity'])

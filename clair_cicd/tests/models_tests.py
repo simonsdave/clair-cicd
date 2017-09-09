@@ -48,7 +48,7 @@ class VulnerabilityTestCase(unittest.TestCase):
     def test_ctr(self):
         vulnerability_dict = {}
         vulnerability = Vulnerability(vulnerability_dict)
-        self.assertTrue(vulnerability_dict == vulnerability.vulnerability)
+        self.assertTrue(vulnerability_dict == vulnerability)
 
     def test_cve_id(self):
         cve_id = 'abc'
