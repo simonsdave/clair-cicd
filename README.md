@@ -6,6 +6,7 @@
 [![Requirements Status](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
 [![Build Status](https://travis-ci.org/simonsdave/clair-cicd.svg?branch=master)](https://travis-ci.org/simonsdave/clair-cicd)
 [![Coverage Status](https://coveralls.io/repos/github/simonsdave/clair-cicd/badge.svg?branch=master)](https://coveralls.io/github/simonsdave/clair-cicd?branch=master)
+
 [![docker-simonsdave/clair-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-database/)
 [![docker-simonsdave/clair-cicd-tools](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20tools-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
 
