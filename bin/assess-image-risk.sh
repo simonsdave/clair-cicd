@@ -128,9 +128,9 @@ CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }
 #
 DOCKER_IMAGE_EXPLODED_TAR_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 echo_if_verbose "saving docker image '$DOCKER_IMAGE_TO_ANALYZE' to '$DOCKER_IMAGE_EXPLODED_TAR_DIR'"
-pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" || echo "only here to avoid shellcheck's SC2164" > /dev/null
+pushd "$DOCKER_IMAGE_EXPLODED_TAR_DIR" > /dev/null || echo "only here to avoid shellcheck's SC2164"
 docker save "$DOCKER_IMAGE_TO_ANALYZE" | tar xv > /dev/null
-popd || echo "only here to avoid shellcheck's SC2164" > /dev/null
+popd > /dev/null || echo "only here to avoid shellcheck's SC2164"
 LAYERS=$(jq ".[0].Layers[]" < "$DOCKER_IMAGE_EXPLODED_TAR_DIR/manifest.json" | sed -e 's|"||g' | sed -e 's|/layer.tar$||g')
 echo_if_verbose "successfully saved docker image '$DOCKER_IMAGE_TO_ANALYZE'"
 
