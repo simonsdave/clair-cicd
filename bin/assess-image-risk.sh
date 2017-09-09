@@ -111,6 +111,7 @@ then
 fi
 echo_if_verbose "successfully started clair container '$CLAIR_CONTAINER'"
 
+# :TODO: should not be hard coding port number
 CLAIR_ENDPOINT=http://$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$CLAIR_CONTAINER"):6060
 
 #
