@@ -44,9 +44,7 @@ DOCKER_IMAGE_TO_ANALYZE=${1:-}
 #
 # :TODO: clair database version & clair version should match
 CLAIR_DATABASE_IMAGE=simonsdave/clair-database:latest
-# https://quay.io/repository/coreos/clair?tab=tags
-# :TODO: should not be hard coding version number here - where should this be read from?
-CLAIR_VERSION=v1.2.2
+CLAIR_VERSION=$(python -c "import clair_cicd; print clair_cicd.__clair_version__")
 CLAIR_IMAGE=quay.io/coreos/clair:$CLAIR_VERSION
 # :TODO: should not be latest version
 CLAIR_CICD_TOOLS_IMAGE=simonsdave/clair-cicd-tools:latest
@@ -80,7 +78,7 @@ curl \
     -s \
     -o "$CLAIR_CONFIG_YAML" \
     -L \
-    https://raw.githubusercontent.com/coreos/clair/$CLAIR_VERSION/config.example.yaml
+    "https://raw.githubusercontent.com/coreos/clair/$CLAIR_VERSION/config.example.yaml"
 
 sed \
     -i \
@@ -88,7 +86,7 @@ sed \
     "$CLAIR_CONFIG_YAML"
 
 echo_if_verbose "pulling clair image '$CLAIR_IMAGE'"
-if ! docker pull $CLAIR_IMAGE > /dev/null; then 
+if ! docker pull "$CLAIR_IMAGE" > /dev/null; then 
     echo "error pulling clair image '$CLAIR_IMAGE'" >&2
     exit 1
 fi

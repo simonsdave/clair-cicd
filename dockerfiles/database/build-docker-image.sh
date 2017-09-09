@@ -51,8 +51,8 @@ DOCKERHUB_PASSWORD=${2:-}
 
 CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-database:$TAG
 # https://quay.io/repository/coreos/clair?tab=tags
-CLAIR_BRANCH=v1.2.2
-CLAIR_IMAGE_NAME=quay.io/coreos/clair:$CLAIR_BRANCH
+CLAIR_VERSION=$(python -c "import clair_cicd; print clair_cicd.__clair_version__")
+CLAIR_IMAGE_NAME=quay.io/coreos/clair:$CLAIR_VERSION
 CLAIR_CONTAINER_NAME=clair-$(openssl rand -hex 8)
 CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
@@ -127,7 +127,7 @@ ts_echo "successfully created database"
 # get clair running
 #
 ts_echo "pulling clair image '$CLAIR_IMAGE_NAME'"
-if ! docker pull $CLAIR_IMAGE_NAME > /dev/null; then
+if ! docker pull "$CLAIR_IMAGE_NAME" > /dev/null; then
     ts_echo_stderr "error pulling clair image '$CLAIR_IMAGE_NAME'"
     exit 1
 fi
@@ -145,7 +145,7 @@ curl \
     -s \
     -o "$CLAIR_CONFIG_YAML" \
     -L \
-    https://raw.githubusercontent.com/coreos/clair/$CLAIR_BRANCH/config.example.yaml
+    "https://raw.githubusercontent.com/coreos/clair/$CLAIR_VERSION/config.example.yaml"
 
 # postgres connection string details
 # http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
