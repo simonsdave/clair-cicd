@@ -12,6 +12,7 @@ echo_if_verbose() {
 #
 VERBOSE=0
 VERBOSE_FLAG=""
+NO_PULL_DB_AND_TOOLS_DOCKER_IMAGES=0
 
 while true
 do
@@ -26,6 +27,10 @@ do
             VERBOSE=1
             VERBOSE_FLAG=--log=debug
             ;;
+        -np)
+            shift
+            NO_PULL_DB_AND_TOOLS_DOCKER_IMAGES=1
+            ;;
         *)
             break
             ;;
@@ -33,7 +38,7 @@ do
 done
 
 if [ $# != 1 ]; then
-    echo "usage: $(basename "$0") [-v|-vv] <docker image id>" >&2
+    echo "usage: $(basename "$0") [-v|-vv|-np] <docker image id>" >&2
     exit 1
 fi
 
@@ -52,12 +57,16 @@ CLAIR_CICD_TOOLS_IMAGE=simonsdave/clair-cicd-tools:latest
 #
 # pull image and spin up clair database
 #
-echo_if_verbose "pulling clair database image '$CLAIR_DATABASE_IMAGE'"
-if ! docker pull $CLAIR_DATABASE_IMAGE > /dev/null; then
-    echo "error pulling clair database image '$CLAIR_DATABASE_IMAGE'" >&2
-    exit 1
+if [ "0" -eq "${NO_PULL_DB_AND_TOOLS_DOCKER_IMAGES:-0}" ]; then
+    echo_if_verbose "pulling clair database image '$CLAIR_DATABASE_IMAGE'"
+    if ! docker pull $CLAIR_DATABASE_IMAGE > /dev/null; then
+        echo "error pulling clair database image '$CLAIR_DATABASE_IMAGE'" >&2
+        exit 1
+    fi
+    echo_if_verbose "successfully pulled clair database image"
+else
+    echo_if_verbose "**not** pulling clair database image '$CLAIR_DATABASE_IMAGE'"
 fi
-echo_if_verbose "successfully pulled clair database image"
 
 CLAIR_DATABASE_CONTAINER=clair-db-$(openssl rand -hex 8)
 echo_if_verbose "starting clair database container '$CLAIR_DATABASE_CONTAINER'"
@@ -190,12 +199,16 @@ done
 #
 # pull and spin up ci/cd tools
 #
-echo_if_verbose "pulling clair ci/cd tools image '$CLAIR_CICD_TOOLS_IMAGE'"
-if ! docker pull "$CLAIR_CICD_TOOLS_IMAGE" > /dev/null; then
-    echo "error pulling clair image '$CLAIR_CICD_TOOLS_IMAGE'" >&2
-    exit 1
+if [ "0" -eq "${NO_PULL_DB_AND_TOOLS_DOCKER_IMAGES:-0}" ]; then
+    echo_if_verbose "pulling clair ci/cd tools image '$CLAIR_CICD_TOOLS_IMAGE'"
+    if ! docker pull "$CLAIR_CICD_TOOLS_IMAGE" > /dev/null; then
+        echo "error pulling clair image '$CLAIR_CICD_TOOLS_IMAGE'" >&2
+        exit 1
+    fi
+    echo_if_verbose "successfully pulled clair ci/cd tools image"
+else
+    echo_if_verbose "**not** pulling clair ci/cd tools image '$CLAIR_CICD_TOOLS_IMAGE'"
 fi
-echo_if_verbose "successfully pulled clair ci/cd tools image"
 
 CLAIR_CICD_TOOLS_CONTAINER=clair-cicd-tools-$(openssl rand -hex 8)
 docker \
