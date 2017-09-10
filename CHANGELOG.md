@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- How using Clair 1.2.6
+- Now using Clair 1.2.6
 - added ```-np``` (no docker image pull) command line option to ```assess-image-risk.sh```
 
 ### Removed
