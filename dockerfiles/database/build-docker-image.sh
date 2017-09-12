@@ -49,7 +49,7 @@ fi
 DOCKERHUB_USERNAME=${1:-}
 DOCKERHUB_PASSWORD=${2:-}
 
-CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-database:$TAG
+CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-cicd-database:$TAG
 # https://quay.io/repository/coreos/clair?tab=tags
 CLAIR_VERSION=$(python -c "import clair_cicd; print clair_cicd.__clair_version__")
 CLAIR_IMAGE_NAME=quay.io/coreos/clair:$CLAIR_VERSION
