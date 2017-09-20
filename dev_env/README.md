@@ -61,15 +61,15 @@ Identity added: /home/vagrant/.ssh/id_rsa_github (/home/vagrant/.ssh/id_rsa_gith
 Clone the repo.
 
 ```bash
-vagrant@vagrant-ubuntu-trusty-64:~$ git clone git@github.com:simonsdave/clair-cicd.git
-Cloning into 'clair-database'...
-remote: Counting objects: 3, done.
-remote: Compressing objects: 100% (2/2), done.
-remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
-Unpacking objects: 100% (3/3), done.
+~/> git clone git@github.com:simonsdave/clair-cicd.git
+Cloning into 'clair-cicd'...
+remote: Counting objects: 718, done.
+remote: Compressing objects: 100% (73/73), done.
+remote: Total 718 (delta 71), reused 109 (delta 53), pack-reused 582
+Receiving objects: 100% (718/718), 104.36 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (396/396), done.
 Checking connectivity... done.
-vagrant@vagrant-ubuntu-trusty-64:~$ cd clair-database/
-vagrant@vagrant-ubuntu-trusty-64:~/clair-database$
+~/>
 ```
 
 Configure the dev environment
