@@ -151,7 +151,7 @@ curl \
 # http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
 sed \
     -i \
-    -e 's|source:|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
+    -e 's|source:.*$|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
     "$CLAIR_CONFIG_YAML"
 
 ts_echo "created clair configuration"
@@ -176,11 +176,11 @@ ts_echo "successfully created clair container"
 ts_echo -n "waiting for vulnerabilities database update to finish "
 while true
 do
-    if docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: update finished" >& /dev/null; then
+    if docker logs "$CLAIR_CONTAINER_NAME" | grep "update finished" >& /dev/null; then
         break
     fi
 
-    if docker logs "$CLAIR_CONTAINER_NAME" | grep "updater: an error occured" >& /dev/null; then
+    if docker logs "$CLAIR_CONTAINER_NAME" | grep "an error occured" >& /dev/null; then
         echo ""
         ts_echo_stderr "error during vulnerabilities database update"
         exit 1
