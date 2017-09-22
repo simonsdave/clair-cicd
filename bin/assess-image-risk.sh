@@ -181,8 +181,6 @@ do
         echo "{\"Layer\": {\"Name\": \"$LAYER\", \"Path\": \"$DOCKER_IMAGE_EXPLODED_TAR_DIR/$LAYER/layer.tar\", \"ParentName\": \"$PREVIOUS_LAYER\", \"Format\": \"Docker\"}}" > "$BODY"
     fi
 
-    # :TODO: might need to add a retry loop around this cURL statement as it
-    # seems to fail every now and again:-(
     ERROR_OUTPUT=$(mktemp 2> /dev/null || mktemp -t DAS)
 
     if ! HTTP_STATUS_CODE=$(curl \
