@@ -3,9 +3,9 @@
 ![Maintained](https://img.shields.io/maintenance/yes/2017.svg)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 ![Python 2.7](https://img.shields.io/badge/python-2.7-FFC100.svg?style=flat)
-[![Requirements Status](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
-[![Build Status](https://travis-ci.org/simonsdave/clair-cicd.svg?branch=master)](https://travis-ci.org/simonsdave/clair-cicd)
-[![Coverage Status](https://coveralls.io/repos/github/simonsdave/clair-cicd/badge.svg?branch=master)](https://coveralls.io/github/simonsdave/clair-cicd?branch=master)
+[![Requirements Status](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=release-0.3.0)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=release-0.3.0)
+[![Build Status](https://travis-ci.org/simonsdave/clair-cicd.svg?branch=release-0.3.0)](https://travis-ci.org/simonsdave/clair-cicd)
+[![Coverage Status](https://coveralls.io/repos/github/simonsdave/clair-cicd/badge.svg?branch=release-0.3.0)](https://coveralls.io/github/simonsdave/clair-cicd?branch=release-0.3.0)
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 [![docker-simonsdave/clair-cicd-tools](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20tools-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
 
