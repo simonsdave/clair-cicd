@@ -117,12 +117,16 @@ if ! docker pull "$CLAIR_IMAGE" > /dev/null; then
 fi
 echo_if_verbose "$(ts) successfully pulled clair image"
 
+CLAIR_API_PORT=$(yq .clair.api.port < "$CLAIR_CONFIG_YAML")
+CLAIR_HEALTH_API_PORT=$(yq .clair.api.healthport < "$CLAIR_CONFIG_YAML")
+
 CLAIR_CONTAINER=clair-$(openssl rand -hex 8)
 echo_if_verbose "$(ts) starting clair container '$CLAIR_CONTAINER'"
 if ! docker run \
     -d \
     --name "$CLAIR_CONTAINER" \
-    -p 6060-6061:6060-6061 \
+    -p "$CLAIR_API_PORT":"$CLAIR_API_PORT" \
+    -p "$CLAIR_HEALTH_API_PORT":"$CLAIR_HEALTH_API_PORT" \
     --link "$CLAIR_DATABASE_CONTAINER":clair-database \
     -v /tmp:/tmp \
     -v "$CLAIR_CONFIG_DIR":/config \
@@ -135,10 +139,9 @@ then
     exit 1
 fi
 
-# :TODO: should not be hard coding port number
 CLAIR_IP_ADDRESS=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' "$CLAIR_CONTAINER")
-CLAIR_ENDPOINT=http://$CLAIR_IP_ADDRESS:6060
-CLAIR_HEALTH_ENDPOINT=http://$CLAIR_IP_ADDRESS:6061
+CLAIR_ENDPOINT=http://$CLAIR_IP_ADDRESS:$CLAIR_API_PORT
+CLAIR_HEALTH_ENDPOINT=http://$CLAIR_IP_ADDRESS:$CLAIR_HEALTH_API_PORT
 
 while true
 do
