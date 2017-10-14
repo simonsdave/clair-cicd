@@ -37,8 +37,10 @@ Welcome to Ubuntu 14.04 LTS (GNU/Linux 3.13.0-27-generic x86_64)
 0 packages can be updated.
 0 updates are security updates.
 
+New release '16.04.3 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
 
-vagrant@vagrant-ubuntu-trusty-64:~$
+~>
 ```
 
 Start the ssh-agent in the background.
