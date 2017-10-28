@@ -5,5 +5,5 @@ flake8>=2.5.3
 mock==2.0.0
 nose==1.3.7
 nose-cov==1.6
-pep8==1.7.1
 pudb>=2015.4.1
+pycodestyle==2.3.1
