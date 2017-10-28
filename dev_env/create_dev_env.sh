@@ -5,5 +5,5 @@ if [ $# != 4 ]; then
     exit 1
 fi
 
-curl -s https://raw.githubusercontent.com/simonsdave/dev-env/v0.2.0/ubuntu/trusty/create_dev_env.sh | bash -s -- "$@"
+curl -s https://raw.githubusercontent.com/simonsdave/dev-env/v0.4.0/ubuntu/trusty/create_dev_env.sh | bash -s -- "$@"
 exit $?
