@@ -1,7 +1,7 @@
 # Development Environment
 
 To increase predicability, it is recommended
-that ```clair-database``` development be done on a [Vagrant](http://www.vagrantup.com/) provisioned
+that ```clair-cicd``` development be done on a [Vagrant](http://www.vagrantup.com/) provisioned
 [VirtualBox](https://www.virtualbox.org/)
 VM running [Ubuntu 14.04](http://releases.ubuntu.com/14.04/).
 Below are the instructions for spinning up such a VM.
