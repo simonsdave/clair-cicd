@@ -21,9 +21,9 @@ Integrating Clair into a CI/CD pipeline:
 1. can create performance problems (building the Postgres vulnerabilities database is slow)
 1. in and of itself is insufficient from a risk assessment POV because once vulnerabilities
 are identified there's a lack of prescriptive guidance on how to act on
-the vulnerabilities report in an automated manner
+the identified vulnerabilities
 
-This repo was created to address each of the above problems.
+This repo was created to address the above problems.
 
 ## Background
 
@@ -38,9 +38,9 @@ ie. security is important
 way to *production* vs docker images that will only ever be used in *development*
 * Docker images should not be pushed to a Docker registry until
 their risk profile is understood (this is an important one)
-* inserted into the CI/CD pipeline, Clair can be a very effective
+* Clair can be a very effective
 foundation for the automated assessment of Docker image
-vulnerabilities
+vulnerabilities when inserted into the CI/CD pipeline
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
 between code commit and automated (CD) deployment begins rolling
 out a change
@@ -63,20 +63,21 @@ out a change
 ### Getting Started
 
 To get started with using ```clair-cicd```
-to assess vulnerabilities,
+to assess risk,
 a service engineer inserts a single line of code into a
-service's CI script.
-Part of the CI script's responsibility is to build
+service's CI script which runs the shell script ```assess-image-risk.sh```.
+Part of the CI script's responsibility is to build the docker image
 ```username/repo:tag``` and then push ```username/repo:tag```
 to a docker registry.
 The single line of ```clair-cicd``` code should appear after
 ```username/repo:tag``` is built but
 before ```username/repo:tag``` is pushed to a docker registry.
+
 In this simple case, ```assess-image-risk.sh``` returns a zero
 exit status if ```username/repo:tag``` contains no known vulnerabilities
 above a medium severity. If ```username/repo:tag``` contains
 any known vulnerabilities with a severity higher than medium ```assess-image-risk.sh``` returns a non-zero exit status
-and the build should fail immediately
+and the build fails immediately
 ie. the build should fail before ```username/repo:tag```
 is pushed to a docker registry.
 
@@ -101,12 +102,12 @@ tool with the vulnerability would never be used.
 Enter ```clair-cicd's``` whitelists.
 
 Whitelists are json documents which allow security analysts
-to influence ```assess-image-risk.sh``` vulnerability assessment.
+to influence ```assess-image-risk.sh``` risk assessment.
 Whitelist expectations:
 
 * maintained by security analyst **not** service engineer
 * checked into source code control and appropriate change
-management process used to make changes (code reviews, feature
+management processes are used to make changes (code reviews, feature
 branches, etc)
 
 ### Adding a Service Profile
@@ -120,7 +121,7 @@ Assumptions/requirements:
 * bash, curl & jq are installed and available
 * docker is installed and running
 * all testing and dev has been done on Ubuntu 14.04 so no promises about other
-platforms (feedback on this would be very helpful)
+platforms (feedback on this would be very helpful - thanks in advance)
 
 There are 4 moving pieces:
 
