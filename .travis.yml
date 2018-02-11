@@ -16,7 +16,7 @@ script:
   - docker run -v "$PWD:/mnt" koalaman/shellcheck:latest $(find . -name \*.sh | grep -v \.\/env)
   - nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
   - coveralls || true
-  - python setup.py sdist --formats=gztar
+  - python setup.py bdist_wheel sdist --formats=gztar
   - |
     if [ "$TRAVIS_BRANCH" == "master" ] || [ "$TRAVIS_TAG" != "" ]; then
       ./dockerfiles/build-docker-images.sh -t "$TRAVIS_TAG" ./dist/clair-cicd-*.*.*.tar.gz $DOCKERHUB_USERNAME $DOCKERHUB_PASSWORD
