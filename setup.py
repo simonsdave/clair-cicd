@@ -3,7 +3,7 @@
 #
 #   >git clone https://github.com/simonsdave/clair-cicd.git
 #   >cd clair-cicd
-#   >python setup.py sdist --formats=gztar
+#   >python setup.py bdist_wheel sdist --formats=gztar
 #
 
 import re
