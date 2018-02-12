@@ -7,48 +7,24 @@ set -e
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
-TAG=latest
-
-while true
-do
-    case "${1,,}" in
-        -t)
-            shift
-            TAG=${1:-latest}
-            shift
-            ;;
-        *)
-            break
-            ;;
-    esac
-done
-
-if [ $# != 2 ] && [ $# != 3 ]; then
-    echo "usage: $(basename "$0") [-t <tag>] <package-tar-gz> <username> [<password>]" >&2
+if [ $# != 3 ]; then
+    echo "usage: $(basename "$0") <username> <tag> <package-tar-gz>" >&2
     exit 1
 fi
 
-PACKAGE_TAR_GZ=${1:-}
-DOCKERHUB_USERNAME=${2:-}
-DOCKERHUB_PASSWORD=${3:-}
+USERNAME=${1:-}
+TAG=${2:-}
+PACKAGE_TAR_GZ=${3:-}
 
 if [ ! -r "$PACKAGE_TAR_GZ" ]; then
     echo "can't find package @ '$PACKAGE_TAR_GZ'" >&2
     exit 1
 fi
 
-IMAGENAME=$DOCKERHUB_USERNAME/clair-cicd-tools:$TAG
+IMAGENAME=$USERNAME/clair-cicd-tools:$TAG
 
 cp "$PACKAGE_TAR_GZ" "$SCRIPT_DIR_NAME/package.tar.gz"
 docker build -t "$IMAGENAME" "$SCRIPT_DIR_NAME"
 rm "$SCRIPT_DIR_NAME/package.tar.gz"
-
-if [ "$DOCKERHUB_PASSWORD" != "" ]; then
-    echo "logging in to dockerhub"
-    docker login --username="$DOCKERHUB_USERNAME" --password="$DOCKERHUB_PASSWORD"
-    echo "logged in to dockerhub"
-
-    docker push "$IMAGENAME"
-fi
 
 exit 0

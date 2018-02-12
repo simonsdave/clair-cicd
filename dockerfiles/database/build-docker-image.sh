@@ -25,31 +25,15 @@ ts_echo_stderr() {
     return 0
 }
 
-TAG=latest
-
-while true
-do
-    case "${1,,}" in
-        -t)
-            shift
-            TAG=${1:-latest}
-            shift
-            ;;
-        *)
-            break
-            ;;
-    esac
-done
-
-if [ $# != 1 ] && [ $# != 2 ]; then
-    echo "usage: $(basename "$0") [-t <tag>] <dockerhub-username> [<dockerhub-password>]" >&2
+if [ $# != 2 ]; then
+    echo "usage: $(basename "$0") <username> <tag>" >&2
     exit 1
 fi
 
-DOCKERHUB_USERNAME=${1:-}
-DOCKERHUB_PASSWORD=${2:-}
+USERNAME=${1:-}
+TAG=${2:-}
 
-CLAIR_DATABASE_IMAGE_NAME=$DOCKERHUB_USERNAME/clair-cicd-database:$TAG
+CLAIR_DATABASE_IMAGE_NAME=$USERNAME/clair-cicd-database:$TAG
 # https://quay.io/repository/coreos/clair?tab=tags
 CLAIR_VERSION=$(python -c "import clair_cicd; print clair_cicd.__clair_version__")
 CLAIR_IMAGE_NAME=quay.io/coreos/clair:$CLAIR_VERSION
@@ -205,16 +189,6 @@ docker \
     "$CLAIR_DATABASE_CONTAINER_NAME" \
     "$CLAIR_DATABASE_IMAGE_NAME" \
     > /dev/null
-
-if [ "$DOCKERHUB_PASSWORD" != "" ]; then
-    ts_echo "logging in to dockerhub"
-    docker login --username="$DOCKERHUB_USERNAME" --password="$DOCKERHUB_PASSWORD"
-    ts_echo "logged in to dockerhub"
-
-    ts_echo "pushing vulnerabilities database ($CLAIR_DATABASE_IMAGE_NAME) to dockerhub"
-    docker push "$CLAIR_DATABASE_IMAGE_NAME" > /dev/null
-    ts_echo "pushed vulnerabilities database to dockerhub"
-fi
 
 docker kill "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
 docker rm "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
