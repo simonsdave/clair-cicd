@@ -4,9 +4,6 @@ set -e
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
-echo "$#"
-echo "$@"
-
 if [ $# != 4 ]; then
     echo "usage: $(basename "$0") <username> <password> <current tag> <new tag>" >&2
     exit 1
