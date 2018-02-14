@@ -5,7 +5,8 @@ sudo: required
 services:
   - docker
 env:
-  - DOCKER_TEMP_TAG=bindle
+  global:
+    - DOCKER_TEMP_TAG=bindle
 install:
   - source cfg4dev
   # installing ndg-httpsclient eliminates a TLS warning
@@ -23,15 +24,15 @@ script:
   - python setup.py bdist_wheel sdist --formats=gztar
   - travis_fold end "build.python.packages"
   - travis_fold start "build.docker.image"
-  - ./dockerfiles/build-docker-images.sh $DOCKERHUB_USERNAME $DOCKER_TEMP_TAG ./dist/clair-cicd-*.*.*.tar.gz
+  - ./dockerfiles/build-docker-images.sh ${DOCKERHUB_USERNAME} ${DOCKER_TEMP_TAG} ./dist/clair-cicd-*.*.*.tar.gz
   - travis_fold start "build.docker.image"
   # :TODO: add integration/sanity tests on the docker images we just built
 deploy:
   - provider: script
-    script: ./dockerfiles/tag-and-push-docker-images.sh $DOCKER_USERNAME $DOCKER_PASSWORD $DOCKER_TEMP_TAG latest
+    script: ./dockerfiles/tag-and-push-docker-images.sh ${DOCKER_USERNAME} ${DOCKER_PASSWORD} ${DOCKER_TEMP_TAG} latest
     on:
       branch: master
   - provider: script
-    script: ./dockerfiles/tag-and-push-docker-images.sh $DOCKER_USERNAME $DOCKER_PASSWORD $DOCKER_TEMP_TAG $TRAVIS_TAG
+    script: ./dockerfiles/tag-and-push-docker-images.sh ${DOCKER_USERNAME} ${DOCKER_PASSWORD} ${DOCKER_TEMP_TAG} ${TRAVIS_TAG}
     on:
       tags: true
