@@ -22,6 +22,8 @@ FROM ubuntu:14.04
 
 MAINTAINER Dave Simons
 
+ENV DEBIAN_FRONTEND noninteractive
+
 RUN apt-get update -y
 
 # basic stuff to get python going
@@ -34,3 +36,5 @@ COPY package.tar.gz /tmp/package.tar.gz
 RUN pip install /tmp/package.tar.gz
 
 RUN rm /tmp/package.tar.gz
+
+ENV DEBIAN_FRONTEND newt
