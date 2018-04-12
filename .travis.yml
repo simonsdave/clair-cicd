@@ -27,7 +27,7 @@ script:
   - travis_fold end "build.python.packages"
   - travis_fold start "build.docker.image"
   - ./dockerfiles/build-docker-images.sh ${DOCKERHUB_USERNAME} ${DOCKER_TEMP_TAG} ./dist/clair-cicd-*.*.*.tar.gz
-  - travis_fold start "build.docker.image"
+  - travis_fold end "build.docker.image"
   # :TODO: add integration/sanity tests on the docker images we just built
 deploy:
   - provider: script
