@@ -15,10 +15,7 @@ install:
   - pip install coveralls
   - docker pull koalaman/shellcheck:latest
 script:
-  # pycodestyle 2.4.0 & flake8 3.5.0 aren't compatible - until
-  # that's fixed running pycodestyle directly
-  - pycodestyle
-  # - flake8
+  - flake8
   - docker run -v "$PWD:/mnt" koalaman/shellcheck:latest $(find . -name \*.sh | grep -v \.\/env)
   - nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
   - coveralls || true
