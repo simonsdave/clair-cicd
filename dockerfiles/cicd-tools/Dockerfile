@@ -18,7 +18,7 @@
 #
 #   docker push simonsdave/clair-cicd-tools
 #
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 MAINTAINER Dave Simons
 
@@ -29,7 +29,6 @@ RUN apt-get update -y
 # basic stuff to get python going
 RUN apt-get install -y python
 RUN apt-get install -y python-pip
-RUN pip install pip==1.5.6
 
 COPY package.tar.gz /tmp/package.tar.gz
 
