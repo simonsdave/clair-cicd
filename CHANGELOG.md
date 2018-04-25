@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - pep8 -> pycodestyle
+- clair v2.0.1 -> v2.0.2
 
 ### Removed
 
