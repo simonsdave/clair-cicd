@@ -9,7 +9,9 @@
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 [![docker-simonsdave/clair-cicd-tools](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20tools-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
 
-**THIS REPO IS A WIP (but starting to see real progress)**
+```
+Repo Status = this repo is a WIP but starting to see real progress 
+```
 
 [Clair](https://github.com/coreos/clair),
 [released by CoreOS in Nov '16](https://coreos.com/blog/vulnerability-analysis-for-containers/),
