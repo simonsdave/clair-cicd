@@ -18,7 +18,7 @@
 #
 #   docker push simonsdave/clair-cicd-tools
 #
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 MAINTAINER Dave Simons
 
