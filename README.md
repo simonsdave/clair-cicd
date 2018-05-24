@@ -38,9 +38,9 @@ and ultimately deployment of Docker images
 ie. security is important
 * risk is assessed differently for docker images that could find their
 way to *production* vs docker images that will only ever be used in *development*
-* Docker images should not be pushed to a Docker registry until
+* Docker images should **not** be pushed to a Docker registry until
 their risk profile is understood (this is an important one)
-* Clair can be a very effective
+* [Clair](https://github.com/coreos/clair) can be a very effective
 foundation for the automated assessment of Docker image
 vulnerabilities when inserted into the CI/CD pipeline
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
@@ -157,4 +157,5 @@ docker image
 * [9 Oct '17 - 10 layers of Linux container security](https://opensource.com/article/17/10/10-layers-container-security)
 * [5 Oct '17 - How to Maintain Security when Rolling out DevOps](https://www.informationweek.com/devops/how-to-maintain-security-when-rolling-out-devops/a/d-id/1330047?imm_mid=0f71d7&cmp=em-webops-na-na-newsltr_security_20171010_length_control)
 * [26 Jul '16 - Injecting security into Continuous Delivery](https://www.oreilly.com/learning/injecting-security-into-continuous-delivery)
+* [5 Jun '16 - <— Shifting Security to the Left](http://www.devsecops.org/blog/2016/5/20/-security)
 * [Five Secrets and Two Common “Gotchas” of Vulnerability Scanning](https://www.kennasecurity.com/resources/secrets-gotchas-of-vuln-scanning)
