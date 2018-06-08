@@ -15,7 +15,9 @@ install:
   - pip install coveralls
   - docker pull koalaman/shellcheck:latest
 script:
-  - pip check
+  # disabled pip check for now as there seems to be an upstream
+  # problem with requests & urllib3
+  # - pip check
   - flake8
   - docker run -v "$PWD:/mnt" koalaman/shellcheck:latest $(find . -name \*.sh | grep -v \.\/env)
   - nosetests --with-coverage --cover-branches --cover-erase --cover-package clair_cicd
