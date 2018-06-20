@@ -10,7 +10,7 @@
 [![docker-simonsdave/clair-cicd-tools](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20tools-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
 
 ```
-Repo Status = this repo is a WIP but starting to see real progress 
+Repo Status = this repo is a WIP but starting to show some promise!
 ```
 
 [Clair](https://github.com/coreos/clair),
@@ -21,7 +21,7 @@ Integrating Clair into a CI/CD pipeline:
 
 1. can be complex (believe this is mostly a documentation challenge)
 1. can create performance problems (building the Postgres vulnerabilities database is slow)
-1. in and of itself is insufficient from a risk assessment POV because once vulnerabilities
+1. in and of itself is insufficient from a risk assessment point of view because once vulnerabilities
 are identified there's a lack of prescriptive guidance on how to act on
 the identified vulnerabilities
 
@@ -46,19 +46,25 @@ vulnerabilities when inserted into the CI/CD pipeline
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
 between code commit and automated (CD) deployment begins rolling
 out a change
-
-## Key Concepts
-
-* vulnerabilities
-* docker image
-* static vulnerability analysis
-* vulnerability whitelist
-* service profile
+* there should be a clear division of responsibilities between
+those who create a docker image and those that determine the
+risk of vulnerabilities in a docker image
+* the risk assessment process must generate evidence which
+can be used to understand the risk assessment decision
 
 ## Key Participants
 
-* service engineer
-* security analyst
+* service engineer - responsible for implementing a service that packaged
+in a docker container
+* security analyst - responsible for defining the
+
+## Key Concepts
+
+* docker image
+* vulnerabilities
+* static vulnerability analysis
+* vulnerability whitelist
+* service profile
 
 ## How to Use
 
