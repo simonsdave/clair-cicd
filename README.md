@@ -128,8 +128,12 @@ Assumptions/requirements:
 
 * bash, curl & jq are installed and available
 * docker is installed and running
-* all testing and dev has been done on Ubuntu 14.04 so no promises about other
-platforms (feedback on this would be very helpful - thanks in advance)
+* ```clair-cicd``` was originally developed on [Ubuntu 14.04](http://releases.ubuntu.com/14.04/)
+although all development and testing is now done on [Ubuntu 16.04](http://releases.ubuntu.com/16.04/)
+so while things should still work on [Ubuntu 14.04](http://releases.ubuntu.com/14.04/)
+they will certainly work on [Ubuntu 16.04](http://releases.ubuntu.com/16.04/) - if you
+try using ```clair-cicd``` on other platforms the feedback on how things go would be
+greatly appreciated
 
 There are 4 moving pieces:
 
