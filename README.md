@@ -156,6 +156,7 @@ docker image
 
 ## References
 
+* [20 Jun '18 - Where in the DevOps cycle do you do security?](https://opensource.com/article/18/6/where-cycle-security-devops)
 * [8 May '18 - DevSecOps: 7 habits of strong security organizations](https://enterprisersproject.com/article/2018/5/devsecops-7-habits-strong-security-organizations)
 * [18 Apr '18 - The Cloudcast #343 - Container Vulnerability Scanning](http://www.thecloudcast.net/2018/04/the-cloudcast-343-container.html)
 * [21 Feb '18 - Automated Compliance Testing Tool Accelerates DevSecOps](https://www.securityweek.com/automated-compliance-testing-tool-accelerates-devsecops)
