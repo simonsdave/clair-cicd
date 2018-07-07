@@ -19,8 +19,8 @@ is a very effective tool for statically analyzing docker images
 and assessing images against known vulnerabilities.
 Integrating Clair into a CI/CD pipeline:
 
-1. can be complex (believe this is mostly a documentation challenge)
-1. can create performance problems (building the Postgres vulnerabilities database is slow)
+1. is complex (believe this is mostly a documentation challenge)
+1. creates performance problems (building the Postgres vulnerabilities database is slow)
 1. in and of itself is insufficient from a risk assessment point of view because once vulnerabilities
 are identified there's a lack of prescriptive guidance on how to act on
 the identified vulnerabilities
