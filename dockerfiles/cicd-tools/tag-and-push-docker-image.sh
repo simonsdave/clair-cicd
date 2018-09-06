@@ -18,7 +18,7 @@ NEW_IMAGE="$USERNAME/$BASE_IMAGE:$NEW_TAG"
 
 docker tag "$CURRENT_IMAGE" "$NEW_IMAGE"
 
-docker login --username="$USERNAME" --password="$PASSWORD"
+echo "$PASSWORD" | docker login --username="$USERNAME" --password-stdin
 docker push "$NEW_IMAGE"
 
 exit 0
