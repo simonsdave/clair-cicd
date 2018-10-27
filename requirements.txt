@@ -1,15 +1,9 @@
 # See setup.py
 -e .
 # the packages below are required for development & testing
-flake8==3.5.0
+flake8==3.6.0
 mock==2.0.0
 nose==1.3.7
 nose-cov==1.6
 pudb>=2015.4.1
-# per https://github.com/PyCQA/pycodestyle/issues/741
-# pycodestyle==2.4.0 isn't compatiable with flake8==3.5.0
-# and since we value flake8 over pycodestyle we'll
-# keep pycodestyle @ 2.3.1 until pycodestyle works with
-# flake8==3.5.0 - this decision will result in requires.io
-# flagging the repo as having out of date requirements
-pycodestyle==2.3.1
+pycodestyle==2.4.0
