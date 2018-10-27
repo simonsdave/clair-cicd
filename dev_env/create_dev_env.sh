@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
+set -e
+
 if [ $# != 4 ]; then
     echo "usage: $(basename "$0") <github username> <github email> <github public key> <github private key>" >&2
     exit 1
 fi
 
-curl -s https://raw.githubusercontent.com/simonsdave/dev-env/v0.5.4/ubuntu/xenial/create_dev_env.sh | bash -s -- "$@"
-exit $?
+DEV_ENV_VERSION=$(cat "$SCRIPT_DIR_NAME/dev-env-version.txt")
+
+curl -s "https://raw.githubusercontent.com/simonsdave/dev-env/$DEV_ENV_VERSION/ubuntu/xenial/create_dev_env.sh" | bash -s -- "$@"
+
+exit 0
