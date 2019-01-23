@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Nothing
+- clair v2.0.6 -> v2.0.7
 
 ### Removed
 

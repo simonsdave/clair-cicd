@@ -10,4 +10,4 @@ __version__ = '0.5.0'
 #
 # see https://quay.io/repository/coreos/clair?tab=tags
 #
-__clair_version__ = 'v2.0.6'
+__clair_version__ = 'v2.0.7'
