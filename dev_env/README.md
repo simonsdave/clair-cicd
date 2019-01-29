@@ -78,6 +78,9 @@ Configure the dev environment
 
 ```bash
 ~> cd clair-cicd/
+```
+
+```bash
 ~/clair-cicd> source cfg4dev
 New python executable in env/bin/python
 Installing setuptools, pip...done.
