@@ -16,7 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 
-- Nothing
+- removed ```kill-and-remove-all-docker-containers.sh``` since that command is now available from ```dev-env```
 
 ## [0.4.0] - [2018-09-29]
 
