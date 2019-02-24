@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - clair v2.0.6 -> v2.0.7
 - flake8 3.7.5 -> 3.7.6
+- jsonschema 2.6.0 -> 3.0.0
 
 ### Removed
 
