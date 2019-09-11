@@ -39,6 +39,12 @@ jobs:
       - run:
           name: Scan repo for passwords, private keys, etc.
           command: run-repo-security-scanner.sh
+      - run:
+          name: Run unit tests
+          command: run-unit-tests.sh
+      - run:
+          name: Upload Unit Test Coverage Data to Codecov
+          command: codecov
 
 workflows:
   build_test_and_deploy:

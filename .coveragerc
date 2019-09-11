@@ -1,0 +1,10 @@
+[run]
+branch = True
+include =
+    ./clair_cicd/*
+omit =
+    *tests*
+    *__init__*
+
+[html]
+directory = coverage_report
