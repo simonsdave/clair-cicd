@@ -42,29 +42,29 @@ CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
 DATABASE_SERVER_DOCKER_IMAGE=postgres:9.5.2
 
-ts_echo "pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE"
+ts_echo "pulling database server docker image ${DATABASE_SERVER_DOCKER_IMAGE}"
 
-if ! docker pull $DATABASE_SERVER_DOCKER_IMAGE >& /dev/null; then
-    ts_echo_stderr "error pulling database server docker image $DATABASE_SERVER_DOCKER_IMAGE"
+if ! docker pull "${DATABASE_SERVER_DOCKER_IMAGE}" >& /dev/null; then
+    ts_echo_stderr "error pulling database server docker image ${DATABASE_SERVER_DOCKER_IMAGE}"
     exit 1
 fi
 
 ts_echo "successfully pulled database server docker image"
 
-ts_echo "starting database server container '$CLAIR_DATABASE_CONTAINER_NAME'"
+ts_echo "starting database server container '${CLAIR_DATABASE_CONTAINER_NAME}'"
 docker \
     run \
-    --name "$CLAIR_DATABASE_CONTAINER_NAME" \
+    --name "${CLAIR_DATABASE_CONTAINER_NAME}" \
     -e 'PGDATA=/var/lib/postgresql/data-non-volume' \
     -d \
-    $DATABASE_SERVER_DOCKER_IMAGE \
+    ${DATABASE_SERVER_DOCKER_IMAGE} \
     > /dev/null
 ts_echo "successfully started database server container"
 
-ts_echo -n "waiting for database server in container '$CLAIR_DATABASE_CONTAINER_NAME' to start "
+ts_echo -n "waiting for database server in container '${CLAIR_DATABASE_CONTAINER_NAME}' to start "
 for i in $(seq 1 10)
 do
-    if ! docker logs "$CLAIR_DATABASE_CONTAINER_NAME" |& grep "database system is ready to accept connections" > /dev/null; then
+    if ! docker logs "${CLAIR_DATABASE_CONTAINER_NAME}" |& grep "database system is ready to accept connections" > /dev/null; then
         break
     fi
     echo -n "."
@@ -72,22 +72,22 @@ do
 done
 echo ''
 
-ts_echo "successfully started database server from docker image '$DATABASE_SERVER_DOCKER_IMAGE'"
+ts_echo "successfully started database server from docker image '${DATABASE_SERVER_DOCKER_IMAGE}'"
 
 ts_echo -n "creating database "
 
 MAX_NUM_DATABASE_CREATE_ATTEMPTS=10
-for i in $(seq 1 $MAX_NUM_DATABASE_CREATE_ATTEMPTS)
+for i in $(seq 1 ${MAX_NUM_DATABASE_CREATE_ATTEMPTS})
 do
     docker \
         exec \
-        "$CLAIR_DATABASE_CONTAINER_NAME" \
+        "${CLAIR_DATABASE_CONTAINER_NAME}" \
         sh -c 'echo "create database clair" | psql -U postgres' \
         >& /dev/null
 
     if docker \
         exec \
-         "$CLAIR_DATABASE_CONTAINER_NAME" \
+         "${CLAIR_DATABASE_CONTAINER_NAME}" \
          sh -c 'echo "\list" | psql -U postgres' |& \
          grep '^\s*clair' \
          >& /dev/null;
@@ -100,7 +100,7 @@ do
 
     sleep 3
 done
-if [ "$i" == "$MAX_NUM_DATABASE_CREATE_ATTEMPTS" ]; then
+if [ "$i" == "${MAX_NUM_DATABASE_CREATE_ATTEMPTS}" ]; then
     ts_echo "error creating database"
     exit 1
 fi

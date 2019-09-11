@@ -48,6 +48,7 @@ jobs:
       - run:
           name: Build python packages
           command: build-python-package.sh
+      - setup_remote_docker
       - run:
           name: Build Docker Images
           command: ./dockerfiles/build-docker-images.sh simonsdave bindle ./dist/clair-cicd-*.*.*.tar.gz
