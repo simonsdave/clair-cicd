@@ -1,27 +1,23 @@
-configure_dev_env()
-{
-    if [ ! -f "$PWD/requirements.txt" ]; then
-        echo "Must source this script from project's root directory"
-        return 1
-    fi
+pushd "$(git rev-parse --show-toplevel)" > /dev/null
 
-    if [ -d "$PWD/env" ]; then
-        source "$PWD/env/bin/activate"
-    else
-        virtualenv env
-        if [ $? != 0 ]; then
-            echo "error creating virtualenv"
-            return 1
-        fi
-        source "$PWD/env/bin/activate"
+export DEV_ENV_DOCKER_IMAGE=simonsdave/clair-cicd-xenial-dev-env:build
 
-        pip install --requirement "$PWD/requirements.txt"
-    fi
+if [ -d ./env ]; then
+    source ./env/bin/activate
+else
+    virtualenv env
+    source ./env/bin/activate
 
-    export PATH="$PWD/bin":$PATH
-    export PYTHONPATH="$PWD"
+    pip install --upgrade pip
 
-    return 0
-}
+    DEV_ENV_VERSION=$(cat ./dev_env/dev-env-version.txt)
+    if [ "${DEV_ENV_VERSION}" == "latest" ]; then DEV_ENV_VERSION=master; fi
+    curl -s -L https://raw.githubusercontent.com/simonsdave/dev-env/${DEV_ENV_VERSION}/bin/install-dev-env.sh | bash -s --
+    unset DEV_ENV_VERSION
 
-configure_dev_env
+    ./dev_env/build-docker-image.sh "${DEV_ENV_DOCKER_IMAGE}"
+fi
+
+export PATH="$PWD/bin":$PATH
+
+popd > /dev/null
