@@ -45,6 +45,9 @@ jobs:
       - run:
           name: Upload Unit Test Coverage Data to Codecov
           command: codecov
+      - run:
+          name: Build python packages
+          command: build-python-package.sh
 
 workflows:
   build_test_and_deploy:
