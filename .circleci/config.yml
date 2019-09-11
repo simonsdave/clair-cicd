@@ -1,0 +1,48 @@
+---
+version: 2.1
+
+executors:
+  dev-env:
+    docker:
+      - image: simonsdave/xenial-dev-env:v0.5.25
+
+jobs:
+  build_test_and_deploy:
+    working_directory: ~/repo
+    executor: dev-env
+    steps:
+      - checkout
+      - run: check-consistent-dev-env-version.sh --verbose
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
+      - run:
+          name: Install Python prerequisites
+          command: pip install --requirement requirements.txt
+      - save_cache:
+          paths:
+            - ./env
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+      - run: run-pip-check.sh
+      - run:
+          name: Lint Python Files
+          command: run-flake8.sh
+      - run:
+          name: PyCQA/bandit
+          command: run-bandit.sh
+      - run:
+          name: Lint Shell Scripts
+          command: run-shellcheck.sh
+      - run:
+          name: Lint YAML Files
+          command: run-yamllint.sh
+      - run:
+          name: Scan repo for passwords, private keys, etc.
+          command: run-repo-security-scanner.sh
+
+workflows:
+  build_test_and_deploy:
+    jobs:
+      - build_test_and_deploy:
+          context: dev-env-testing
