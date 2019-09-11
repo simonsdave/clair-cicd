@@ -48,6 +48,9 @@ jobs:
       - run:
           name: Build python packages
           command: build-python-package.sh
+      - run:
+          name: Build Docker Images
+          command: ./dockerfiles/build-docker-images.sh simonsdave bindle ./dist/clair-cicd-*.*.*.tar.gz
 
 workflows:
   build_test_and_deploy:
