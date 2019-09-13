@@ -25,6 +25,48 @@ ts_echo_stderr() {
     return 0
 }
 
+create_clair_config_container() {
+    local CLAIR_VERSION=${1:-}
+
+    local CLAIR_CONFIG_DIR
+    CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
+
+    local CLAIR_CONFIG_YAML
+    CLAIR_CONFIG_YAML=${CLAIR_CONFIG_DIR}/config.yaml
+
+    curl \
+        -s \
+        -o "${CLAIR_CONFIG_YAML}" \
+        -L \
+        "https://raw.githubusercontent.com/coreos/clair/${CLAIR_VERSION}/config.example.yaml"
+
+    # postgres connection string details
+    # http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
+    sed \
+        -i \
+        -e 's|source:.*$|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
+        "${CLAIR_CONFIG_YAML}"
+
+    local DUMMY_CONTAINER_NAME
+    DUMMY_CONTAINER_NAME=$(python -c "import uuid; print uuid.uuid4().hex")
+
+    # explict pull to create opportunity to swallow stdout
+    docker pull alpine:3.4 > /dev/null
+
+    docker create \
+        -v /config \
+        --name "${DUMMY_CONTAINER_NAME}" \
+        alpine:3.4 \
+        /bin/true \
+        > /dev/null
+
+    docker cp "${CLAIR_CONFIG_YAML}" "${DUMMY_CONTAINER_NAME}:/config/."
+
+    rm -rf "${CLAIR_CONFIG_DIR}"
+
+    echo "${DUMMY_CONTAINER_NAME}"
+}
+
 if [ $# != 2 ]; then
     echo "usage: $(basename "$0") <username> <tag>" >&2
     exit 1
@@ -110,49 +152,33 @@ ts_echo "successfully created database"
 #
 # get clair running
 #
-ts_echo "pulling clair image '$CLAIR_IMAGE_NAME'"
-if ! docker pull "$CLAIR_IMAGE_NAME" > /dev/null; then
-    ts_echo_stderr "error pulling clair image '$CLAIR_IMAGE_NAME'"
+ts_echo "pulling clair image '${CLAIR_IMAGE_NAME}'"
+if ! docker pull "${CLAIR_IMAGE_NAME}" > /dev/null; then
+    ts_echo_stderr "error pulling clair image '${CLAIR_IMAGE_NAME}'"
     exit 1
 fi
-ts_echo "pulled clair image '$CLAIR_IMAGE_NAME'"
+ts_echo "pulled clair image '${CLAIR_IMAGE_NAME}'"
 
 #
 # create clair configuration that will point clair @ the database we just created
 #
-CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
-CLAIR_CONFIG_YAML=$CLAIR_CONFIG_DIR/config.yaml
+ts_echo "creating clair configuration container"
+CLAIR_CONFIG_CONTAINER_NAME=$(create_clair_config_container "${CLAIR_VERSION}")
+ts_echo "created clair configuration container '${CLAIR_CONFIG_CONTAINER_NAME}'"
 
-ts_echo "creating clair configuration @ '$CLAIR_CONFIG_YAML'"
-
-curl \
-    -s \
-    -o "$CLAIR_CONFIG_YAML" \
-    -L \
-    "https://raw.githubusercontent.com/coreos/clair/$CLAIR_VERSION/config.example.yaml"
-
-# postgres connection string details
-# http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
-sed \
-    -i \
-    -e 's|source:.*$|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
-    "$CLAIR_CONFIG_YAML"
-
-ts_echo "created clair configuration"
-
-ts_echo "creating clair container '$CLAIR_CONTAINER_NAME'"
+ts_echo "creating clair container '${CLAIR_CONTAINER_NAME}'"
 if ! docker \
     run \
     -d \
-    --name "$CLAIR_CONTAINER_NAME" \
-    --link "$CLAIR_DATABASE_CONTAINER_NAME":clair-database \
+    --name "${CLAIR_CONTAINER_NAME}" \
+    --volumes-from "${CLAIR_CONFIG_CONTAINER_NAME}:ro" \
+    --link "${CLAIR_DATABASE_CONTAINER_NAME}":clair-database \
     -v /tmp:/tmp \
-    -v "$CLAIR_CONFIG_DIR":/config \
-    "$CLAIR_IMAGE_NAME" \
+    "${CLAIR_IMAGE_NAME}" \
     -config=/config/config.yaml \
     > /dev/null;
 then
-    ts_echo_stderr "error creating clair container '$CLAIR_CONTAINER_NAME'"
+    ts_echo_stderr "error creating clair container '${CLAIR_CONTAINER_NAME}'"
     exit 1
 fi
 ts_echo "successfully created clair container"
@@ -160,13 +186,13 @@ ts_echo "successfully created clair container"
 ts_echo -n "waiting for vulnerabilities database update to finish "
 while true
 do
-    if docker logs "$CLAIR_CONTAINER_NAME" | grep "update finished" >& /dev/null; then
+    if docker logs "${CLAIR_CONTAINER_NAME}" | grep "update finished" >& /dev/null; then
         break
     fi
 
-    if docker logs "$CLAIR_CONTAINER_NAME" | grep "an error occured" >& /dev/null; then
+    if docker logs "${CLAIR_CONTAINER_NAME}" | grep "an error occured" >& /dev/null; then
         echo ""
-        ts_echo_stderr "error during vulnerabilities database update"
+        ts_echo_stderr "error during vulnerabilities database update try 'docker logs ${CLAIR_CONTAINER_NAME}'"
         exit 1
     fi
 
@@ -175,10 +201,10 @@ do
 done
 echo ""
 
-docker kill "$CLAIR_CONTAINER_NAME" > /dev/null
-docker rm "$CLAIR_CONTAINER_NAME" > /dev/null
+docker kill "${CLAIR_CONTAINER_NAME}" > /dev/null
+docker rm "${CLAIR_CONTAINER_NAME}" > /dev/null
 
-docker rmi "$CLAIR_DATABASE_IMAGE_NAME" >& /dev/null
+docker rmi "${CLAIR_DATABASE_IMAGE_NAME}" >& /dev/null
 
 docker \
     commit \
@@ -186,12 +212,15 @@ docker \
     --change='CMD ["postgres"]' \
     --change='EXPOSE 5432' \
     --change='ENTRYPOINT ["/docker-entrypoint.sh"]' \
-    "$CLAIR_DATABASE_CONTAINER_NAME" \
-    "$CLAIR_DATABASE_IMAGE_NAME" \
+    "${CLAIR_DATABASE_CONTAINER_NAME}" \
+    "${CLAIR_DATABASE_IMAGE_NAME}" \
     > /dev/null
 
-docker kill "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
-docker rm "$CLAIR_DATABASE_CONTAINER_NAME" > /dev/null
+docker kill "${CLAIR_DATABASE_CONTAINER_NAME}" > /dev/null
+docker rm "${CLAIR_DATABASE_CONTAINER_NAME}" > /dev/null
+
+docker kill "${CLAIR_CONFIG_CONTAINER_NAME}" > /dev/null
+docker rm "${CLAIR_CONFIG_CONTAINER_NAME}" > /dev/null
 
 ts_echo "done!"
 
