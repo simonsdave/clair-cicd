@@ -193,6 +193,9 @@ do
     if docker logs "${CLAIR_CONTAINER_NAME}" | grep "an error occured" >& /dev/null; then
         echo ""
         ts_echo_stderr "error during vulnerabilities database update try 'docker logs ${CLAIR_CONTAINER_NAME}'"
+        ts_echo_stderr "------------------------------------------------------------"
+        docker logs "${CLAIR_CONTAINER_NAME}"
+        ts_echo_stderr "------------------------------------------------------------"
         exit 1
     fi
 
