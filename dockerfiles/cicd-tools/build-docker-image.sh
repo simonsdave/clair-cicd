@@ -16,15 +16,21 @@ USERNAME=${1:-}
 TAG=${2:-}
 PACKAGE_TAR_GZ=${3:-}
 
-if [ ! -r "$PACKAGE_TAR_GZ" ]; then
-    echo "can't find package @ '$PACKAGE_TAR_GZ'" >&2
+if [ ! -r "${PACKAGE_TAR_GZ}" ]; then
+    echo "can't find package @ '${PACKAGE_TAR_GZ}'" >&2
     exit 1
 fi
 
-IMAGENAME=$USERNAME/clair-cicd-tools:$TAG
+IMAGE_NAME=${USERNAME}/clair-cicd-tools:${TAG}
 
-cp "$PACKAGE_TAR_GZ" "$SCRIPT_DIR_NAME/package.tar.gz"
-docker build -t "$IMAGENAME" "$SCRIPT_DIR_NAME"
-rm "$SCRIPT_DIR_NAME/package.tar.gz"
+CONTEXT_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
+cp "${PACKAGE_TAR_GZ}" "${CONTEXT_DIR}/package.tar.gz"
+
+docker build \
+    -t "${IMAGE_NAME}" \
+    --file "${SCRIPT_DIR_NAME}/Dockerfile" \
+    "${CONTEXT_DIR}"
+
+rm -rf "${CONTEXT_DIR}"
 
 exit 0
