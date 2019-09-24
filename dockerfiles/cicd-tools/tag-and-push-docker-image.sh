@@ -13,12 +13,12 @@ CURRENT_TAG=${3:-}
 NEW_TAG=${4:-}
 
 BASE_IMAGE=clair-cicd-tools
-CURRENT_IMAGE="$USERNAME/$BASE_IMAGE:$CURRENT_TAG"
-NEW_IMAGE="$USERNAME/$BASE_IMAGE:$NEW_TAG"
+CURRENT_IMAGE="${USERNAME}/${BASE_IMAGE}:${CURRENT_TAG}"
+NEW_IMAGE="${USERNAME}/${BASE_IMAGE}:${NEW_TAG}"
 
-docker tag "$CURRENT_IMAGE" "$NEW_IMAGE"
+docker tag "${CURRENT_IMAGE}" "${NEW_IMAGE}"
 
-echo "$PASSWORD" | docker login --username="$USERNAME" --password-stdin
-docker push "$NEW_IMAGE"
+echo "${PASSWORD}" | docker login --username="${USERNAME}" --password-stdin
+docker push "${NEW_IMAGE}"
 
 exit 0
