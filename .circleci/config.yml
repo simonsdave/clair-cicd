@@ -55,8 +55,8 @@ jobs:
       - run:
           name: Build Docker Images
           command: |
-            ./dockerfiles/cicd-tools/build-docker-images.sh "dist/clair-cicd-$(python-version.sh).tar.gz" "${DOCKER_TOOLS_TEMP_IMAGE}"
-            ./dockerfiles/database/build-docker-images.sh "${DOCKER_DATABASE_TEMP_IMAGE}"
+            ./dockerfiles/cicd-tools/build-docker-image.sh "dist/clair-cicd-$(python-version.sh).tar.gz" "${DOCKER_TOOLS_TEMP_IMAGE}"
+            ./dockerfiles/database/build-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}"
 
 workflows:
   build_test_and_deploy:
