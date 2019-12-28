@@ -75,7 +75,7 @@ fi
 CLAIR_DATABASE_IMAGE_NAME=${1:-}
 
 # https://quay.io/repository/coreos/clair?tab=tags
-CLAIR_VERSION=$(cat $(repo-root-dir.sh)/$(repo.sh -u)/__init__.py | grep '^__clair_version__' | sed -e "s|^.*=[[:space:]]*['\"]||g" | sed -e "s|['\"].*$||g")
+CLAIR_VERSION=$(grep '^__clair_version__' "$(repo-root-dir.sh)/$(repo.sh -u)/__init__.py" | sed -e "s|^.*=[[:space:]]*['\"]||g" | sed -e "s|['\"].*$||g")
 CLAIR_IMAGE_NAME=quay.io/coreos/clair:$CLAIR_VERSION
 CLAIR_CONTAINER_NAME=clair-$(openssl rand -hex 8)
 CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)

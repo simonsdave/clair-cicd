@@ -10,10 +10,11 @@ fi
 PACKAGE=${1:-}
 CLAIR_CICD_TOOLS_IMAGE_NAME=${2:-}
 
-PACKAGE=$(python3.7 -c "import os; print(os.path.abspath('${PACKAGE}'))")
-IN_CONTAINER_PACKAGE=$(echo "${PACKAGE}" | sed -e "s|$(repo-root-dir.sh)|/app|g")
+REPO_ROOT_DIR=$(repo-root-dir.sh)
+
+IN_CONTAINER_PACKAGE=$(python3.7 -c "import os; print(os.path.abspath('${PACKAGE}').replace('${REPO_ROOT_DIR}', '/app'))")
 if [[ "${PACKAGE}" == "${IN_CONTAINER_PACKAGE}" ]]; then
-    echo "'${PACKAGE}' must be in '$(repo-root-dir.sh)' or a sub-directory of '$(repo-root-dir.sh)'" >&2
+    echo "'${PACKAGE}' must be in '${REPO_ROOT_DIR}' or a sub-directory of '${REPO_ROOT_DIR}'" >&2
     exit 1
 fi
 
@@ -21,11 +22,11 @@ DOCKER_CONTAINER_NAME=$(python3.7 -c "import uuid; print(uuid.uuid4().hex)")
 
 DUMMY_DOCKER_CONTAINER_NAME=$(create-dummy-docker-container.sh)
 
-IMAGE_NAME_TEMPLATE=$(cat "$(repo-root-dir.sh)/dev_env/Dockerfile.template" | grep FROM | sed -e "s|^FROM[[:space:]]*||g")
-DEV_ENV_VERSION=$(cat "$(repo-root-dir.sh)/dev_env/dev-env-version.txt")
-IMAGE_NAME=$(echo "${IMAGE_NAME_TEMPLATE}" | sed -e "s|%DEV_ENV_VERSION%|${DEV_ENV_VERSION}|g")
+IMAGE_NAME_TEMPLATE=$(grep FROM "${REPO_ROOT_DIR}/dev_env/Dockerfile.template" | sed -e "s|^FROM[[:space:]]*||g")
+DEV_ENV_VERSION=$(cat "${REPO_ROOT_DIR}/dev_env/dev-env-version.txt")
+IMAGE_NAME=${IMAGE_NAME_TEMPLATE//%DEV_ENV_VERSION%/${DEV_ENV_VERSION}}
 
-IN_CONTAINER_SCRIPT_DIR_NAME=$(echo "${SCRIPT_DIR_NAME}" | sed -e "s|$(repo-root-dir.sh)|/app|g")
+IN_CONTAINER_SCRIPT_DIR_NAME=$(python3.7 -c "print('${SCRIPT_DIR_NAME}'.replace('${REPO_ROOT_DIR}', '/app'))")
 
 #
 # --volumes-from below implements the pattern described @ https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
