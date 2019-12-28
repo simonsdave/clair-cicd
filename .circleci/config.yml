@@ -22,7 +22,7 @@ jobs:
             - v1-dependencies-
       - run:
           name: Install Python prerequisites
-          command: pip install --requirement requirements.txt
+          command: pip3 install --requirement requirements.txt
       - save_cache:
           paths:
             - ./env
