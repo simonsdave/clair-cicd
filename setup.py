@@ -34,6 +34,20 @@ with open('clair_cicd/__init__.py', 'r') as fd:
 if not version:
     raise Exception("Can't locate project's version number")
 
+
+def _long_description():
+    try:
+        with open('README.rst', 'r') as f:
+            return f.read()
+    except IOError:
+        # simple fix for avoid failure on "source cfg4dev"
+        return "a long description"
+
+
+_author = 'Dave Simons'
+_author_email = 'simonsdave@gmail.com'
+
+
 setup(
     name='clair-cicd',
     packages=[
@@ -50,7 +64,28 @@ setup(
     include_package_data=True,
     version=version,
     description='Clair CI/CD',
-    author='Dave Simons',
-    author_email='simonsdave@gmail.com',
+    long_description=_long_description(),
+    author=_author,
+    author_email=_author_email,
+    maintainer=_author,
+    maintainer_email=_author_email,
+    license='MIT',
     url='https://github.com/simonsdave/clair-cicd',
+    download_url='https://github.com/simonsdave/clair-cicd/tarball/v%s' % version,
+    keywords=[
+        'development',
+        'tools',
+    ],
+    # list of valid classifiers @ https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Natural Language :: English',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
 )
