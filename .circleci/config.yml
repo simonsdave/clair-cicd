@@ -3,8 +3,11 @@ version: 2.1
 
 executors:
   dev-env:
+    environment:
+      DOCKER_TOOLS_TEMP_IMAGE: simonsdave/clair-cicd-tools:bindle
+      DOCKER_DATABASE_TEMP_IMAGE: simonsdave/clair-cicd-database:bindle
     docker:
-      - image: simonsdave/xenial-dev-env:v0.5.25
+      - image: simonsdave/bionic-dev-env:v0.6.1
 
 jobs:
   build_test_and_deploy:
@@ -32,7 +35,7 @@ jobs:
           command: run-bandit.sh
       - run:
           name: Lint Shell Scripts
-          command: run-shellcheck.sh
+          command: run-shelllint.sh
       - run:
           name: Lint YAML Files
           command: run-yamllint.sh
@@ -51,7 +54,9 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Docker Images
-          command: ./dockerfiles/build-docker-images.sh simonsdave bindle ./dist/clair-cicd-*.*.*.tar.gz
+          command: |
+            ./dockerfiles/cicd-tools/build-docker-images.sh "dist/clair-cicd-$(python-version.sh).tar.gz" "${DOCKER_TOOLS_TEMP_IMAGE}"
+            ./dockerfiles/database/build-docker-images.sh "${DOCKER_DATABASE_TEMP_IMAGE}"
 
 workflows:
   build_test_and_deploy:

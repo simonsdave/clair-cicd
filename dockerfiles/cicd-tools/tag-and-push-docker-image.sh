@@ -1,24 +1,27 @@
 #!/usr/bin/env bash
 
+#
+# Assuming <existing-image-name> is of the format <hub-user>/<repo-name>:<old-tag>,
+# tag <existing-image-name> as <hub-user>/<repo-name>:<tag>, login to dockerhub using
+# <hub-user> plus <password> and then push <hub-user>/<repo-name>:<tag> to dockerhub.
+#
+
 set -e
 
-if [ $# != 4 ]; then
-    echo "usage: $(basename "$0") <username> <password> <current tag> <new tag>" >&2
+if [ $# != 3 ]; then
+    echo "usage: $(basename "$0") <existing-image-name> <tag> <password>" >&2
     exit 1
 fi
 
-USERNAME=${1:-}
-PASSWORD=${2:-}
-CURRENT_TAG=${3:-}
-NEW_TAG=${4:-}
+EXISTING_IMAGE_NAME=${1:-}
+TAG=${2:-}
+PASSWORD=${3:-}
 
-BASE_IMAGE=clair-cicd-tools
-CURRENT_IMAGE="${USERNAME}/${BASE_IMAGE}:${CURRENT_TAG}"
-NEW_IMAGE="${USERNAME}/${BASE_IMAGE}:${NEW_TAG}"
+NEW_IMAGE_NAME="${EXISTING_IMAGE_NAME%:*}:${TAG}"
 
-docker tag "${CURRENT_IMAGE}" "${NEW_IMAGE}"
+docker tag "${EXISTING_IMAGE_NAME}" "${NEW_IMAGE_NAME}"
 
-echo "${PASSWORD}" | docker login --username="${USERNAME}" --password-stdin
-docker push "${NEW_IMAGE}"
+echo "${PASSWORD}" | docker login --username="${NEW_IMAGE_NAME%/*}" --password-stdin
+docker push "${NEW_IMAGE_NAME}"
 
 exit 0
