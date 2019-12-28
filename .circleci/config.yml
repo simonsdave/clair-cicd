@@ -57,6 +57,17 @@ jobs:
           command: |
             ./dockerfiles/cicd-tools/build-docker-image.sh "dist/clair-cicd-$(python-version.sh).tar.gz" "${DOCKER_TOOLS_TEMP_IMAGE}"
             ./dockerfiles/database/build-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}"
+      - deploy:
+          name: Push Docker Images to DockerHub
+          command: |
+            if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
+              ./dockerfiles/cicd-tools/tag-and-push-docker-image.sh "${DOCKER_TOOLS_TEMP_IMAGE}" "latest" "${DOCKER_PASSWORD}"
+              ./dockerfiles/database/tag-and-push-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}" "latest" "${DOCKER_PASSWORD}"
+            fi
+            if [[ "${CIRCLE_BRANCH}" =~ ^release-([0-9]+.)*[0-9]+$ ]]; then
+              ./dockerfiles/cicd-tools/tag-and-push-docker-image.sh "${DOCKER_TOOLS_TEMP_IMAGE}" "v${CIRCLE_BRANCH##release-}" "${DOCKER_PASSWORD}"
+              ./dockerfiles/database/tag-and-push-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}" "v${CIRCLE_BRANCH##release-}" "${DOCKER_PASSWORD}"
+            fi
 
 workflows:
   build_test_and_deploy:
