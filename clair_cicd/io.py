@@ -2,8 +2,8 @@ import json
 import logging
 import os
 
-from models import Whitelist
-from models import Vulnerability
+from .models import Whitelist
+from .models import Vulnerability
 
 _logger = logging.getLogger(__name__)
 
@@ -38,8 +38,18 @@ def read_whitelist(filename):
 
 
 def read_vulnerabilities(directory):
+    """...
+
+    If ```directory``` is ```None``` then an empty dictionary
+    is returned.
+
+    If any kind of error occurs ```None``` is returned.
+    """
 
     vulnerabilities_by_cve_id = {}
+
+    if directory is None:
+        return None
 
     try:
         filenames = os.listdir(directory)
