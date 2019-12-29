@@ -70,7 +70,20 @@ jobs:
             fi
 
 workflows:
-  build_test_and_deploy:
+  version: 2
+  commit:
+    jobs:
+      - build_test_and_deploy:
+          context: clair-cicd
+  three_days_per_week:
+    triggers:
+      - schedule:
+          # https://crontab.guru/ is super useful in decoding the value of the cron key
+          cron: "0 3 * * 1,3,5"
+          filters:
+            branches:
+              only:
+                - master
     jobs:
       - build_test_and_deploy:
           context: clair-cicd

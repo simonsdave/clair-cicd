@@ -8,7 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Nothing
+- [Circle CI](https://circleci.com/) builds docker images for master branch
+every Monday, Wednesday and Friday at ~03:00 UTC
 
 ### Changed
 
