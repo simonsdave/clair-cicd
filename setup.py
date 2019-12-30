@@ -1,11 +1,3 @@
-#
-# to build the distrubution @ dist/clair-cicd-*.*.*.tar.gz
-#
-#   >git clone https://github.com/simonsdave/clair-cicd.git
-#   >cd clair-cicd
-#   >python setup.py bdist_wheel sdist --formats=gztar
-#
-
 import re
 
 from setuptools import setup
