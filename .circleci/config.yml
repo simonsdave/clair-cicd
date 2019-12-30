@@ -40,6 +40,9 @@ jobs:
           name: Lint YAML Files
           command: run-yamllint.sh
       - run:
+          name: Lint JSON Files
+          command: run-jsonlint.sh
+      - run:
           name: Scan repo for passwords, private keys, etc.
           command: run-repo-security-scanner.sh
       - run:
