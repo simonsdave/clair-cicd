@@ -2,9 +2,9 @@
 
 ![Maintained](https://img.shields.io/maintenance/yes/2019.svg)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
-![PythonVersions](https://img.shields.io/pypi/pyversions/dev-env.svg?style=flat)
-![status](https://img.shields.io/pypi/status/dev-env.svg?style=flat)
-[![PyPI](https://img.shields.io/pypi/v/dev-env.svg?style=flat)](https://pypi.python.org/pypi/dev-env)
+![PythonVersions](https://img.shields.io/pypi/pyversions/clair-cicd.svg?style=flat)
+![status](https://img.shields.io/pypi/status/clair-cicd.svg?style=flat)
+[![PyPI](https://img.shields.io/pypi/v/clair-cicd.svg?style=flat)](https://pypi.python.org/pypi/clair-cicd)
 [![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd)
 [![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd)
