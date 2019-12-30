@@ -16,7 +16,7 @@ every Monday, Wednesday and Friday at ~03:00 UTC
 - clair v2.0.6 -> v2.1.2
 - flake8 3.7.5 -> 3.7.6
 - jsonschema 2.6.0 -> 3.0.1
-- dev-env 0.5.14 -> 0.6.2
+- dev-env 0.5.14 -> 0.6.3
 - [Travis CI](https://travis-ci.org/) -> [Circle CI](https://circleci.com/)
 
 ### Removed
