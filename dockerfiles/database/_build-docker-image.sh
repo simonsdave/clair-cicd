@@ -209,6 +209,7 @@ docker rmi "${CLAIR_DATABASE_IMAGE_NAME}" >& /dev/null
 
 docker \
     commit \
+    --change "ENV CLAIR_VERSION ${CLAIR_VERSION}" \
     --change 'ENV PGDATA /var/lib/postgresql/data-non-volume' \
     --change='CMD ["postgres"]' \
     --change='EXPOSE 5432' \
