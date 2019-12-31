@@ -8,3 +8,4 @@ clair_cicd.egg-info
 coverage_report
 .DS_Store
 htmlcov
+README.rst
