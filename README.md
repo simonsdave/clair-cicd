@@ -9,7 +9,7 @@
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd)
 [![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd)
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
-[![docker-simonsdave/clair-cicd-tools](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20tools-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
+[![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20tools-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 
 ```
 Repo Status = this repo is a WIP but starting to show some promise!
@@ -128,33 +128,29 @@ branches, etc)
 
 Assumptions/requirements:
 
-* bash, curl & jq are installed and available
-* docker is installed and running
-* ```clair-cicd``` was originally developed on [Ubuntu 14.04](http://releases.ubuntu.com/14.04/)
-although all development and testing is now done on [Ubuntu 16.04](http://releases.ubuntu.com/16.04/)
-so while things should still work on [Ubuntu 14.04](http://releases.ubuntu.com/14.04/)
-they will certainly work on [Ubuntu 16.04](http://releases.ubuntu.com/16.04/) - if you
-try using ```clair-cicd``` on other platforms the feedback on how things go would be
-greatly appreciated
+* [assess-image-risk.sh](bin/assess-image-risk.sh) is a bash script used to launch
+the risk assessment process and as such it's this script which defines the bulk of
+the assumptions/requirements for ```clair-cicd``` - the script uses docker, sed and openssl
+so all these need to be available in the environment running ```clair-cicd```
+* :TODO: which docker versions are supported?
 
-There are 4 moving pieces:
+There are 3 moving pieces:
 
-1. ```assess-image-risk.sh``` is bash script which does
+1. [assess-image-risk.sh](bin/assess-image-risk.sh) is bash script which does
 the heavy lifting to co-ordinate
-the interaction of the 3 other moving pieces
-1. [Clair](https://github.com/coreos/clair) which
-is packaged inside the docker image [quay.io/coreos/clair](https://quay.io/repository/coreos/clair)
+the interaction of the 2 other moving pieces
 1. [Clair's](https://github.com/coreos/clair) vulnerability database
 which is packaged inside the docker image
 [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) -
-a [Travis Cron Job](https://docs.travis-ci.com/user/cron-jobs/)
+a [CircleCI](https://circleci.com/) cron job
 is used to rebuild
 [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/)
-daily to ensure
-the vulnerability database is kept current
-1. a set of Python and Bash risk analysis scripts packaged in the
-[simonsdave/clair-cicd-tools](https://hub.docker.com/r/simonsdave/clair-cicd-tools/)
-docker image
+3 days per week to ensure
+the vulnerability database is current
+1. a set of Python and Bash risk assessment scripts packaged in the
+[simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
+docker image which is based on the docker image [quay.io/coreos/clair](https://quay.io/repository/coreos/clair)
+which packages up [Clair](https://github.com/coreos/clair)
 
 ## References
 

@@ -4,7 +4,7 @@ version: 2.1
 executors:
   dev-env:
     environment:
-      DOCKER_TOOLS_TEMP_IMAGE: simonsdave/clair-cicd-tools:bindle
+      DOCKER_CLAIR_TEMP_IMAGE: simonsdave/clair-cicd-clair:bindle
       DOCKER_DATABASE_TEMP_IMAGE: simonsdave/clair-cicd-database:bindle
     docker:
       - image: simonsdave/bionic-dev-env:v0.6.3
@@ -58,17 +58,17 @@ jobs:
       - run:
           name: Build Docker Images
           command: |
-            ./dockerfiles/cicd-tools/build-docker-image.sh "dist/clair-cicd-$(python-version.sh).tar.gz" "${DOCKER_TOOLS_TEMP_IMAGE}"
+            ./dockerfiles/cicd-clair/build-docker-image.sh "dist/clair-cicd-$(python-version.sh).tar.gz" "${DOCKER_CLAIR_TEMP_IMAGE}"
             ./dockerfiles/database/build-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}"
       - deploy:
           name: Push Docker Images to DockerHub
           command: |
             if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
-              ./dockerfiles/cicd-tools/tag-and-push-docker-image.sh "${DOCKER_TOOLS_TEMP_IMAGE}" "latest" "${DOCKER_PASSWORD}"
+              ./dockerfiles/cicd-clair/tag-and-push-docker-image.sh "${DOCKER_CLAIR_TEMP_IMAGE}" "latest" "${DOCKER_PASSWORD}"
               ./dockerfiles/database/tag-and-push-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}" "latest" "${DOCKER_PASSWORD}"
             fi
             if [[ "${CIRCLE_BRANCH}" =~ ^release-([0-9]+.)*[0-9]+$ ]]; then
-              ./dockerfiles/cicd-tools/tag-and-push-docker-image.sh "${DOCKER_TOOLS_TEMP_IMAGE}" "v${CIRCLE_BRANCH##release-}" "${DOCKER_PASSWORD}"
+              ./dockerfiles/cicd-clair/tag-and-push-docker-image.sh "${DOCKER_CLAIR_TEMP_IMAGE}" "v${CIRCLE_BRANCH##release-}" "${DOCKER_PASSWORD}"
               ./dockerfiles/database/tag-and-push-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}" "v${CIRCLE_BRANCH##release-}" "${DOCKER_PASSWORD}"
             fi
 

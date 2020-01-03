@@ -6,7 +6,6 @@ to generate a non-zero exit status when vulnerabilities
 exceed an acceptable threshold.
 """
 
-import json
 import logging
 import optparse
 import re
@@ -90,7 +89,6 @@ class CommandLineParser(optparse.OptionParser):
 
 
 if __name__ == '__main__':
-
     #
     # parse command line
     #
@@ -118,11 +116,6 @@ if __name__ == '__main__':
     vulnerabilities = io.read_vulnerabilities(vulnerabilities_directory)
     if vulnerabilities is None:
         sys.exit(2)
-
-    #
-    # can be super useful for debugging
-    #
-    _logger.debug(json.dumps(vulnerabilities))
 
     #
     # this is what it's all been leading up to:-)
