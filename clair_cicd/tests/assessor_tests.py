@@ -26,21 +26,36 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
 
     def test_medium_severity_vulnerabilities_should_assess_clean_by_default(self):
         whitelist = Whitelist({})
-        vulnerabilities = [Vulnerability({'Severity': 'Medium'})]
+        vulnerabilities = [
+            Vulnerability({
+                'Name': 'CVE-0000-0000',
+                'Severity': 'Medium',
+            }),
+        ]
 
         vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
         self.assertTrue(vra.assess())
 
     def test_med_sev_vul_with_medium_sev_wl_should_assess_clean(self):
         whitelist = Whitelist({'ignoreSevertiesAtOrBelow': 'Medium'})
-        vulnerabilities = [Vulnerability({'Severity': 'Medium'})]
+        vulnerabilities = [
+            Vulnerability({
+                'Name': 'CVE-0000-0000',
+                'Severity': 'Medium',
+            }),
+        ]
 
         vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
         self.assertTrue(vra.assess())
 
     def test_high_severity_vulnerabilities_should_assess_dirty(self):
         whitelist = Whitelist({})
-        vulnerabilities = [Vulnerability({'Severity': 'High'})]
+        vulnerabilities = [
+            Vulnerability({
+                'Name': 'CVE-0000-0000',
+                'Severity': 'High',
+            }),
+        ]
 
         vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
         self.assertFalse(vra.assess())
