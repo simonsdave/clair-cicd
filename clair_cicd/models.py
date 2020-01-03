@@ -13,6 +13,9 @@ class Severity(object):
 
         self.severity = type(self)._severity_as_strs.index(severity_as_str.strip().lower())
 
+    def __str__(self):
+        return type(self)._severity_as_strs[self.severity]
+
     def __hash__(self):
         return hash(self.severity)
 
@@ -35,6 +38,7 @@ class Whitelist(object):
         object.__init__(self)
 
         self.whitelist = whitelist
+        # :TODO: add list of vulnerabilities to whitelist regardless of severity
 
     @property
     def ignore_severties_at_or_below(self):

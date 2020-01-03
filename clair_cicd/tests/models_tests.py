@@ -7,6 +7,17 @@ from ..models import Whitelist
 
 class SeverityTestCase(unittest.TestCase):
 
+    def test_str(self):
+        severities_as_strs = [
+            'medium',
+            ' Medium',
+            'high  ',
+            'low',
+            ' low  ',
+        ]
+        for severity_as_str in severities_as_strs:
+            self.assertEqual(str(Severity(severity_as_str)), severity_as_str.strip().lower())
+
     def test_hash(self):
         severity = Severity('medium')
         hash(severity)
