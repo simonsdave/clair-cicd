@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 ts() {
-    # date "+%Y-%m-%d %k:%M:%S"
     date "+%Y-%m-%d %H:%M:%S"
 }
 
@@ -64,8 +63,10 @@ echo_if_verbose "$(ts) successfully saved docker image '${DOCKER_IMAGE_TO_ANALYZ
 
 #
 # Iterate through each layer in the saved image and use 
-# Clair's RESTful API (https://coreos.com/clair/docs/latest/api_v1.html#layers)
-# to analyze each layer.
+# Clair's RESTful API to analyze each layer.
+#
+# References
+# -- https://coreos.com/clair/docs/latest/api_v1.html#layers
 #
 echo_if_verbose "$(ts) starting to create clair layers"
 
@@ -106,9 +107,11 @@ done
 echo_if_verbose "$(ts) done creating clair layers"
 
 #
-# Iterate through each layer in the saved image and use 
-# Clair's RESTful API (https://coreos.com/clair/docs/latest/api_v1.html#vulnerabilities)
-# to get the vulnerabilities for each layer.
+# Iterate through each layer in the saved image and use Clair's
+# RESTful API to get the vulnerabilities for each layer.
+#
+# References
+# -- https://coreos.com/clair/docs/latest/api_v1.html#vulnerabilities
 #
 echo_if_verbose "$(ts) starting to get vulnerabilities for clair layers"
 
@@ -144,4 +147,4 @@ echo_if_verbose "$(ts) done getting vulnerabilities for clair layers"
 #
 assess-vulnerabilities-risk.py "${LOG_LEVEL}" "${VULNERABILTIES_DIR}"
 
-exit 0
+exit $?
