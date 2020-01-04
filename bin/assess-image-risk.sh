@@ -203,10 +203,11 @@ done
 echo_if_verbose "$(ts) successfully started clair container '${CLAIR_CONTAINER}'"
 
 #
-#
+# Now that the Clair container and Clair database container are started
+# it's time to kick-off the process of assessing the image's risk.
 #
 docker exec "${CLAIR_CONTAINER}" assess-image-risk.sh --api-port "${CLAIR_API_PORT}" "${VERBOSE_FLAG_ASSESS_RISK}" "${DOCKER_IMAGE_TO_ANALYZE}"
-EXIT_CODE=$(docker inspect --format '{{ .State.ExitCode }}' "${CLAIR_CONTAINER}")
+EXIT_CODE=$?
 
 #
 # a little bit of cleanup
