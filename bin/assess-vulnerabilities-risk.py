@@ -28,7 +28,7 @@ def _check_logging_level(option, opt, value):
         return getattr(logging, value.upper())
     fmt = (
         "option %s: should be one of "
-        "DEBUG, INFO, WARNING, ERROR, CRITICAL or FATAL"
+        "DEBUG, INFO, WARNING, ERROR or CRITICAL"
     )
     raise optparse.OptionValueError(fmt % opt)
 
