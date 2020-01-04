@@ -22,7 +22,7 @@ _logger = logging.getLogger(__name__)
 
 def _check_logging_level(option, opt, value):
     """Type checking function for command line parser's 'logginglevel' type."""
-    reg_ex_pattern = "^(DEBUG|INFO|WARNING|ERROR|CRITICAL|FATAL)$"
+    reg_ex_pattern = "^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$"
     reg_ex = re.compile(reg_ex_pattern, re.IGNORECASE)
     if reg_ex.match(value):
         return getattr(logging, value.upper())
@@ -67,7 +67,7 @@ class CommandLineParser(optparse.OptionParser):
 
         default = logging.ERROR
         fmt = (
-            "logging level [DEBUG,INFO,WARNING,ERROR,CRITICAL,FATAL] - "
+            "logging level [DEBUG,INFO,WARNING,ERROR,CRITICAL] - "
             "default = %s"
         )
         help = fmt % logging.getLevelName(default)
