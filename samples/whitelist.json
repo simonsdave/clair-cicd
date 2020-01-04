@@ -1,66 +1,13 @@
 {
-    "comment": "justification for ignoreSevertiesAtOrBelow's value",
     "ignoreSevertiesAtOrBelow": "low",
     "vulnerabilities": [
         {
-            "comment": "you can optionally say things about a vulnerability",
             "cveId": "CVE-2016-99999",
-            "production": {
-                "externallyFacing": {
-                    "whitelist": true,
-                    "comment": "bla bla bla"
-                },
-                "touchesCardHolderData": {
-                    "whitelist": true
-                },
-                "touchesPII": {
-                    "whitelist": false,
-                    "comment": "just gotta deal with this one"
-                }
-            }
+            "rationale": "why are we ignoring this vulnerability?"
         },
         {
             "cveId": "CVE-2016-88888",
-            "whitelist": true,
-            "production": {
-                "touchesCardHolderData": {
-                    "whitelist": false
-                }
-            },
-            "development": {
-                "externallyFacing": {
-                    "whitelist": true,
-                    "comment": "bla bla bla"
-                },
-                "touchesCardHolderData": {
-                    "whitelist": true
-                },
-                "touchesPII": {
-                    "whitelist": true,
-                    "comment": "will deal with it later"
-                }
-            }
-        },
-        {
-            "cveId": "CVE-2016-77777",
-            "production": {
-                "touchesCardHolderData": {
-                    "whitelist": false
-                }
-            },
-            "development": {
-                "externallyFacing": {
-                    "whitelist": true,
-                    "comment": "bla bla bla"
-                },
-                "touchesCardHolderData": {
-                    "whitelist": true
-                },
-                "touchesPII": {
-                    "whitelist": true,
-                    "comment": "will deal with it later"
-                }
-            }
+            "rationale": "why are we ignoring this vulnerability?"
         }
     ]
 }
