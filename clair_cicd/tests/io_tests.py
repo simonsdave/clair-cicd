@@ -49,9 +49,8 @@ class ReadWhitelistTestCase(unittest.TestCase):
 class ReadVulnerabilitiesTestCase(unittest.TestCase):
 
     def test_ctr(self):
-        directory_name = None
-        vulnerabilities = read_vulnerabilities(directory_name)
-        self.assertEqual({}, vulnerabilities)
+        vulnerabilities = read_vulnerabilities(None)
+        self.assertEqual([], vulnerabilities)
 
     def test_directory_does_not_exist(self):
         directory_name = os.path.join(
