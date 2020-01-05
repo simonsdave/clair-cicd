@@ -65,8 +65,7 @@ def read_vulnerabilities(directory):
                     vulnerabilities = feature.get('Vulnerabilities', [])
                     for vulnerability in vulnerabilities:
                         vulnerability = Vulnerability(vulnerability)
-                        if vulnerability.cve_id not in vulnerabilities_by_cve_id:
-                            vulnerabilities_by_cve_id[vulnerability.cve_id] = vulnerability
+                        vulnerabilities_by_cve_id[vulnerability.cve_id] = vulnerability
         except Exception:
             _logger.error("Could not read vulnerabilities from '%s'", absolute_filename)
             return None
