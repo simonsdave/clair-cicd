@@ -55,7 +55,8 @@ class Vulnerability(dict):
 
     def __init__(self, *args, **kwargs):
         """'''vulnerability''' is expected to be a dictionary
-        of the form illustrated by the example below:
+        of the form illustrated by the example below. Name and
+        Severity are the only two required proprities.
 
             {
               "Name": "CVE-2016-1238",
@@ -75,6 +76,8 @@ class Vulnerability(dict):
         """
         dict.__init__(self, *args, **kwargs)
 
+        jsonschema.validate(self, jsonschemas.vulnerability)
+
     def __str__(self):
         return self.cve_id
 
@@ -84,6 +87,6 @@ class Vulnerability(dict):
 
     @property
     def severity(self):
-        # use Severity if it exists otherwise uses Score
+        # :TODO: use Severity if it exists otherwise uses Score
         # where low = 0.0-3.9, medium = 4.0-6.9 & high = 7.0-10.0
         return Severity(self['Severity'])

@@ -8,9 +8,13 @@
       "type": "string",
       "enum": [
         "negligible",
+        "Negligible",
         "low",
+        "Low",
         "medium",
-        "high"
+        "Medium",
+        "high",
+        "High"
       ]
     },
     "vulnerabilities": {

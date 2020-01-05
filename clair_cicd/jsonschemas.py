@@ -13,3 +13,5 @@ def _load_jsonschema(schema_name):
 
 
 whitelist = _load_jsonschema('whitelist')
+
+vulnerability = _load_jsonschema('vulnerability')

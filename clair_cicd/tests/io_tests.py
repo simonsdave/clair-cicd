@@ -51,6 +51,14 @@ class ReadVulnerabilitiesTestCase(unittest.TestCase):
     def test_ctr(self):
         directory_name = None
         vulnerabilities = read_vulnerabilities(directory_name)
+        self.assertEqual({}, vulnerabilities)
+
+    def test_directory_does_not_exist(self):
+        directory_name = os.path.join(
+            os.path.dirname(__file__),
+            'vulnerabilities',
+            'directory-that-does-not-exist')
+        vulnerabilities = read_vulnerabilities(directory_name)
         self.assertIsNone(vulnerabilities)
 
     def test_error_reading_vulnerabilities_because_of_file_with_invalid_json(self):

@@ -45,16 +45,16 @@ def read_vulnerabilities(directory):
     If any kind of error occurs ```None``` is returned.
     """
 
-    vulnerabilities_by_cve_id = {}
-
     if directory is None:
-        return None
+        return {}
 
     try:
         filenames = os.listdir(directory)
     except Exception:
         _logger.error("Could not read vulnerabilities from directory '%s'", directory)
         return None
+
+    vulnerabilities_by_cve_id = {}
 
     for filename in filenames:
         absolute_filename = os.path.join(directory, filename)

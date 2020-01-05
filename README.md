@@ -27,12 +27,15 @@ Integrating Clair into a CI/CD pipeline:
 are identified there's a lack of prescriptive guidance on how to act on
 the identified vulnerabilities
 
-This repo was created to address the above problems.
+This repo was created to address the above challenges.
 
 ## Background
 
 The roots of this repo center around the belief that:
 
+* [Clair](https://github.com/coreos/clair) can be a very effective
+foundation for the automated assessment of Docker image
+vulnerabilities when inserted into the CI/CD pipeline
 * services should be run in Docker containers and thus a CI/CD
 pipeline should be focused on the automated generation, assessment
 and ultimately deployment of Docker images
@@ -42,23 +45,14 @@ ie. security is important
 way to *production* vs docker images that will only ever be used in *development*
 * Docker images should **not** be pushed to a Docker registry until
 their risk profile is understood (this is an important one)
-* [Clair](https://github.com/coreos/clair) can be a very effective
-foundation for the automated assessment of Docker image
-vulnerabilities when inserted into the CI/CD pipeline
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
 between code commit and automated (CD) deployment begins rolling
 out a change
 * there should be a clear division of responsibilities between
-those who create a docker image (service engineer) and those that determine the
-risk of vulnerabilities in a docker image (security analyst)
+those who create a docker image (service engineer) and those who
+determine the risk of vulnerabilities in a docker image (security analyst)
 * the risk assessment process must generate evidence which
 can be used to understand the risk assessment decision
-
-## Key Participants
-
-* service engineer - responsible for implementing a service that is packaged
-in a docker image
-* security analyst - responsible for defining the :TODO:
 
 ## Key Concepts
 
@@ -67,32 +61,38 @@ in a docker image
 * static vulnerability analysis
 * vulnerability whitelist
 
+## Key Participants
+
+* service engineer - responsible for implementing a service that is packaged
+in a docker image
+* security analyst - responsible for defining whitelists
+
 ## How to Use
 
 ### Getting Started
 
-To get started with using ```clair-cicd```
-to assess risk,
-a service engineer inserts a single line of code into a
-service's CI script which runs the shell script ```assess-image-risk.sh```.
-Part of the CI script's responsibility is to build the docker image
-```username/repo:tag``` and then push ```username/repo:tag```
-to a docker registry.
-The single line of ```clair-cicd``` code should appear after
-```username/repo:tag``` is built but
-before ```username/repo:tag``` is pushed to a docker registry.
+To start using ```clair-cicd```
+a service engineer inserts a single line of code into a service's CI pipeline.
+The single line of code runs the shell script [assess-image-risk.sh](bin/assess-image-risk.sh).
+Part of the CI pipeline's responsibility is to build the docker image ```username/repo:tag```
+and then push ```username/repo:tag``` to a docker registry.
+The single line of ```clair-cicd``` code should appear after ```username/repo:tag```
+is built and tested but before ```username/repo:tag``` is pushed to a docker registry.
 
-In this simple case, ```assess-image-risk.sh``` returns a zero
+In this simple case, [assess-image-risk.sh](bin/assess-image-risk.sh) returns a zero
 exit status if ```username/repo:tag``` contains no known vulnerabilities
 above a medium severity. If ```username/repo:tag``` contains
-any known vulnerabilities with a severity higher than medium ```assess-image-risk.sh``` returns a non-zero exit status
-and the build fails immediately
-ie. the build should fail before ```username/repo:tag```
-is pushed to a docker registry.
+any known vulnerabilities with a severity higher than medium [assess-image-risk.sh](bin/assess-image-risk.sh)
+returns a non-zero exit status and the build fails
+ie. the build should fail before ```username/repo:tag``` is pushed to a docker registry.
 
 ```bash
 curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s -- "username/repo:tag"
 ```
+
+### Medium -> High
+
+* :TODO:
 
 ### Adding a Vulnerability Whitelist
 
@@ -169,8 +169,7 @@ which packages up [Clair](https://github.com/coreos/clair)
 
 ## :TODO:
 
-* whitelist should be just list of vulnerabilities and the ignore below severity
-* whitelist should be jsonschema verified
+* assessor should use whitelist vulnerabilities
 * vulnerabilities should be jsonschema verified
 * whitelist needs to be passed from ```assess-image-risk.sh``` all the way through to ```assess-vulnerabilities-risk.py```
 * unit test coverage should be 100% given how simple this code is

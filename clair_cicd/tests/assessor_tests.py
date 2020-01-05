@@ -18,7 +18,7 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
         self.assertEqual(vulnerabilities, vra.vulnerabilities)
 
     def test_no_vulnerabilities_should_assess_clean(self):
-        for severity in ['negligible', 'low', 'medium', 'high']:
+        for severity in ['Negligible', 'Low', 'Medium', 'High']:
             whitelist = Whitelist({'ignoreSevertiesAtOrBelow': severity})
             vulnerabilities = []
 
@@ -26,7 +26,7 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
             self.assertTrue(vra.assess())
 
     def test_X_sev_vul_with_X_sev_wl_should_assess_clean(self):
-        for severity in ['negligible', 'low', 'medium', 'high']:
+        for severity in ['Negligible', 'Low', 'Medium', 'High']:
             whitelist = Whitelist({'ignoreSevertiesAtOrBelow': severity})
             vulnerabilities = [
                 Vulnerability({

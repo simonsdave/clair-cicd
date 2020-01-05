@@ -52,15 +52,11 @@ class WhitelistTestCase(unittest.TestCase):
 
 class VulnerabilityTestCase(unittest.TestCase):
 
-    def test_ctr(self):
-        vulnerability_dict = {}
-        vulnerability = Vulnerability(vulnerability_dict)
-        self.assertTrue(vulnerability_dict == vulnerability)
-
     def test_cve_id(self):
         cve_id = 'abc'
         vulnerability_dict = {
             'Name': cve_id,
+            'Severity': 'medium',
         }
         vulnerability = Vulnerability(vulnerability_dict)
         self.assertTrue(cve_id == vulnerability.cve_id)
@@ -69,6 +65,7 @@ class VulnerabilityTestCase(unittest.TestCase):
         cve_id = 'abc'
         vulnerability_dict = {
             'Name': cve_id,
+            'Severity': 'medium',
         }
         vulnerability = Vulnerability(vulnerability_dict)
         self.assertTrue(cve_id == str(vulnerability))
@@ -76,6 +73,7 @@ class VulnerabilityTestCase(unittest.TestCase):
     def test_severity(self):
         severity = 'medium'
         vulnerability_dict = {
+            'Name': 'DAVE-WAS-HERE',
             'Severity': severity,
         }
         vulnerability = Vulnerability(vulnerability_dict)
