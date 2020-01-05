@@ -102,8 +102,8 @@ if __name__ == '__main__':
     logging.Formatter.converter = time.gmtime
     logging.basicConfig(
         level=clo.logging_level,
-        datefmt='%Y-%m-%dT%H:%M:%S',
-        format='%(asctime)s.%(msecs)03d+00:00 %(levelname)s %(module)s:%(lineno)d %(message)s')
+        datefmt='%Y-%m-%d %H:%M:%S',
+        format='%(asctime)s %(levelname)s %(module)s:%(lineno)d %(message)s')
 
     #
     # read all the various bits we need into memory
