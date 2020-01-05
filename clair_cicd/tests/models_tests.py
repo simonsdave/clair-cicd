@@ -45,13 +45,9 @@ class SeverityTestCase(unittest.TestCase):
 class WhitelistTestCase(unittest.TestCase):
 
     def test_ctr(self):
-        wl = {}
-        whitelist = Whitelist(wl)
-        self.assertTrue(whitelist.whitelist == wl)
-
-    def test_default_ignore_severties_at_or_below(self):
-        whitelist = Whitelist({})
-        self.assertTrue(whitelist.ignore_severties_at_or_below == Severity('medium'))
+        whitelist_as_json = {'ignoreSevertiesAtOrBelow': 'low'}
+        whitelist = Whitelist(whitelist_as_json)
+        self.assertEqual(whitelist_as_json, whitelist)
 
 
 class VulnerabilityTestCase(unittest.TestCase):

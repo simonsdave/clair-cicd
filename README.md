@@ -21,7 +21,7 @@ is a very effective tool for statically analyzing docker images
 and assessing images against known vulnerabilities.
 Integrating Clair into a CI/CD pipeline:
 
-1. is complex (believe this is mostly a documentation challenge)
+1. is complex (believe this is partly a documentation challenge)
 1. creates performance problems (building the Postgres vulnerabilities database is slow)
 1. in and of itself is insufficient from a risk assessment point of view because once vulnerabilities
 are identified there's a lack of prescriptive guidance on how to act on
@@ -49,16 +49,16 @@ vulnerabilities when inserted into the CI/CD pipeline
 between code commit and automated (CD) deployment begins rolling
 out a change
 * there should be a clear division of responsibilities between
-those who create a docker image and those that determine the
-risk of vulnerabilities in a docker image
+those who create a docker image (service engineer) and those that determine the
+risk of vulnerabilities in a docker image (security analyst)
 * the risk assessment process must generate evidence which
 can be used to understand the risk assessment decision
 
 ## Key Participants
 
-* service engineer - responsible for implementing a service that packaged
-in a docker container
-* security analyst - responsible for defining the
+* service engineer - responsible for implementing a service that is packaged
+in a docker image
+* security analyst - responsible for defining the :TODO:
 
 ## Key Concepts
 
@@ -66,7 +66,6 @@ in a docker container
 * vulnerabilities
 * static vulnerability analysis
 * vulnerability whitelist
-* service profile
 
 ## How to Use
 
@@ -120,10 +119,6 @@ Whitelist expectations:
 management processes are used to make changes (code reviews, feature
 branches, etc)
 
-### Adding a Service Profile
-
-* service engineer defines a service profile
-
 ## How it Works
 
 Assumptions/requirements:
@@ -171,3 +166,13 @@ which packages up [Clair](https://github.com/coreos/clair)
 * [26 Jul '16 - Injecting security into Continuous Delivery](https://www.oreilly.com/learning/injecting-security-into-continuous-delivery)
 * [5 Jun '16 - <— Shifting Security to the Left](http://www.devsecops.org/blog/2016/5/20/-security)
 * [Five Secrets and Two Common “Gotchas” of Vulnerability Scanning](https://www.kennasecurity.com/resources/secrets-gotchas-of-vuln-scanning)
+
+## :TODO:
+
+* whitelist should be just list of vulnerabilities and the ignore below severity
+* whitelist should be jsonschema verified
+* vulnerabilities should be jsonschema verified
+* whitelist needs to be passed from ```assess-image-risk.sh``` all the way through to ```assess-vulnerabilities-risk.py```
+* unit test coverage should be 100% given how simple this code is
+* ```assess-vulnerabilities-risk.py``` should support ```file:``` and ```https``` schemes for ```--whitelist``` command line arg and just pass json doc
+* publish ```clair-cicd``` to PyPI

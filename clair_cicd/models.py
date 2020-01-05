@@ -1,3 +1,8 @@
+import jsonschema
+
+from . import jsonschemas
+
+
 class Severity(object):
 
     # these labels need to be in order of increasing severity
@@ -32,17 +37,18 @@ class Severity(object):
         return self.severity != other.severity
 
 
-class Whitelist(object):
+class Whitelist(dict):
 
-    def __init__(self, whitelist):
-        object.__init__(self)
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
 
-        self.whitelist = whitelist
-        # :TODO: add list of vulnerabilities to whitelist regardless of severity
+        jsonschema.validate(self, jsonschemas.whitelist)
 
     @property
     def ignore_severties_at_or_below(self):
-        return Severity(self.whitelist.get('ignoreSevertiesAtOrBelow', 'Medium'))
+        return Severity(self['ignoreSevertiesAtOrBelow'])
+
+    # :TODO: add list of vulnerabilities to whitelist regardless of severity
 
 
 class Vulnerability(dict):

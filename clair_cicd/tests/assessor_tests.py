@@ -18,38 +18,28 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
         self.assertEqual(vulnerabilities, vra.vulnerabilities)
 
     def test_no_vulnerabilities_should_assess_clean(self):
-        whitelist = Whitelist({})
-        vulnerabilities = []
+        for severity in ['negligible', 'low', 'medium', 'high']:
+            whitelist = Whitelist({'ignoreSevertiesAtOrBelow': severity})
+            vulnerabilities = []
 
-        vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
-        self.assertTrue(vra.assess())
+            vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
+            self.assertTrue(vra.assess())
 
-    def test_medium_severity_vulnerabilities_should_assess_clean_by_default(self):
-        whitelist = Whitelist({})
-        vulnerabilities = [
-            Vulnerability({
-                'Name': 'CVE-0000-0000',
-                'Severity': 'Medium',
-            }),
-        ]
+    def test_X_sev_vul_with_X_sev_wl_should_assess_clean(self):
+        for severity in ['negligible', 'low', 'medium', 'high']:
+            whitelist = Whitelist({'ignoreSevertiesAtOrBelow': severity})
+            vulnerabilities = [
+                Vulnerability({
+                    'Name': 'CVE-0000-0000',
+                    'Severity': severity,
+                }),
+            ]
 
-        vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
-        self.assertTrue(vra.assess())
-
-    def test_med_sev_vul_with_medium_sev_wl_should_assess_clean(self):
-        whitelist = Whitelist({'ignoreSevertiesAtOrBelow': 'Medium'})
-        vulnerabilities = [
-            Vulnerability({
-                'Name': 'CVE-0000-0000',
-                'Severity': 'Medium',
-            }),
-        ]
-
-        vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
-        self.assertTrue(vra.assess())
+            vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
+            self.assertTrue(vra.assess())
 
     def test_high_severity_vulnerabilities_should_assess_dirty(self):
-        whitelist = Whitelist({})
+        whitelist = Whitelist({'ignoreSevertiesAtOrBelow': 'medium'})
         vulnerabilities = [
             Vulnerability({
                 'Name': 'CVE-0000-0000',

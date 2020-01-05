@@ -8,31 +8,30 @@ from .models import Vulnerability
 _logger = logging.getLogger(__name__)
 
 
-def read_whitelist(filename):
-    """Attempt to populate and return a ```Whitelist```
-    from the file pointed to by ```filename```.
+def read_whitelist(filename_or_json):
+    """Attempt to populate and return a ```Whitelist```.
 
-    If ```filename``` is ```None``` then an empty ```Whitelist```
-    is returned.
+    As the name implies, ```filename_or_json``` is either a filename
+    or a string representing a JSON doc. More specifically,
+    ```filename_or_json``` is assumed to be a JSON doc if it starts
+    a { character otherwise ```filename_or_json``` is assumed to be
+    the name of a file with UTF-8 character encoding.
 
     If any kind of error occurs ```None``` is returned.
     """
-
-    if filename is None:
-        return Whitelist({})
-
-    try:
-        with open(filename) as fp:
-            try:
-                whitelist = Whitelist(json.load(fp))
-            except Exception as ex:
-                _logger.error("Could not read whitelist from '%s' - %s\n", filename, ex)
-                return None
-    except Exception as ex:
-        _logger.error("Could not read whitelist from '%s' - %s\n", filename, ex)
-        return None
-
-    # :TODO: validate whitelist with jsonschema or done in Whitelist class
+    if 0 < len(filename_or_json) and '{' == filename_or_json[0]:
+        try:
+            whitelist = Whitelist(json.loads(filename_or_json))
+        except Exception:
+            _logger.error("Looked like JSON but guess not :-( - %s\n", filename_or_json)
+            return None
+    else:
+        try:
+            with open(filename_or_json, 'r', encoding='utf-8') as f:
+                whitelist = Whitelist(json.load(f))
+        except Exception as ex:
+            _logger.error("Could not read whitelist from '%s' - %s\n", filename_or_json, ex)
+            return None
 
     return whitelist
 

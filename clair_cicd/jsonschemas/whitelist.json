@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Vulnerability Whitelist",
+  "description": "Vulnerability Whitelist",
+  "type": "object",
+  "properties": {
+    "ignoreSevertiesAtOrBelow": {
+      "type": "string",
+      "enum": [
+        "negligible",
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "vulnerabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cveId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "required": [
+          "cveId",
+          "rationale"
+        ],
+        "additionalProperties": false
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "ignoreSevertiesAtOrBelow"
+  ],
+  "additionalProperties": false
+}
