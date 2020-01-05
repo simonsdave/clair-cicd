@@ -96,6 +96,8 @@ curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/as
 
 ### Adding a Vulnerability Whitelist
 
+* :TODO: inline whitelist
+
 Consider this scenario:
 
 * a high severity vulnerability exists

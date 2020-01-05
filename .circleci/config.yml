@@ -60,6 +60,9 @@ jobs:
           command: |
             ./dockerfiles/clair/build-docker-image.sh "dist/clair-cicd-$(python-version.sh).tar.gz" "${DOCKER_CLAIR_TEMP_IMAGE}"
             ./dockerfiles/database/build-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}"
+      - run:
+          name: Run Integration Tests
+          command: ./tests/integration/docker-image-integration-tests.sh "${DOCKER_CLAIR_TEMP_IMAGE}"
       - deploy:
           name: Push Docker Images to DockerHub
           command: |
