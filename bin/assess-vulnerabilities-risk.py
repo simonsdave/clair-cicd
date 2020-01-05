@@ -86,8 +86,6 @@ class CommandLineParser(optparse.OptionParser):
             sys.stderr.write(self.get_usage())
             sys.exit(1)
 
-        self.vulnerabilities_directory = cla[0]
-
         return (clo, cla)
 
 
@@ -117,7 +115,7 @@ if __name__ == '__main__':
         if whitelist is None:
             sys.exit(1)
 
-    vulnerabilities = io.read_vulnerabilities(cla.vulnerabilities_directory)
+    vulnerabilities = io.read_vulnerabilities(cla[0])
     if vulnerabilities is None:
         sys.exit(2)
 
