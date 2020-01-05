@@ -111,7 +111,7 @@ echo_if_verbose "$(ts) done creating clair layers"
 # RESTful API to get the vulnerabilities for each layer.
 #
 # References
-# -- https://coreos.com/clair/docs/latest/api_v1.html#vulnerabilities
+# -- https://coreos.com/clair/docs/latest/api_v1.html#get-layersname
 #
 echo_if_verbose "$(ts) starting to get vulnerabilities for clair layers"
 
@@ -125,7 +125,7 @@ do
 
     if ! HTTP_STATUS_CODE=$(curl \
         -s \
-        -o "${VULNERABILTIES_DIR}/${LAYER}" \
+        -o "${VULNERABILTIES_DIR}/${LAYER}.json" \
         --write-out "%{http_code}" \
         --silent \
         --output /dev/null \
