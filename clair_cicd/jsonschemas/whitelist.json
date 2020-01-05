@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Vulnerability Whitelist",
-  "description": "Vulnerability Whitelist",
+  "title": "Whitelist",
+  "description": "Whitelist",
   "type": "object",
   "properties": {
     "ignoreSevertiesAtOrBelow": {
