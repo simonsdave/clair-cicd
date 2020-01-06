@@ -34,19 +34,8 @@ test_assess_vulnerabilities_risk_dot_py_no_command_line_args() {
 
 test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore() {
     DOCKER_IMAGE=${1:-}
+    VULNERABILITIES_CONTAINER=${2:-}
 
-    VULNERABILITIES_CONTAINER=vulnerabilities-$(openssl rand -hex 8)
-    docker create \
-        -v /vulnerabilities \
-        --name "${VULNERABILITIES_CONTAINER}" \
-        alpine:3.4 \
-        /bin/true \
-        > /dev/null
-    find "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
-        docker cp -a "${FILENAME}" "${VULNERABILITIES_CONTAINER}:/vulnerabilities"
-    done
-
-    # :ODD: Normally you'd expect the line below to be something like
     # :ODD: Normally you'd expect the line below to be something like
     # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
     # is not shared from OS X and is not known to Docker" was generated
@@ -73,25 +62,12 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
 
     rm -f "${STDOUT}"
 
-    docker kill "${VULNERABILITIES_CONTAINER}" >& /dev/null
-    docker rm "${VULNERABILITIES_CONTAINER}" >& /dev/null
-
     return "${EXIT_CODE}"
 }
 
 test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore() {
     DOCKER_IMAGE=${1:-}
-
-    VULNERABILITIES_CONTAINER=vulnerabilities-$(openssl rand -hex 8)
-    docker create \
-        -v /vulnerabilities \
-        --name "${VULNERABILITIES_CONTAINER}" \
-        alpine:3.4 \
-        /bin/true \
-        > /dev/null
-    find "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
-        docker cp -a "${FILENAME}" "${VULNERABILITIES_CONTAINER}:/vulnerabilities"
-    done
+    VULNERABILITIES_CONTAINER=${2:-}
 
     # :ODD: Normally you'd expect the line below to be something like
     # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
@@ -119,9 +95,6 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore
 
     rm -f "${STDOUT}"
 
-    docker kill "${VULNERABILITIES_CONTAINER}" >& /dev/null
-    docker rm "${VULNERABILITIES_CONTAINER}" >& /dev/null
-
     return "${EXIT_CODE}"
 }
 
@@ -144,14 +117,28 @@ fi
 
 DOCKER_IMAGE=${1:-}
 
+VULNERABILITIES_CONTAINER=vulnerabilities-$(openssl rand -hex 8)
+docker create \
+    -v /vulnerabilities \
+    --name "${VULNERABILITIES_CONTAINER}" \
+    alpine:3.4 \
+    /bin/true \
+    > /dev/null
+find "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
+    docker cp -a "${FILENAME}" "${VULNERABILITIES_CONTAINER}:/vulnerabilities"
+done
+
 NUMBER_TESTS_RUN=0
 NUMBER_TEST_SUCCESSES=0
 NUMBER_TEST_FAILURES=0
 test_wrapper test_assess_vulnerabilities_risk_dot_py_no_command_line_args "${DOCKER_IMAGE}"
-test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore "${DOCKER_IMAGE}"
-test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore "${DOCKER_IMAGE}"
+test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore "${DOCKER_IMAGE}" "${VULNERABILITIES_CONTAINER}"
+test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore "${DOCKER_IMAGE}" "${VULNERABILITIES_CONTAINER}"
 echo ""
 echo "Successfully completed ${NUMBER_TESTS_RUN} integration tests. ${NUMBER_TEST_SUCCESSES} successes. ${NUMBER_TEST_FAILURES} failures."
+
+docker kill "${VULNERABILITIES_CONTAINER}" >& /dev/null
+docker rm "${VULNERABILITIES_CONTAINER}" >& /dev/null
 
 if [[ "${NUMBER_TEST_FAILURES}" != "0" ]]; then
     exit 1
