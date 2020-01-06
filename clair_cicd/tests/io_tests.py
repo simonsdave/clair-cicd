@@ -15,11 +15,16 @@ class ReadWhitelistTestCase(unittest.TestCase):
         whitelist = read_whitelist(filename)
         self.assertIsNone(whitelist)
 
-    def test_invalid_json(self):
+    def test_invalid_json_in_file(self):
         temp_whitelist_filename = tempfile.NamedTemporaryFile()
         with open(temp_whitelist_filename.name, 'w+', encoding='utf-8') as fp:
             fp.write('{')
         whitelist = read_whitelist(temp_whitelist_filename.name)
+        self.assertIsNone(whitelist)
+
+    def test_invalid_json_in_str(self):
+        whitelist_as_str = '{'
+        whitelist = read_whitelist(whitelist_as_str)
         self.assertIsNone(whitelist)
 
     def test_happy_path_from_file(self):
