@@ -50,6 +50,11 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
         "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "high"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
+
+        echo ""
+        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} success - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
     else
         EXIT_CODE=1
 
@@ -82,6 +87,11 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore
         "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "medium"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
+
+        echo ""
+        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} success - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
     else
         EXIT_CODE=1
 
