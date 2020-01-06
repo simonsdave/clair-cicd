@@ -117,7 +117,14 @@ fi
 
 DOCKER_IMAGE=${1:-}
 
+#
+# :TRICKY: creating vulnerability container so the integration
+# tests will work on CircleCI - see link below for pattern overview
+# https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
+#
 VULNERABILITIES_CONTAINER=vulnerabilities-$(openssl rand -hex 8)
+# explict pull to create opportunity to swallow stdout
+docker pull alpine:3.4 > /dev/null
 docker create \
     -v /vulnerabilities \
     --name "${VULNERABILITIES_CONTAINER}" \
@@ -137,6 +144,7 @@ test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_
 echo ""
 echo "Successfully completed ${NUMBER_TESTS_RUN} integration tests. ${NUMBER_TEST_SUCCESSES} successes. ${NUMBER_TEST_FAILURES} failures."
 
+# :TRICKY: see comment above
 docker kill "${VULNERABILITIES_CONTAINER}" >& /dev/null
 docker rm "${VULNERABILITIES_CONTAINER}" >& /dev/null
 
