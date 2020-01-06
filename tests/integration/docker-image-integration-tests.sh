@@ -35,6 +35,18 @@ test_assess_vulnerabilities_risk_dot_py_no_command_line_args() {
 test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore() {
     DOCKER_IMAGE=${1:-}
 
+    VULNERABILITIES_CONTAINER=vulnerabilities-$(openssl rand -hex 8)
+    docker create \
+        -v /vulnerabilities \
+        --name "${VULNERABILITIES_CONTAINER}" \
+        alpine:3.4 \
+        /bin/true \
+        > /dev/null
+    find "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
+        docker cp -a "${FILENAME}" "${VULNERABILITIES_CONTAINER}:/vulnerabilities"
+    done
+
+    # :ODD: Normally you'd expect the line below to be something like
     # :ODD: Normally you'd expect the line below to be something like
     # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
     # is not shared from OS X and is not known to Docker" was generated
@@ -44,25 +56,16 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
 
     if docker run \
         --rm \
-        -v "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity:/vulnerabilities" \
+        --volumes-from "${VULNERABILITIES_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${DOCKER_IMAGE}" \
         "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "high"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
-
-        echo ""
-        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
-        ls -la "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity"
-        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
-        cat "${STDOUT}"
-        echo "${FUNCNAME[0]} success - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
     else
         EXIT_CODE=1
 
         echo ""
-        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
-        ls -la "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity"
         echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
         cat "${STDOUT}"
         echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
@@ -70,11 +73,25 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
 
     rm -f "${STDOUT}"
 
+    docker kill "${VULNERABILITIES_CONTAINER}" >& /dev/null
+    docker rm "${VULNERABILITIES_CONTAINER}" >& /dev/null
+
     return "${EXIT_CODE}"
 }
 
 test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore() {
     DOCKER_IMAGE=${1:-}
+
+    VULNERABILITIES_CONTAINER=vulnerabilities-$(openssl rand -hex 8)
+    docker create \
+        -v /vulnerabilities \
+        --name "${VULNERABILITIES_CONTAINER}" \
+        alpine:3.4 \
+        /bin/true \
+        > /dev/null
+    find "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
+        docker cp -a "${FILENAME}" "${VULNERABILITIES_CONTAINER}:/vulnerabilities"
+    done
 
     # :ODD: Normally you'd expect the line below to be something like
     # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
@@ -85,31 +102,25 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore
 
     if ! docker run \
         --rm \
-        -v "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity:/vulnerabilities" \
+        --volumes-from "${VULNERABILITIES_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${DOCKER_IMAGE}" \
         "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "medium"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
-
-        echo ""
-        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
-        ls -la "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity"
-        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
-        cat "${STDOUT}"
-        echo "${FUNCNAME[0]} success - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
     else
         EXIT_CODE=1
 
         echo ""
-        echo "${FUNCNAME[0]} success - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
-        ls -la "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity"
         echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
         cat "${STDOUT}"
         echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
     fi
 
     rm -f "${STDOUT}"
+
+    docker kill "${VULNERABILITIES_CONTAINER}" >& /dev/null
+    docker rm "${VULNERABILITIES_CONTAINER}" >& /dev/null
 
     return "${EXIT_CODE}"
 }
