@@ -17,6 +17,7 @@ echo_if_verbose() {
 VERBOSE=0
 LOG_LEVEL=ERROR
 CLAIR_API_PORT=6060
+VULNERABILITY_WHITELIST='{"ignoreSevertiesAtOrBelow": "medium"}'
 
 while true
 do
@@ -35,6 +36,11 @@ do
             shift
             VERBOSE=1
             LOG_LEVEL=DEBUG
+            ;;
+        -wl|--whitelist)
+            shift
+            VULNERABILITY_WHITELIST=${1:-}
+            shift
             ;;
         --api-port)
             shift
@@ -150,6 +156,6 @@ echo_if_verbose "$(ts) done getting vulnerabilities for clair layers"
 #
 # ...
 #
-assess-vulnerabilities-risk.py "--log=${LOG_LEVEL}" "${VULNERABILTIES_DIR}"
+assess-vulnerabilities-risk.py "--whitelist=${VULNERABILITY_WHITELIST}" "--log=${LOG_LEVEL}" "${VULNERABILTIES_DIR}"
 
 exit $?
