@@ -16,6 +16,8 @@ class VulnerabilitiesRiskAssessor(object):
         """Returns ```True``` if the risk is deemed acceptable
         otherwise returns ```False```.
         """
+        _logger.info('Assessment starts')
+
         for vulnerability in self.vulnerabilities:
             _logger.info('Assessing vulnerability %s - start', vulnerability)
 
@@ -29,6 +31,7 @@ class VulnerabilitiesRiskAssessor(object):
                     vulnerability.severity,
                     self.whitelist.ignore_severties_at_or_below)
 
+                _logger.info('Assessment ends - fail')
                 return False
 
             _logger.info(
@@ -38,5 +41,7 @@ class VulnerabilitiesRiskAssessor(object):
                 self.whitelist.ignore_severties_at_or_below)
 
             _logger.info('Assessing vulnerability %s - finish', vulnerability)
+
+        _logger.info('Assessment ends - pass')
 
         return True
