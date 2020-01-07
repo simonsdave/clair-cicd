@@ -15,21 +15,26 @@ echo_if_verbose() {
 # parse command line arguments
 #
 VERBOSE=0
-LOG_LEVEL=""
+LOG_LEVEL=ERROR
 CLAIR_API_PORT=6060
 
 while true
 do
     case "$(echo "${1:-}" | tr "[:upper:]" "[:lower:]")" in
+        -s)
+            shift
+            VERBOSE=0
+            LOG_LEVEL=ERROR
+            ;;
         -v)
             shift
             VERBOSE=1
-            LOG_LEVEL=--log=info
+            LOG_LEVEL=INFO
             ;;
         -vv)
             shift
             VERBOSE=1
-            LOG_LEVEL=--log=debug
+            LOG_LEVEL=DEBUG
             ;;
         --api-port)
             shift
@@ -43,7 +48,7 @@ do
 done
 
 if [ $# != 1 ]; then
-    echo "usage: $(basename "$0") [-v|-vv] [--api-port <port>] <docker image>" >&2
+    echo "usage: $(basename "$0") [-s|-v|-vv] [--api-port <port>] <docker image>" >&2
     exit 1
 fi
 
@@ -145,6 +150,6 @@ echo_if_verbose "$(ts) done getting vulnerabilities for clair layers"
 #
 # ...
 #
-assess-vulnerabilities-risk.py "${LOG_LEVEL}" "${VULNERABILTIES_DIR}"
+assess-vulnerabilities-risk.py "--log=${LOG_LEVEL}" "${VULNERABILTIES_DIR}"
 
 exit $?

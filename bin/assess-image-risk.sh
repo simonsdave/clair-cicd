@@ -30,7 +30,7 @@ echo_if_verbose() {
 # parse command line arguments
 #
 VERBOSE=0
-VERBOSE_FLAG_ASSESS_RISK=""
+IMAGE_ASSESS_RISK_VERBOSE_FLAG=-s
 NO_PULL_DOCKER_IAMGES=0
 
 while true
@@ -39,12 +39,12 @@ do
         -v)
             shift
             VERBOSE=1
-            VERBOSE_FLAG_ASSESS_RISK=-v
+            IMAGE_ASSESS_RISK_VERBOSE_FLAG=-v
             ;;
         -vv)
             shift
             VERBOSE=1
-            VERBOSE_FLAG_ASSESS_RISK=-vv
+            IMAGE_ASSESS_RISK_VERBOSE_FLAG=-vv
             ;;
         -np|--no-pull)
             shift
@@ -206,7 +206,7 @@ echo_if_verbose "$(ts) successfully started clair container '${CLAIR_CONTAINER}'
 # Now that the Clair container and Clair database container are started
 # it's time to kick-off the process of assessing the image's risk.
 #
-docker exec "${CLAIR_CONTAINER}" assess-image-risk.sh --api-port "${CLAIR_API_PORT}" "${VERBOSE_FLAG_ASSESS_RISK}" "${DOCKER_IMAGE_TO_ANALYZE}"
+docker exec "${CLAIR_CONTAINER}" assess-image-risk.sh --api-port "${CLAIR_API_PORT}" "${IMAGE_ASSESS_RISK_VERBOSE_FLAG}" "${DOCKER_IMAGE_TO_ANALYZE}"
 EXIT_CODE=$?
 
 #
