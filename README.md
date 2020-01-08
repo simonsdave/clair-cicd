@@ -82,39 +82,104 @@ is built and tested but before ```username/repo:tag``` is pushed to a docker reg
 In this simple case, [assess-image-risk.sh](bin/assess-image-risk.sh) returns a zero
 exit status if ```username/repo:tag``` contains no known vulnerabilities
 above a medium severity. If ```username/repo:tag``` contains
-any known vulnerabilities with a severity higher than medium [assess-image-risk.sh](bin/assess-image-risk.sh)
+any known vulnerabilities with a severity higher than medium, [assess-image-risk.sh](bin/assess-image-risk.sh)
 returns a non-zero exit status and the build fails
 ie. the build should fail before ```username/repo:tag``` is pushed to a docker registry.
 
 ```bash
-curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s -- "username/repo:tag"
+~> curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s -- alpine:3.4
+~> echo $?
+0
+~>
 ```
 
-### Medium -> High
+#### Understanding the Risk Assessment Decision
 
-* :TODO:
+To understand how ```assess-image-risk.sh``` is making its risk assessment
+decision try using the ```-v``` flag.
 
-### Adding a Vulnerability Whitelist
+```bash
+~> curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s -- -v alpine:3.4
+2020-01-06 22:02:58 pulling clair database image 'simonsdave/clair-cicd-database:latest'
+2020-01-06 22:03:00 successfully pulled clair database image
+2020-01-06 22:03:00 starting clair database container 'clair-db-77d45579c731b0c1'
+2020-01-06 22:03:01 waiting for database server in container 'clair-db-77d45579c731b0c1' to start ..............................
+2020-01-06 22:03:47 successfully started clair database container
+2020-01-06 22:03:48 clair configuration in '/var/folders/7x/rr443kj575s8zz54jrbrp4jc0000gn/T/tmp.asvSm7Ul'
+2020-01-06 22:03:50 pulling clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-06 22:03:51 successfully pulled clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-06 22:03:51 starting clair container 'clair-f1194c72e585f990'
+2020-01-06 22:03:52 successfully started clair container 'clair-f1194c72e585f990'
+2020-01-06 22:03:53 saving docker image 'alpine:3.4' to '/tmp/tmp.KgAAoi'
+2020-01-06 22:03:53 successfully saved docker image 'alpine:3.4'
+2020-01-06 22:03:53 starting to create clair layers
+2020-01-06 22:03:53 creating clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-06 22:03:53 successfully created clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-06 22:03:53 done creating clair layers
+2020-01-06 22:03:53 starting to get vulnerabilities for clair layers
+2020-01-06 22:03:53 saving vulnerabilities to directory '/tmp/tmp.pFkldj'
+2020-01-06 22:03:53 getting vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-06 22:03:53 successfully got vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-06 22:03:53 done getting vulnerabilities for clair layers
+2020-01-07 03:03:54 INFO io:56 Looking for vulnerabilities in directory '/tmp/tmp.pFkldj'
+2020-01-07 03:03:54 INFO io:62 Found 1 files with vulnerabilities in directory '/tmp/tmp.pFkldj'
+2020-01-07 03:03:54 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.pFkldj/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
+2020-01-07 03:03:54 INFO io:84 Found 0 vulnerabilities in '/tmp/tmp.pFkldj/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
+2020-01-07 03:03:54 INFO io:95 Found 0 vulnerabilities in 1 files in directory '/tmp/tmp.pFkldj'
+~> echo $?
+0
+~>
+```
 
-* :TODO: inline whitelist
+#### Adding a Vulnerability Whitelist
 
-Consider this scenario:
+In the above examples a default vulnerability whitelist was used.
+When specified as a JSON doc, this whitelist would be:
 
-* a high severity vulnerability exists
-in a command line utility that's part of ```username/repo:tag```
-* you have a 100% confidence that the utility will never be used
+```json
+{
+  "ignoreSevertiesAtOrBelow": "medium"
+}
+```
 
-Following the steps described in the previous section
-would result in the CI process failing because the high severity
-vulnerability would be detected and ```assess-image-risk.sh```
-would return a non-zero exit status. But this failure seems
-inappropriate given the knowledge that the command line
-tool with the vulnerability would never be used.
-Enter ```clair-cicd's``` whitelists.
+By default, [assess-image-risk.sh](bin/assess-image-risk.sh)
+returns a non-zero exit status if any vulnerabilities are identified
+in the image with a severity higher than medium. The medium is
+derived from the default vulnerability whitelist.
 
-Whitelists are json documents which allow security analysts
-to influence ```assess-image-risk.sh``` risk assessment.
-Whitelist expectations:
+The examples below illustrate how to specify a vulnerability whitelist
+and specify a severity other than medium.
+
+```bash
+~> URL=https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh
+~> curl -s -L "${URL}" | bash -s -- -v --whitelist '{"ignoreSevertiesAtOrBelow": "negligible"}' ubuntu:18.04
+2020-01-07 03:39:25 INFO io:56 Looking for vulnerabilities in directory '/tmp/tmp.HmIfbf'
+2020-01-07 03:39:25 INFO io:62 Found 4 files with vulnerabilities in directory '/tmp/tmp.HmIfbf'
+2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/27a911bb510bf1e9458437f0f44216fd38fd08c462ed7aa026d91aab8c054e54.json'
+2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/27a911bb510bf1e9458437f0f44216fd38fd08c462ed7aa026d91aab8c054e54.json'
+2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/cc59b0ca1cf21d77c81a98138703008daa167b1ab1a115849d498dba64e738dd.json'
+2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/cc59b0ca1cf21d77c81a98138703008daa167b1ab1a115849d498dba64e738dd.json'
+2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/1ee34a985f7aef86436a5519f5ad83f866a74c7d9a0c22e47c4213ee9cb64e6d.json'
+2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/1ee34a985f7aef86436a5519f5ad83f866a74c7d9a0c22e47c4213ee9cb64e6d.json'
+2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/d80735acaa72040a0a98ca3ae6891f9abb4e2f5d627b4099c4fefdc3ce1e696e.json'
+2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/d80735acaa72040a0a98ca3ae6891f9abb4e2f5d627b4099c4fefdc3ce1e696e.json'
+2020-01-07 03:39:25 INFO io:95 Found 32 vulnerabilities in 4 files in directory '/tmp/tmp.HmIfbf'
+2020-01-07 03:39:25 INFO assessor:19 Assessment starts
+2020-01-07 03:39:25 INFO assessor:22 Assessing vulnerability CVE-2017-8283 - start
+2020-01-07 03:39:25 INFO assessor:41 Vulnerability CVE-2017-8283 @ severity negligible less than or equal to whitelist severity @ negligible - pass
+2020-01-07 03:39:25 INFO assessor:43 Assessing vulnerability CVE-2017-8283 - finish
+2020-01-07 03:39:25 INFO assessor:22 Assessing vulnerability CVE-2019-17543 - start
+2020-01-07 03:39:25 INFO assessor:32 Vulnerability CVE-2019-17543 @ severity low greater than whitelist severity @ negligible - fail
+2020-01-07 03:39:25 INFO assessor:34 Assessment ends - fail
+~> echo $?
+1
+~>
+```
+
+The above is an example of an inline whitelist. It's also possible
+to specify a whitelist in a file.
+
+#### Responsibilities
 
 * maintained by security analyst **not** service engineer
 * checked into source code control and appropriate change
@@ -169,11 +234,10 @@ which packages up [Clair](https://github.com/coreos/clair)
 * [5 Jun '16 - <— Shifting Security to the Left](http://www.devsecops.org/blog/2016/5/20/-security)
 * [Five Secrets and Two Common “Gotchas” of Vulnerability Scanning](https://www.kennasecurity.com/resources/secrets-gotchas-of-vuln-scanning)
 
-## :TODO:
+## :TODO: to get to V1
 
-* assessor should use whitelist vulnerabilities
-* vulnerabilities should be jsonschema verified
 * whitelist needs to be passed from ```assess-image-risk.sh``` all the way through to ```assess-vulnerabilities-risk.py```
-* unit test coverage should be 100% given how simple this code is
-* ```assess-vulnerabilities-risk.py``` should support ```file:``` and ```https``` schemes for ```--whitelist``` command line arg and just pass json doc
+* assessor should use whitelist vulnerabilities
+* ```assess-vulnerabilities-risk.py``` should support ```file:``` and ```https:``` schemes for ```--whitelist``` command line arg and just pass json doc
+* main ```README.md``` needs a refresh
 * publish ```clair-cicd``` to PyPI
