@@ -2,8 +2,12 @@ import json
 import logging
 import os
 
-from .models import Whitelist
+import jsonschema
+
+from . import jsonschemas
+from .models import Severity
 from .models import Vulnerability
+from .models import Whitelist
 
 _logger = logging.getLogger(__name__)
 
@@ -21,14 +25,19 @@ def read_whitelist(filename_or_json):
     """
     if 0 < len(filename_or_json) and '{' == filename_or_json[0]:
         try:
-            whitelist = Whitelist(json.loads(filename_or_json))
+            whitelist_as_json_doc = json.loads(filename_or_json)
+            jsonschema.validate(whitelist_as_json_doc, jsonschemas.whitelist)
+            whitelist = Whitelist(Severity(whitelist_as_json_doc['ignoreSevertiesAtOrBelow']))
         except Exception:
             _logger.error("Looked like JSON but guess not :-( - %s\n", filename_or_json)
             return None
     else:
         try:
             with open(filename_or_json, 'r', encoding='utf-8') as f:
-                whitelist = Whitelist(json.load(f))
+                whitelist_as_json_doc = json.load(f)
+                jsonschema.validate(whitelist_as_json_doc, jsonschemas.whitelist)
+                ignore_severties_at_or_below = Severity(whitelist_as_json_doc['ignoreSevertiesAtOrBelow'])
+                whitelist = Whitelist(ignore_severties_at_or_below)
         except Exception as ex:
             _logger.error("Could not read whitelist from '%s' - %s\n", filename_or_json, ex)
             return None
@@ -74,8 +83,13 @@ def read_vulnerabilities(directory_name):
                 features = json.load(fp).get('Layer', {}).get('Features', [])
                 for feature in features:
                     vulnerabilities = feature.get('Vulnerabilities', [])
-                    for vulnerability in vulnerabilities:
-                        vulnerability = Vulnerability(vulnerability)
+                    for vulnerability_as_json_doc in vulnerabilities:
+                        jsonschema.validate(vulnerability_as_json_doc, jsonschemas.vulnerability)
+
+                        vulnerability = Vulnerability(
+                            vulnerability_as_json_doc['Name'],
+                            Severity(vulnerability_as_json_doc['Severity']))
+
                         vulnerabilities_in_layer_by_cve_id[vulnerability.cve_id] = vulnerability
 
             _logger.info(

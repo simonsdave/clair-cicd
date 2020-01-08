@@ -5,6 +5,7 @@ import unittest
 
 from ..io import read_whitelist
 from ..io import read_vulnerabilities
+from ..models import Severity
 from ..models import Whitelist
 
 
@@ -28,7 +29,8 @@ class ReadWhitelistTestCase(unittest.TestCase):
         self.assertIsNone(whitelist)
 
     def test_happy_path_from_file(self):
-        whitelist_as_json_doc = {'ignoreSevertiesAtOrBelow': 'low'}
+        ignore_severities_at_or_below = Severity('low')
+        whitelist_as_json_doc = {'ignoreSevertiesAtOrBelow': str(ignore_severities_at_or_below)}
         # line below should not throw an exception
         Whitelist(whitelist_as_json_doc)
 
@@ -38,17 +40,18 @@ class ReadWhitelistTestCase(unittest.TestCase):
         whitelist = read_whitelist(temp_whitelist_filename.name)
 
         self.assertIsNotNone(whitelist)
-        self.assertEqual(whitelist, whitelist_as_json_doc)
+        self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
 
     def test_happy_path_from_str(self):
-        whitelist_as_str = '{"ignoreSevertiesAtOrBelow": "low"}'
+        ignore_severities_at_or_below = Severity('low')
+        whitelist_as_str = '{"ignoreSevertiesAtOrBelow": "%s"}' % ignore_severities_at_or_below
         # line below should not throw an exception
         Whitelist(json.loads(whitelist_as_str))
 
         whitelist = read_whitelist(whitelist_as_str)
 
         self.assertIsNotNone(whitelist)
-        self.assertEqual(whitelist, json.loads(whitelist_as_str))
+        self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
 
 
 class ReadVulnerabilitiesTestCase(unittest.TestCase):

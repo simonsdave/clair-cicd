@@ -24,12 +24,12 @@ class VulnerabilitiesRiskAssessor(object):
             # :TODO: add code to check whitelist for vulnerability - ignore
             # all other checks if vulnerability is in that list
 
-            if self.whitelist.ignore_severties_at_or_below < vulnerability.severity:
+            if self.whitelist.ignore_severities_at_or_below < vulnerability.severity:
                 _logger.info(
                     'Vulnerability %s @ severity %s greater than whitelist severity @ %s - fail',
                     vulnerability,
                     vulnerability.severity,
-                    self.whitelist.ignore_severties_at_or_below)
+                    self.whitelist.ignore_severities_at_or_below)
 
                 _logger.info('Assessment ends - fail')
                 return False
@@ -38,7 +38,7 @@ class VulnerabilitiesRiskAssessor(object):
                 'Vulnerability %s @ severity %s less than or equal to whitelist severity @ %s - pass',
                 vulnerability,
                 vulnerability.severity,
-                self.whitelist.ignore_severties_at_or_below)
+                self.whitelist.ignore_severities_at_or_below)
 
             _logger.info('Assessing vulnerability %s - finish', vulnerability)
 

@@ -1,4 +1,5 @@
 import unittest
+import uuid
 
 from ..models import Severity
 from ..models import Vulnerability
@@ -45,36 +46,26 @@ class SeverityTestCase(unittest.TestCase):
 class WhitelistTestCase(unittest.TestCase):
 
     def test_ctr(self):
-        whitelist_as_json = {'ignoreSevertiesAtOrBelow': 'low'}
-        whitelist = Whitelist(whitelist_as_json)
-        self.assertEqual(whitelist_as_json, whitelist)
+        ignore_severities_at_or_below = Severity('high')
+        whitelist = Whitelist(ignore_severities_at_or_below)
+        self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
 
 
 class VulnerabilityTestCase(unittest.TestCase):
 
     def test_cve_id(self):
-        cve_id = 'abc'
-        vulnerability_dict = {
-            'Name': cve_id,
-            'Severity': 'medium',
-        }
-        vulnerability = Vulnerability(vulnerability_dict)
-        self.assertTrue(cve_id == vulnerability.cve_id)
+        cve_id = uuid.uuid4().hex
+        severity = uuid.uuid4().hex
+
+        vulnerability = Vulnerability(cve_id, severity)
+
+        self.assertEqual(vulnerability.cve_id, vulnerability.cve_id)
+        self.assertEqual(vulnerability.severity, vulnerability.severity)
 
     def test_str(self):
-        cve_id = 'abc'
-        vulnerability_dict = {
-            'Name': cve_id,
-            'Severity': 'medium',
-        }
-        vulnerability = Vulnerability(vulnerability_dict)
-        self.assertTrue(cve_id == str(vulnerability))
+        cve_id = uuid.uuid4().hex
+        severity = uuid.uuid4().hex
 
-    def test_severity(self):
-        severity = 'medium'
-        vulnerability_dict = {
-            'Name': 'DAVE-WAS-HERE',
-            'Severity': severity,
-        }
-        vulnerability = Vulnerability(vulnerability_dict)
-        self.assertTrue(Severity(severity) == vulnerability.severity)
+        vulnerability = Vulnerability(cve_id, severity)
+
+        self.assertEqual(str(vulnerability), cve_id)
