@@ -13,7 +13,7 @@ test_assess_image_risk_dot_sh_no_command_line_args() {
     # implementation.
     STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
 
-    if ! "$(repo-root-dir.sh)/bin/repo-root-dir.sh" \
+    if "$(repo-root-dir.sh)/bin/assess-image-risk.sh" \
         -v \
         --no-pull \
         --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
@@ -46,7 +46,7 @@ test_assess_image_risk_dot_sh_inline_whitelist_command_line_args() {
     # implementation.
     STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
 
-    if ! "$(repo-root-dir.sh)/bin/repo-root-dir.sh" \
+    if "$(repo-root-dir.sh)/bin/assess-image-risk.sh" \
         -v \
         --no-pull \
         --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
