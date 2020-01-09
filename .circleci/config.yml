@@ -62,7 +62,7 @@ jobs:
             ./dockerfiles/database/build-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}"
       - run:
           name: Run Integration Tests
-          command: ./tests/integration/docker-image-integration-tests.sh "${DOCKER_CLAIR_TEMP_IMAGE}"
+          command: ./tests/integration/docker-image-integration-tests.sh "${DOCKER_CLAIR_TEMP_IMAGE}" "${DOCKER_DATABASE_TEMP_IMAGE}"
       - deploy:
           name: Push Docker Images to DockerHub
           command: |

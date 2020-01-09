@@ -2,8 +2,75 @@
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
+test_assess_image_risk_dot_sh_no_command_line_args() {
+    CLAIR_DOCKER_IMAGE=${1:-}
+    CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
+
+    # :ODD: Normally you'd expect the line below to be something like
+    # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
+    # is not shared from OS X and is not known to Docker" was generated
+    # and could not figure out what the problem and hence the current
+    # implementation.
+    STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
+
+    if ! "$(repo-root-dir.sh)/bin/repo-root-dir.sh" \
+        -v \
+        --no-pull \
+        --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
+        --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
+        alpine:3.4 \
+        >& "${STDOUT}"; then
+        EXIT_CODE=0
+    else
+        EXIT_CODE=1
+
+        echo ""
+        echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
+    fi
+
+    rm -f "${STDOUT}"
+
+    return "${EXIT_CODE}"
+}
+
+test_assess_image_risk_dot_sh_inline_whitelist_command_line_args() {
+    CLAIR_DOCKER_IMAGE=${1:-}
+    CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
+
+    # :ODD: Normally you'd expect the line below to be something like
+    # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
+    # is not shared from OS X and is not known to Docker" was generated
+    # and could not figure out what the problem and hence the current
+    # implementation.
+    STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
+
+    if ! "$(repo-root-dir.sh)/bin/repo-root-dir.sh" \
+        -v \
+        --no-pull \
+        --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
+        --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
+        --whitelist '{"ignoreSevertiesAtOrBelow": "medium"}' \
+        alpine:3.4 \
+        >& "${STDOUT}"; then
+        EXIT_CODE=0
+    else
+        EXIT_CODE=1
+
+        echo ""
+        echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
+    fi
+
+    rm -f "${STDOUT}"
+
+    return "${EXIT_CODE}"
+}
+
 test_assess_vulnerabilities_risk_dot_py_no_command_line_args() {
-    DOCKER_IMAGE=${1:-}
+    CLAIR_DOCKER_IMAGE=${1:-}
 
     # :ODD: Normally you'd expect the line below to be something like
     # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
@@ -15,7 +82,7 @@ test_assess_vulnerabilities_risk_dot_py_no_command_line_args() {
     if ! docker run \
         --rm \
         --entrypoint assess-vulnerabilities-risk.py \
-        "${DOCKER_IMAGE}" \
+        "${CLAIR_DOCKER_IMAGE}" \
         >& "${STDOUT}"; then
         EXIT_CODE=0
     else
@@ -33,7 +100,7 @@ test_assess_vulnerabilities_risk_dot_py_no_command_line_args() {
 }
 
 test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore() {
-    DOCKER_IMAGE=${1:-}
+    CLAIR_DOCKER_IMAGE=${1:-}
     VULNERABILITIES_CONTAINER=${2:-}
 
     # :ODD: Normally you'd expect the line below to be something like
@@ -47,7 +114,7 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
         --rm \
         --volumes-from "${VULNERABILITIES_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
-        "${DOCKER_IMAGE}" \
+        "${CLAIR_DOCKER_IMAGE}" \
         "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "high"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
@@ -66,7 +133,7 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
 }
 
 test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore() {
-    DOCKER_IMAGE=${1:-}
+    CLAIR_DOCKER_IMAGE=${1:-}
     VULNERABILITIES_CONTAINER=${2:-}
 
     # :ODD: Normally you'd expect the line below to be something like
@@ -80,7 +147,7 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore
         --rm \
         --volumes-from "${VULNERABILITIES_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
-        "${DOCKER_IMAGE}" \
+        "${CLAIR_DOCKER_IMAGE}" \
         "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "medium"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
@@ -110,12 +177,13 @@ test_wrapper() {
     fi
 }
 
-if [ $# != 1 ]; then
-    echo "usage: $(basename "$0") <docker image>" >&2
+if [ $# != 2 ]; then
+    echo "usage: $(basename "$0") <clair docker image> <clair database docker image>" >&2
     exit 1
 fi
 
-DOCKER_IMAGE=${1:-}
+CLAIR_DOCKER_IMAGE=${1:-}
+CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
 
 #
 # :TRICKY: creating vulnerability container so the integration
@@ -138,9 +206,26 @@ done
 NUMBER_TESTS_RUN=0
 NUMBER_TEST_SUCCESSES=0
 NUMBER_TEST_FAILURES=0
-test_wrapper test_assess_vulnerabilities_risk_dot_py_no_command_line_args "${DOCKER_IMAGE}"
-test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore "${DOCKER_IMAGE}" "${VULNERABILITIES_CONTAINER}"
-test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore "${DOCKER_IMAGE}" "${VULNERABILITIES_CONTAINER}"
+
+test_wrapper test_assess_image_risk_dot_sh_no_command_line_args \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${CLAIR_DATABASE_DOCKER_IMAGE}"
+
+test_wrapper test_assess_image_risk_dot_sh_inline_whitelist_command_line_args \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${CLAIR_DATABASE_DOCKER_IMAGE}"
+
+test_wrapper test_assess_vulnerabilities_risk_dot_py_no_command_line_args \
+    "${CLAIR_DOCKER_IMAGE}"
+
+test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${VULNERABILITIES_CONTAINER}"
+
+test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${VULNERABILITIES_CONTAINER}"
+
 echo ""
 echo "Successfully completed ${NUMBER_TESTS_RUN} integration tests. ${NUMBER_TEST_SUCCESSES} successes. ${NUMBER_TEST_FAILURES} failures."
 

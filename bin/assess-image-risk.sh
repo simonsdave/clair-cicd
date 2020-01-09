@@ -34,6 +34,17 @@ IMAGE_ASSESS_RISK_VERBOSE_FLAG=-s
 NO_PULL_DOCKER_IAMGES=0
 VULNERABILITY_WHITELIST='{"ignoreSevertiesAtOrBelow": "medium"}'
 
+#
+# :TRICKY: if this configuration is changed be sure to also change
+# .cut-release-release-branch-changes.sh
+#
+# :TODO: how do we ensure Clair version and database version are the same?
+#
+CLAIR_CICD_VERSION=latest
+CLAIR_DATABASE_IMAGE=simonsdave/clair-cicd-database:${CLAIR_CICD_VERSION}
+CLAIR_VERSION=$(docker run --rm "${CLAIR_DATABASE_IMAGE}" /bin/bash -c 'echo ${CLAIR_VERSION}')
+CLAIR_IMAGE=simonsdave/clair-cicd-clair:${CLAIR_CICD_VERSION}
+
 while true
 do
     case "$(echo "${1:-}" | tr "[:upper:]" "[:lower:]")" in
@@ -56,6 +67,16 @@ do
             VULNERABILITY_WHITELIST=${1:-}
             shift
             ;;
+        --clair-docker-image)
+            shift
+            CLAIR_IMAGE=${1:-}
+            shift
+            ;;
+        --clair-database-docker-image)
+            shift
+            CLAIR_DATABASE_IMAGE=${1:-}
+            shift
+            ;;
         *)
             break
             ;;
@@ -70,22 +91,11 @@ fi
 DOCKER_IMAGE_TO_ANALYZE=${1:-}
 
 #
-# general configuration - :TRICKY: if this configuration is changed
-# be sure to also change .cut-release-release-branch-changes.sh
-#
-# :TODO: how do we ensure Clair version and database version are the same?
-#
-CLAIR_CICD_VERSION=latest
-CLAIR_DATABASE_IMAGE=simonsdave/clair-cicd-database:${CLAIR_CICD_VERSION}
-CLAIR_VERSION=$(docker run --rm "${CLAIR_DATABASE_IMAGE}" /bin/bash -c 'echo ${CLAIR_VERSION}')
-CLAIR_IMAGE=simonsdave/clair-cicd-clair:${CLAIR_CICD_VERSION}
-
-#
 # pull image and spin up clair database
 #
 if [ "0" -eq "${NO_PULL_DOCKER_IAMGES:-0}" ]; then
     echo_if_verbose "$(ts) pulling clair database image '${CLAIR_DATABASE_IMAGE}'"
-    if ! docker pull ${CLAIR_DATABASE_IMAGE} > /dev/null; then
+    if ! docker pull "${CLAIR_DATABASE_IMAGE}" > /dev/null; then
         echo "$(ts) error pulling clair database image '${CLAIR_DATABASE_IMAGE}'" >&2
         exit 1
     fi

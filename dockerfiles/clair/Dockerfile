@@ -11,7 +11,7 @@ RUN apk add --no-cache curl jq bash python3 tzdata \
 # per https://github.com/Cethy/alpine-docker-client/blob/master/Dockerfile
 # useful https://download.docker.com/linux/static/stable/x86_64/
 RUN mkdir -p /tmp/download \
-    && curl -L https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz | tar -xz -C /tmp/download \
+    && curl -s -L https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz | tar -xz -C /tmp/download \
     && mv /tmp/download/docker/docker /usr/local/bin/ \
     && rm -rf /tmp/download
 
