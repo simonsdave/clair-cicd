@@ -87,7 +87,9 @@ returns a non-zero exit status and the build fails
 ie. the build should fail before ```username/repo:tag``` is pushed to a docker registry.
 
 ```bash
-~> curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s -- alpine:3.4
+~> curl -s -L \
+  https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | \
+  bash -s -- alpine:3.4
 ~> echo $?
 0
 ~>
@@ -99,33 +101,37 @@ To understand how ```assess-image-risk.sh``` is making its risk assessment
 decision try using the ```-v``` flag.
 
 ```bash
-~> curl -s -L https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | bash -s -- -v alpine:3.4
-2020-01-06 22:02:58 pulling clair database image 'simonsdave/clair-cicd-database:latest'
-2020-01-06 22:03:00 successfully pulled clair database image
-2020-01-06 22:03:00 starting clair database container 'clair-db-77d45579c731b0c1'
-2020-01-06 22:03:01 waiting for database server in container 'clair-db-77d45579c731b0c1' to start ..............................
-2020-01-06 22:03:47 successfully started clair database container
-2020-01-06 22:03:48 clair configuration in '/var/folders/7x/rr443kj575s8zz54jrbrp4jc0000gn/T/tmp.asvSm7Ul'
-2020-01-06 22:03:50 pulling clair image 'simonsdave/clair-cicd-clair:latest'
-2020-01-06 22:03:51 successfully pulled clair image 'simonsdave/clair-cicd-clair:latest'
-2020-01-06 22:03:51 starting clair container 'clair-f1194c72e585f990'
-2020-01-06 22:03:52 successfully started clair container 'clair-f1194c72e585f990'
-2020-01-06 22:03:53 saving docker image 'alpine:3.4' to '/tmp/tmp.KgAAoi'
-2020-01-06 22:03:53 successfully saved docker image 'alpine:3.4'
-2020-01-06 22:03:53 starting to create clair layers
-2020-01-06 22:03:53 creating clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
-2020-01-06 22:03:53 successfully created clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
-2020-01-06 22:03:53 done creating clair layers
-2020-01-06 22:03:53 starting to get vulnerabilities for clair layers
-2020-01-06 22:03:53 saving vulnerabilities to directory '/tmp/tmp.pFkldj'
-2020-01-06 22:03:53 getting vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
-2020-01-06 22:03:53 successfully got vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
-2020-01-06 22:03:53 done getting vulnerabilities for clair layers
-2020-01-07 03:03:54 INFO io:56 Looking for vulnerabilities in directory '/tmp/tmp.pFkldj'
-2020-01-07 03:03:54 INFO io:62 Found 1 files with vulnerabilities in directory '/tmp/tmp.pFkldj'
-2020-01-07 03:03:54 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.pFkldj/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
-2020-01-07 03:03:54 INFO io:84 Found 0 vulnerabilities in '/tmp/tmp.pFkldj/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
-2020-01-07 03:03:54 INFO io:95 Found 0 vulnerabilities in 1 files in directory '/tmp/tmp.pFkldj'
+~> curl -s -L \
+  https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | \
+  bash -s -- -v alpine:3.4
+2020-01-08 20:03:54 pulling clair database image 'simonsdave/clair-cicd-database:latest'
+2020-01-08 20:04:24 successfully pulled clair database image
+2020-01-08 20:04:24 starting clair database container 'clair-db-51daa8e9cb2e9355'
+2020-01-08 20:04:24 waiting for database server in container 'clair-db-51daa8e9cb2e9355' to start ...
+2020-01-08 20:04:28 successfully started clair database container
+2020-01-08 20:04:28 clair configuration in '/var/folders/8l/61_bnfbd4jl66hr49_w0rg_h0000gn/T/tmp.pp5XhuQB'
+2020-01-08 20:04:30 pulling clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-08 20:04:39 successfully pulled clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-08 20:04:39 starting clair container 'clair-93c60fc0b3598cca'
+2020-01-08 20:04:40 successfully started clair container 'clair-93c60fc0b3598cca'
+2020-01-08 20:04:40 saving docker image 'alpine:3.4' to '/tmp/tmp.nfONgP'
+2020-01-08 20:04:40 successfully saved docker image 'alpine:3.4'
+2020-01-08 20:04:40 starting to create clair layers
+2020-01-08 20:04:40 creating clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 successfully created clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 done creating clair layers
+2020-01-08 20:04:40 starting to get vulnerabilities for clair layers
+2020-01-08 20:04:40 saving vulnerabilities to directory '/tmp/tmp.inCpak'
+2020-01-08 20:04:40 getting vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 successfully got vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 done getting vulnerabilities for clair layers
+2020-01-09 01:04:41 INFO io:65 Looking for vulnerabilities in directory '/tmp/tmp.inCpak'
+2020-01-09 01:04:41 INFO io:71 Found 1 files with vulnerabilities in directory '/tmp/tmp.inCpak'
+2020-01-09 01:04:41 INFO io:80 Looking for vulnerabilities in '/tmp/tmp.inCpak/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
+2020-01-09 01:04:41 INFO io:98 Found 0 vulnerabilities in '/tmp/tmp.inCpak/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
+2020-01-09 01:04:41 INFO io:109 Found 0 vulnerabilities in 1 files in directory '/tmp/tmp.inCpak'
+2020-01-09 01:04:41 INFO assessor:19 Assessment starts
+2020-01-09 01:04:41 INFO assessor:45 Assessment ends - pass
 ~> echo $?
 0
 ~>
@@ -147,37 +153,110 @@ returns a non-zero exit status if any vulnerabilities are identified
 in the image with a severity higher than medium. The medium is
 derived from the default vulnerability whitelist.
 
-The examples below illustrate how to specify a vulnerability whitelist
-and specify a severity other than medium.
+The example below illustrate how to specify a vulnerability whitelist
+and with a severity other than medium.
 
 ```bash
-~> URL=https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh
-~> curl -s -L "${URL}" | bash -s -- -v --whitelist '{"ignoreSevertiesAtOrBelow": "negligible"}' ubuntu:18.04
-2020-01-07 03:39:25 INFO io:56 Looking for vulnerabilities in directory '/tmp/tmp.HmIfbf'
-2020-01-07 03:39:25 INFO io:62 Found 4 files with vulnerabilities in directory '/tmp/tmp.HmIfbf'
-2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/27a911bb510bf1e9458437f0f44216fd38fd08c462ed7aa026d91aab8c054e54.json'
-2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/27a911bb510bf1e9458437f0f44216fd38fd08c462ed7aa026d91aab8c054e54.json'
-2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/cc59b0ca1cf21d77c81a98138703008daa167b1ab1a115849d498dba64e738dd.json'
-2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/cc59b0ca1cf21d77c81a98138703008daa167b1ab1a115849d498dba64e738dd.json'
-2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/1ee34a985f7aef86436a5519f5ad83f866a74c7d9a0c22e47c4213ee9cb64e6d.json'
-2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/1ee34a985f7aef86436a5519f5ad83f866a74c7d9a0c22e47c4213ee9cb64e6d.json'
-2020-01-07 03:39:25 INFO io:71 Looking for vulnerabilities in '/tmp/tmp.HmIfbf/d80735acaa72040a0a98ca3ae6891f9abb4e2f5d627b4099c4fefdc3ce1e696e.json'
-2020-01-07 03:39:25 INFO io:84 Found 32 vulnerabilities in '/tmp/tmp.HmIfbf/d80735acaa72040a0a98ca3ae6891f9abb4e2f5d627b4099c4fefdc3ce1e696e.json'
-2020-01-07 03:39:25 INFO io:95 Found 32 vulnerabilities in 4 files in directory '/tmp/tmp.HmIfbf'
-2020-01-07 03:39:25 INFO assessor:19 Assessment starts
-2020-01-07 03:39:25 INFO assessor:22 Assessing vulnerability CVE-2017-8283 - start
-2020-01-07 03:39:25 INFO assessor:41 Vulnerability CVE-2017-8283 @ severity negligible less than or equal to whitelist severity @ negligible - pass
-2020-01-07 03:39:25 INFO assessor:43 Assessing vulnerability CVE-2017-8283 - finish
-2020-01-07 03:39:25 INFO assessor:22 Assessing vulnerability CVE-2019-17543 - start
-2020-01-07 03:39:25 INFO assessor:32 Vulnerability CVE-2019-17543 @ severity low greater than whitelist severity @ negligible - fail
-2020-01-07 03:39:25 INFO assessor:34 Assessment ends - fail
+~> curl -s -L \
+  https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | \
+  bash -s -- -v --whitelist '{"ignoreSevertiesAtOrBelow": "negligible"}' ubuntu:18.04
+2020-01-08 20:06:27 pulling clair database image 'simonsdave/clair-cicd-database:latest'
+2020-01-08 20:06:28 successfully pulled clair database image
+2020-01-08 20:06:28 starting clair database container 'clair-db-177fe121e4dcb72c'
+2020-01-08 20:06:29 waiting for database server in container 'clair-db-177fe121e4dcb72c' to start ...
+2020-01-08 20:06:32 successfully started clair database container
+2020-01-08 20:06:32 clair configuration in '/var/folders/8l/61_bnfbd4jl66hr49_w0rg_h0000gn/T/tmp.Oc3CwvDo'
+2020-01-08 20:06:34 pulling clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-08 20:06:35 successfully pulled clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-08 20:06:35 starting clair container 'clair-13dc3302df3758b2'
+2020-01-08 20:06:36 successfully started clair container 'clair-13dc3302df3758b2'
+2020-01-08 20:06:36 saving docker image 'ubuntu:18.04' to '/tmp/tmp.IMKANI'
+2020-01-08 20:06:37 successfully saved docker image 'ubuntu:18.04'
+2020-01-08 20:06:37 starting to create clair layers
+2020-01-08 20:06:37 creating clair layer 'c8ba25f7db9f70220ac92449b238a0697f9eb580ef4f905225a333fc0a5e8719'
+2020-01-08 20:06:37 successfully created clair layer 'c8ba25f7db9f70220ac92449b238a0697f9eb580ef4f905225a333fc0a5e8719'
+2020-01-08 20:06:37 creating clair layer '07adecfcb06a1142a69c3e769cb38f2d4ef9d772726ce1e65bc6dbd4448cccc9'
+2020-01-08 20:06:37 successfully created clair layer '07adecfcb06a1142a69c3e769cb38f2d4ef9d772726ce1e65bc6dbd4448cccc9'
+2020-01-08 20:06:37 creating clair layer '3e1d90747aa9d2a7ec6e9693bdd490dff8528b9aec4a2fac2300824e4ba3a60e'
+2020-01-08 20:06:37 successfully created clair layer '3e1d90747aa9d2a7ec6e9693bdd490dff8528b9aec4a2fac2300824e4ba3a60e'
+2020-01-08 20:06:37 creating clair layer 'b0474230e27ddbba2f46397aac85d4d2fd748064ed9c0ff1e57fec4f063fcf6b'
+2020-01-08 20:06:37 successfully created clair layer 'b0474230e27ddbba2f46397aac85d4d2fd748064ed9c0ff1e57fec4f063fcf6b'
+2020-01-08 20:06:37 done creating clair layers
+2020-01-08 20:06:37 starting to get vulnerabilities for clair layers
+2020-01-08 20:06:37 saving vulnerabilities to directory '/tmp/tmp.IFEccc'
+2020-01-08 20:06:37 getting vulnerabilities for layer 'c8ba25f7db9f70220ac92449b238a0697f9eb580ef4f905225a333fc0a5e8719'
+2020-01-08 20:06:37 successfully got vulnerabilities for layer 'c8ba25f7db9f70220ac92449b238a0697f9eb580ef4f905225a333fc0a5e8719'
+2020-01-08 20:06:37 getting vulnerabilities for layer '07adecfcb06a1142a69c3e769cb38f2d4ef9d772726ce1e65bc6dbd4448cccc9'
+2020-01-08 20:06:38 successfully got vulnerabilities for layer '07adecfcb06a1142a69c3e769cb38f2d4ef9d772726ce1e65bc6dbd4448cccc9'
+2020-01-08 20:06:38 getting vulnerabilities for layer '3e1d90747aa9d2a7ec6e9693bdd490dff8528b9aec4a2fac2300824e4ba3a60e'
+2020-01-08 20:06:38 successfully got vulnerabilities for layer '3e1d90747aa9d2a7ec6e9693bdd490dff8528b9aec4a2fac2300824e4ba3a60e'
+2020-01-08 20:06:38 getting vulnerabilities for layer 'b0474230e27ddbba2f46397aac85d4d2fd748064ed9c0ff1e57fec4f063fcf6b'
+2020-01-08 20:06:38 successfully got vulnerabilities for layer 'b0474230e27ddbba2f46397aac85d4d2fd748064ed9c0ff1e57fec4f063fcf6b'
+2020-01-08 20:06:38 done getting vulnerabilities for clair layers
+2020-01-09 01:06:38 INFO io:65 Looking for vulnerabilities in directory '/tmp/tmp.IFEccc'
+2020-01-09 01:06:38 INFO io:71 Found 4 files with vulnerabilities in directory '/tmp/tmp.IFEccc'
+2020-01-09 01:06:38 INFO io:80 Looking for vulnerabilities in '/tmp/tmp.IFEccc/b0474230e27ddbba2f46397aac85d4d2fd748064ed9c0ff1e57fec4f063fcf6b.json'
+2020-01-09 01:06:38 INFO io:98 Found 32 vulnerabilities in '/tmp/tmp.IFEccc/b0474230e27ddbba2f46397aac85d4d2fd748064ed9c0ff1e57fec4f063fcf6b.json'
+2020-01-09 01:06:38 INFO io:80 Looking for vulnerabilities in '/tmp/tmp.IFEccc/3e1d90747aa9d2a7ec6e9693bdd490dff8528b9aec4a2fac2300824e4ba3a60e.json'
+2020-01-09 01:06:38 INFO io:98 Found 32 vulnerabilities in '/tmp/tmp.IFEccc/3e1d90747aa9d2a7ec6e9693bdd490dff8528b9aec4a2fac2300824e4ba3a60e.json'
+2020-01-09 01:06:38 INFO io:80 Looking for vulnerabilities in '/tmp/tmp.IFEccc/07adecfcb06a1142a69c3e769cb38f2d4ef9d772726ce1e65bc6dbd4448cccc9.json'
+2020-01-09 01:06:38 INFO io:98 Found 32 vulnerabilities in '/tmp/tmp.IFEccc/07adecfcb06a1142a69c3e769cb38f2d4ef9d772726ce1e65bc6dbd4448cccc9.json'
+2020-01-09 01:06:38 INFO io:80 Looking for vulnerabilities in '/tmp/tmp.IFEccc/c8ba25f7db9f70220ac92449b238a0697f9eb580ef4f905225a333fc0a5e8719.json'
+2020-01-09 01:06:38 INFO io:98 Found 32 vulnerabilities in '/tmp/tmp.IFEccc/c8ba25f7db9f70220ac92449b238a0697f9eb580ef4f905225a333fc0a5e8719.json'
+2020-01-09 01:06:38 INFO io:109 Found 32 vulnerabilities in 4 files in directory '/tmp/tmp.IFEccc'
+2020-01-09 01:06:38 INFO assessor:19 Assessment starts
+2020-01-09 01:06:38 INFO assessor:22 Assessing vulnerability CVE-2016-2781 - start
+2020-01-09 01:06:38 INFO assessor:32 Vulnerability CVE-2016-2781 @ severity low greater than whitelist severity @ negligible - fail
+2020-01-09 01:06:38 INFO assessor:34 Assessment ends - fail
 ~> echo $?
 1
 ~>
 ```
 
 The above is an example of an inline whitelist. It's also possible
-to specify a whitelist in a file.
+to specify a whitelist in a file. The example below illustrates the
+usage.
+
+```bash
+~> cat whitelist.json
+{
+  "ignoreSevertiesAtOrBelow": "medium"
+}
+~> curl -s -L \
+  https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | \
+  bash -s -- -v --whitelist whitelist.json alpine:3.4
+2020-01-08 20:03:54 pulling clair database image 'simonsdave/clair-cicd-database:latest'
+2020-01-08 20:04:24 successfully pulled clair database image
+2020-01-08 20:04:24 starting clair database container 'clair-db-51daa8e9cb2e9355'
+2020-01-08 20:04:24 waiting for database server in container 'clair-db-51daa8e9cb2e9355' to start ...
+2020-01-08 20:04:28 successfully started clair database container
+2020-01-08 20:04:28 clair configuration in '/var/folders/8l/61_bnfbd4jl66hr49_w0rg_h0000gn/T/tmp.pp5XhuQB'
+2020-01-08 20:04:30 pulling clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-08 20:04:39 successfully pulled clair image 'simonsdave/clair-cicd-clair:latest'
+2020-01-08 20:04:39 starting clair container 'clair-93c60fc0b3598cca'
+2020-01-08 20:04:40 successfully started clair container 'clair-93c60fc0b3598cca'
+2020-01-08 20:04:40 saving docker image 'alpine:3.4' to '/tmp/tmp.nfONgP'
+2020-01-08 20:04:40 successfully saved docker image 'alpine:3.4'
+2020-01-08 20:04:40 starting to create clair layers
+2020-01-08 20:04:40 creating clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 successfully created clair layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 done creating clair layers
+2020-01-08 20:04:40 starting to get vulnerabilities for clair layers
+2020-01-08 20:04:40 saving vulnerabilities to directory '/tmp/tmp.inCpak'
+2020-01-08 20:04:40 getting vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 successfully got vulnerabilities for layer '378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d'
+2020-01-08 20:04:40 done getting vulnerabilities for clair layers
+2020-01-09 01:04:41 INFO io:65 Looking for vulnerabilities in directory '/tmp/tmp.inCpak'
+2020-01-09 01:04:41 INFO io:71 Found 1 files with vulnerabilities in directory '/tmp/tmp.inCpak'
+2020-01-09 01:04:41 INFO io:80 Looking for vulnerabilities in '/tmp/tmp.inCpak/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
+2020-01-09 01:04:41 INFO io:98 Found 0 vulnerabilities in '/tmp/tmp.inCpak/378cb6b4a17e08c366cebd813d218f60889848387fa61a56ac054ca027a4890d.json'
+2020-01-09 01:04:41 INFO io:109 Found 0 vulnerabilities in 1 files in directory '/tmp/tmp.inCpak'
+2020-01-09 01:04:41 INFO assessor:19 Assessment starts
+2020-01-09 01:04:41 INFO assessor:45 Assessment ends - pass
+~> echo $?
+0
+~>
+```
 
 #### Responsibilities
 
@@ -186,15 +265,7 @@ to specify a whitelist in a file.
 management processes are used to make changes (code reviews, feature
 branches, etc)
 
-## How it Works
-
-Assumptions/requirements:
-
-* [assess-image-risk.sh](bin/assess-image-risk.sh) is a bash script used to launch
-the risk assessment process and as such it's this script which defines the bulk of
-the assumptions/requirements for ```clair-cicd``` - the script uses docker, sed and openssl
-so all these need to be available in the environment running ```clair-cicd```
-* :TODO: which docker versions are supported?
+## How it Works + Requirements/Assumptions
 
 There are 3 moving pieces:
 
@@ -213,6 +284,27 @@ the vulnerability database is current
 [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 docker image which is based on the docker image [quay.io/coreos/clair](https://quay.io/repository/coreos/clair)
 which packages up [Clair](https://github.com/coreos/clair)
+
+From the samples at the start of this doc you'll see the approach of
+curl'ing the latest release of [assess-image-risk.sh](bin/assess-image-risk.sh)
+into a localy run bash shell. [assess-image-risk.sh](bin/assess-image-risk.sh)
+then spins up a container using the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/). Another container is then run
+using [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
+with the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container
+being able to talk with the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) container. Once the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container is running, [assess-image-risk.sh](bin/assess-image-risk.sh) [docker exec's]() [this bash script](dockerfiles/clair/assess-image-risk.sh)
+which does the actual risk assessment.
+
+Armed with the understanding of how ```clair-cicd``` works you'll
+appreciate that the ability to execute [assess-image-risk.sh](bin/assess-image-risk.sh)
+is what defines the requirements for the execution environment
+
+* [assess-image-risk.sh](bin/assess-image-risk.sh) is a bash script used to launch
+the risk assessment process and as such it's this script which defines the bulk of
+the assumptions/requirements for ```clair-cicd``` - the script uses docker, sed and openssl
+so all these need to be available in the environment running ```clair-cicd```
+* :TODO: which docker versions are supported?
+
+??? why use latest release?
 
 ## References
 
@@ -234,10 +326,9 @@ which packages up [Clair](https://github.com/coreos/clair)
 * [5 Jun '16 - <— Shifting Security to the Left](http://www.devsecops.org/blog/2016/5/20/-security)
 * [Five Secrets and Two Common “Gotchas” of Vulnerability Scanning](https://www.kennasecurity.com/resources/secrets-gotchas-of-vuln-scanning)
 
-## :TODO: to get to V1
+## :TODO: to get to V1.0
 
-* whitelist needs to be passed from ```assess-image-risk.sh``` all the way through to ```assess-vulnerabilities-risk.py```
+* supplying whitelist via a file does not work!
 * assessor should use whitelist vulnerabilities
-* ```assess-vulnerabilities-risk.py``` should support ```file:``` and ```https:``` schemes for ```--whitelist``` command line arg and just pass json doc
 * main ```README.md``` needs a refresh
 * publish ```clair-cicd``` to PyPI
