@@ -11,36 +11,39 @@ from ..models import Whitelist
 
 class ReadWhitelistTestCase(unittest.TestCase):
 
-    def test_filename_does_not_exist(self):
+    def test_filename_is_none(self):
         whitelist = read_whitelist(None)
         self.assertIsNone(whitelist)
 
+    def test_unknonn_schema(self):
+        whitelist = read_whitelist('unknonwn://this')
+        self.assertIsNone(whitelist)
+
     def test_filename_does_not_exist(self):
-        whitelist = read_whitelist('this file does not exist.json')
+        whitelist = read_whitelist('file://this file does not exist.json')
         self.assertIsNone(whitelist)
 
     def test_invalid_json_in_file(self):
         temp_whitelist_filename = tempfile.NamedTemporaryFile()
         with open(temp_whitelist_filename.name, 'w+', encoding='utf-8') as fp:
             fp.write('{')
-        whitelist = read_whitelist(temp_whitelist_filename.name)
+        whitelist = read_whitelist('file://%s' % temp_whitelist_filename.name)
         self.assertIsNone(whitelist)
 
     def test_invalid_json_in_str(self):
         whitelist_as_str = '{'
-        whitelist = read_whitelist(whitelist_as_str)
+        whitelist = read_whitelist('json://%s' % whitelist_as_str)
         self.assertIsNone(whitelist)
 
     def test_happy_path_from_file(self):
         ignore_severities_at_or_below = Severity('low')
         whitelist_as_json_doc = {'ignoreSevertiesAtOrBelow': str(ignore_severities_at_or_below)}
-        # line below should not throw an exception
-        Whitelist(whitelist_as_json_doc)
+        self.assertIsNotNone(Whitelist('json://%s' % whitelist_as_json_doc))
 
         temp_whitelist_filename = tempfile.NamedTemporaryFile()
         with open(temp_whitelist_filename.name, 'w+', encoding='utf-8') as fp:
             fp.write(json.dumps(whitelist_as_json_doc))
-        whitelist = read_whitelist(temp_whitelist_filename.name)
+        whitelist = read_whitelist('file://%s' % temp_whitelist_filename.name)
 
         self.assertIsNotNone(whitelist)
         self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
@@ -48,10 +51,9 @@ class ReadWhitelistTestCase(unittest.TestCase):
     def test_happy_path_from_str(self):
         ignore_severities_at_or_below = Severity('low')
         whitelist_as_str = '{"ignoreSevertiesAtOrBelow": "%s"}' % ignore_severities_at_or_below
-        # line below should not throw an exception
-        Whitelist(json.loads(whitelist_as_str))
+        self.assertIsNotNone(Whitelist('json://%s' % whitelist_as_str))
 
-        whitelist = read_whitelist(whitelist_as_str)
+        whitelist = read_whitelist('json://%s' % whitelist_as_str)
 
         self.assertIsNotNone(whitelist)
         self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)

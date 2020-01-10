@@ -154,12 +154,13 @@ in the image with a severity higher than medium. The medium is
 derived from the default vulnerability whitelist.
 
 The example below illustrate how to specify a vulnerability whitelist
-and with a severity other than medium.
+and with a severity other than medium. Note the use of the ```json://```
+prefix to indicate this is an inline whitelist.
 
 ```bash
 ~> curl -s -L \
   https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | \
-  bash -s -- -v --whitelist '{"ignoreSevertiesAtOrBelow": "negligible"}' ubuntu:18.04
+  bash -s -- -v --whitelist 'json://{"ignoreSevertiesAtOrBelow": "negligible"}' ubuntu:18.04
 2020-01-08 20:06:27 pulling clair database image 'simonsdave/clair-cicd-database:latest'
 2020-01-08 20:06:28 successfully pulled clair database image
 2020-01-08 20:06:28 starting clair database container 'clair-db-177fe121e4dcb72c'
@@ -214,8 +215,9 @@ and with a severity other than medium.
 ```
 
 The above is an example of an inline whitelist. It's also possible
-to specify a whitelist in a file. The example below illustrates the
-usage.
+to specify a whitelist in a file.
+The example below illustrates the usage.
+Note use of the ```file://``` prefix to indicate the whitelist is contained in a file.
 
 ```bash
 ~> cat whitelist.json
@@ -224,7 +226,7 @@ usage.
 }
 ~> curl -s -L \
   https://raw.githubusercontent.com/simonsdave/clair-cicd/master/bin/assess-image-risk.sh | \
-  bash -s -- -v --whitelist whitelist.json alpine:3.4
+  bash -s -- -v --whitelist file://whitelist.json alpine:3.4
 2020-01-08 20:03:54 pulling clair database image 'simonsdave/clair-cicd-database:latest'
 2020-01-08 20:04:24 successfully pulled clair database image
 2020-01-08 20:04:24 starting clair database container 'clair-db-51daa8e9cb2e9355'
@@ -331,4 +333,5 @@ so all these need to be available in the environment running ```clair-cicd```
 * supplying whitelist via a file does not work!
 * assessor should use whitelist vulnerabilities
 * main ```README.md``` needs a refresh
+  * be sure to check examples in main README.md work as indicated
 * publish ```clair-cicd``` to PyPI

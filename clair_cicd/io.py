@@ -11,6 +11,9 @@ from .models import Whitelist
 
 _logger = logging.getLogger(__name__)
 
+_json_scheme = 'json://'
+_file_scheme = 'file://'
+
 
 def read_whitelist(filename_or_json):
     """Attempt to populate and return a ```Whitelist```.
@@ -26,26 +29,31 @@ def read_whitelist(filename_or_json):
     if filename_or_json is None:
         return None
 
-    if 0 < len(filename_or_json) and '{' == filename_or_json[0]:
+    if filename_or_json.startswith(_json_scheme):
         try:
-            whitelist_as_json_doc = json.loads(filename_or_json)
+            whitelist_as_json_doc = json.loads(filename_or_json[len(_json_scheme):])
             jsonschema.validate(whitelist_as_json_doc, jsonschemas.whitelist)
             whitelist = Whitelist(Severity(whitelist_as_json_doc['ignoreSevertiesAtOrBelow']))
+            return whitelist
         except Exception:
             _logger.error("Looked like JSON but guess not :-( - %s\n", filename_or_json)
             return None
-    else:
+
+    if filename_or_json.startswith(_file_scheme):
         try:
-            with open(filename_or_json, 'r', encoding='utf-8') as f:
+            with open(filename_or_json[len(_file_scheme):], 'r', encoding='utf-8') as f:
                 whitelist_as_json_doc = json.load(f)
                 jsonschema.validate(whitelist_as_json_doc, jsonschemas.whitelist)
                 ignore_severties_at_or_below = Severity(whitelist_as_json_doc['ignoreSevertiesAtOrBelow'])
                 whitelist = Whitelist(ignore_severties_at_or_below)
+                return whitelist
         except Exception as ex:
             _logger.error("Could not read whitelist from '%s' - %s\n", filename_or_json, ex)
             return None
 
-    return whitelist
+    _logger.error("Could not read whitelist from '%s'\n", filename_or_json)
+
+    return None
 
 
 def read_vulnerabilities(directory_name):

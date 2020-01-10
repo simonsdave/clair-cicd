@@ -51,7 +51,7 @@ test_assess_image_risk_dot_sh_inline_whitelist_command_line_args() {
         --no-pull \
         --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
         --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
-        --whitelist '{"ignoreSevertiesAtOrBelow": "medium"}' \
+        --whitelist 'json://{"ignoreSevertiesAtOrBelow": "medium"}' \
         alpine:3.4 \
         >& "${STDOUT}"; then
         EXIT_CODE=0
@@ -64,6 +64,44 @@ test_assess_image_risk_dot_sh_inline_whitelist_command_line_args() {
         echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
     fi
 
+    rm -f "${STDOUT}"
+
+    return "${EXIT_CODE}"
+}
+
+test_assess_image_risk_dot_sh_file_whitelist_command_line_args() {
+    CLAIR_DOCKER_IMAGE=${1:-}
+    CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
+
+    # :ODD: Normally you'd expect the line below to be something like
+    # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
+    # is not shared from OS X and is not known to Docker" was generated
+    # and could not figure out what the problem and hence the current
+    # implementation.
+    STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
+
+    WHITELIST=$(mktemp 2> /dev/null || mktemp -t DAS)
+    echo '{"ignoreSevertiesAtOrBelow": "medium"}' > "${WHITELIST}"
+
+    if "$(repo-root-dir.sh)/bin/assess-image-risk.sh" \
+        -v \
+        --no-pull \
+        --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
+        --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
+        --whitelist "file://${WHITELIST}" \
+        alpine:3.4 \
+        >& "${STDOUT}"; then
+        EXIT_CODE=0
+    else
+        EXIT_CODE=1
+
+        echo ""
+        echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
+    fi
+
+    rm -f "${WHITELIST}"
     rm -f "${STDOUT}"
 
     return "${EXIT_CODE}"
@@ -115,7 +153,7 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
         --volumes-from "${VULNERABILITIES_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "high"}' \
+        "/vulnerabilities" --log info --whitelist 'json://{"ignoreSevertiesAtOrBelow": "high"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
     else
@@ -148,7 +186,7 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore
         --volumes-from "${VULNERABILITIES_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist '{"ignoreSevertiesAtOrBelow": "medium"}' \
+        "/vulnerabilities" --log info --whitelist 'json://{"ignoreSevertiesAtOrBelow": "medium"}' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
     else
@@ -212,6 +250,10 @@ test_wrapper test_assess_image_risk_dot_sh_no_command_line_args \
     "${CLAIR_DATABASE_DOCKER_IMAGE}"
 
 test_wrapper test_assess_image_risk_dot_sh_inline_whitelist_command_line_args \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${CLAIR_DATABASE_DOCKER_IMAGE}"
+
+test_wrapper test_assess_image_risk_dot_sh_file_whitelist_command_line_args \
     "${CLAIR_DOCKER_IMAGE}" \
     "${CLAIR_DATABASE_DOCKER_IMAGE}"
 

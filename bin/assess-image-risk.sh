@@ -32,7 +32,7 @@ echo_if_verbose() {
 VERBOSE=0
 IMAGE_ASSESS_RISK_VERBOSE_FLAG=-s
 NO_PULL_DOCKER_IAMGES=0
-VULNERABILITY_WHITELIST='{"ignoreSevertiesAtOrBelow": "medium"}'
+VULNERABILITY_WHITELIST='json://{"ignoreSevertiesAtOrBelow": "medium"}'
 
 #
 # :TRICKY: if this configuration is changed be sure to also change
@@ -217,6 +217,16 @@ do
 done
 
 echo_if_verbose "$(ts) successfully started clair container '${CLAIR_CONTAINER}'"
+
+#
+# if the vulnerability whitelist is in a file copy the file into
+# Clair container so it's accessible to assess-image-risk.sh
+#
+if [[ $VULNERABILITY_WHITELIST == file://* ]]; then
+    VULNERABILITY_WHITELIST_IN_CONTAINER=/tmp/whitelist.json
+    docker cp "${VULNERABILITY_WHITELIST/file:\/\//}" "${CLAIR_CONTAINER}:${VULNERABILITY_WHITELIST_IN_CONTAINER}"
+    VULNERABILITY_WHITELIST=file://${VULNERABILITY_WHITELIST_IN_CONTAINER}
+fi
 
 #
 # Now that the Clair container and Clair database container are started
