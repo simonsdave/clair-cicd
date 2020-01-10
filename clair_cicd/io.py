@@ -23,6 +23,9 @@ def read_whitelist(filename_or_json):
 
     If any kind of error occurs ```None``` is returned.
     """
+    if filename_or_json is None:
+        return None
+
     if 0 < len(filename_or_json) and '{' == filename_or_json[0]:
         try:
             whitelist_as_json_doc = json.loads(filename_or_json)

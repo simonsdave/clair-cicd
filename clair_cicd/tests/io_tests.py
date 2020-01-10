@@ -12,8 +12,11 @@ from ..models import Whitelist
 class ReadWhitelistTestCase(unittest.TestCase):
 
     def test_filename_does_not_exist(self):
-        filename = 'this file does not exist.json'
-        whitelist = read_whitelist(filename)
+        whitelist = read_whitelist(None)
+        self.assertIsNone(whitelist)
+
+    def test_filename_does_not_exist(self):
+        whitelist = read_whitelist('this file does not exist.json')
         self.assertIsNone(whitelist)
 
     def test_invalid_json_in_file(self):
