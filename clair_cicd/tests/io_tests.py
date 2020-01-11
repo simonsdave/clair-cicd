@@ -2,11 +2,11 @@ import json
 import os
 import tempfile
 import unittest
+import uuid
 
 from ..io import read_whitelist
 from ..io import read_vulnerabilities
 from ..models import Severity
-from ..models import Whitelist
 
 
 class ReadWhitelistTestCase(unittest.TestCase):
@@ -35,10 +35,9 @@ class ReadWhitelistTestCase(unittest.TestCase):
         whitelist = read_whitelist('json://%s' % whitelist_as_str)
         self.assertIsNone(whitelist)
 
-    def test_happy_path_from_file(self):
+    def test_happy_path_from_file_no_vulnerabilities(self):
         ignore_severities_at_or_below = Severity('low')
         whitelist_as_json_doc = {'ignoreSevertiesAtOrBelow': str(ignore_severities_at_or_below)}
-        self.assertIsNotNone(Whitelist('json://%s' % whitelist_as_json_doc))
 
         temp_whitelist_filename = tempfile.NamedTemporaryFile()
         with open(temp_whitelist_filename.name, 'w+', encoding='utf-8') as fp:
@@ -48,10 +47,57 @@ class ReadWhitelistTestCase(unittest.TestCase):
         self.assertIsNotNone(whitelist)
         self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
 
-    def test_happy_path_from_str(self):
+    def test_happy_path_from_file_with_zero_vulnerabilities(self):
+        ignore_severities_at_or_below = Severity('low')
+        whitelist_as_json_doc = {
+            'ignoreSevertiesAtOrBelow': str(ignore_severities_at_or_below),
+            'vulnerabilities': [
+            ],
+        }
+
+        temp_whitelist_filename = tempfile.NamedTemporaryFile()
+        with open(temp_whitelist_filename.name, 'w+', encoding='utf-8') as fp:
+            fp.write(json.dumps(whitelist_as_json_doc))
+        whitelist = read_whitelist('file://%s' % temp_whitelist_filename.name)
+
+        self.assertIsNotNone(whitelist)
+        self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
+
+    def test_happy_path_from_file_with_vulnerabilities(self):
+        ignore_severities_at_or_below = Severity('low')
+        whitelist_as_json_doc = {
+            'ignoreSevertiesAtOrBelow': str(ignore_severities_at_or_below),
+            'vulnerabilities': [
+                {
+                    'cveId': uuid.uuid4().hex,
+                    'rationale': uuid.uuid4().hex,
+                },
+                {
+                    'cveId': uuid.uuid4().hex,
+                    'rationale': uuid.uuid4().hex,
+                },
+                {
+                    'cveId': uuid.uuid4().hex,
+                    'rationale': uuid.uuid4().hex,
+                },
+            ],
+        }
+
+        temp_whitelist_filename = tempfile.NamedTemporaryFile()
+        with open(temp_whitelist_filename.name, 'w+', encoding='utf-8') as fp:
+            fp.write(json.dumps(whitelist_as_json_doc))
+        whitelist = read_whitelist('file://%s' % temp_whitelist_filename.name)
+
+        self.assertIsNotNone(whitelist)
+        self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
+        self.assertEqual(len(whitelist.vulnerabilities), len(whitelist_as_json_doc['vulnerabilities']))
+        for (wlv, jdv) in zip(whitelist.vulnerabilities, whitelist_as_json_doc['vulnerabilities']):
+            self.assertEqual(wlv.cve_id, jdv['cveId'])
+            self.assertEqual(wlv.rationale, jdv['rationale'])
+
+    def test_happy_path_from_str_no_vulnerabilities(self):
         ignore_severities_at_or_below = Severity('low')
         whitelist_as_str = '{"ignoreSevertiesAtOrBelow": "%s"}' % ignore_severities_at_or_below
-        self.assertIsNotNone(Whitelist('json://%s' % whitelist_as_str))
 
         whitelist = read_whitelist('json://%s' % whitelist_as_str)
 

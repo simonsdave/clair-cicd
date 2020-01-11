@@ -32,14 +32,25 @@ class Severity(object):
         return self.severity != other.severity
 
 
+class WhitelistVulnerability(object):
+
+    def __init__(self, cve_id, rationale):
+        object.__init__(self)
+
+        self.cve_id = cve_id
+        self.rationale = rationale
+
+    def __str__(self):
+        return self.cve_id
+
+
 class Whitelist(object):
 
-    def __init__(self, ignore_severities_at_or_below):
+    def __init__(self, ignore_severities_at_or_below, vulnerabilities):
         object.__init__(self)
 
         self.ignore_severities_at_or_below = ignore_severities_at_or_below
-
-        # :TODO: add list of vulnerabilities to whitelist regardless of severity
+        self.vulnerabilities = vulnerabilities
 
 
 class Vulnerability(object):

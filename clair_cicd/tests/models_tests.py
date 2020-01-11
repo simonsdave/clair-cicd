@@ -4,6 +4,7 @@ import uuid
 from ..models import Severity
 from ..models import Vulnerability
 from ..models import Whitelist
+from ..models import WhitelistVulnerability
 
 
 class SeverityTestCase(unittest.TestCase):
@@ -43,12 +44,30 @@ class SeverityTestCase(unittest.TestCase):
         self.assertFalse(Severity('high') != Severity('high'))
 
 
+class WhitelistVulnerabilityTestCase(unittest.TestCase):
+
+    def test_ctr(self):
+        cve_id = uuid.uuid4().hex
+        rationale = uuid.uuid4().hex
+        wv = WhitelistVulnerability(cve_id, rationale)
+        self.assertEqual(wv.cve_id, cve_id)
+        self.assertEqual(wv.rationale, rationale)
+
+    def test_str(self):
+        cve_id = uuid.uuid4().hex
+        rationale = uuid.uuid4().hex
+        wv = WhitelistVulnerability(cve_id, rationale)
+        self.assertEqual(str(wv), cve_id)
+
+
 class WhitelistTestCase(unittest.TestCase):
 
     def test_ctr(self):
         ignore_severities_at_or_below = Severity('high')
-        whitelist = Whitelist(ignore_severities_at_or_below)
+        vulnerabilities = []
+        whitelist = Whitelist(ignore_severities_at_or_below, vulnerabilities)
         self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
+        self.assertEqual(whitelist.vulnerabilities, vulnerabilities)
 
 
 class VulnerabilityTestCase(unittest.TestCase):

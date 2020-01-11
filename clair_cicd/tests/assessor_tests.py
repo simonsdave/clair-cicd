@@ -20,7 +20,7 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
 
     def test_no_vulnerabilities_should_assess_clean(self):
         for severity in ['Negligible', 'Low', 'Medium', 'High']:
-            whitelist = Whitelist('{"ignoreSevertiesAtOrBelow": "%s"}' % severity)
+            whitelist = Whitelist('{"ignoreSevertiesAtOrBelow": "%s"}' % severity, [])
             vulnerabilities = []
 
             vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
@@ -28,7 +28,7 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
 
     def test_X_sev_vul_with_X_sev_wl_should_assess_clean(self):
         for severity in ['Negligible', 'Low', 'Medium', 'High']:
-            whitelist = Whitelist(Severity(severity))
+            whitelist = Whitelist(Severity(severity), [])
             vulnerabilities = [
                 Vulnerability('CVE-0000-0000', Severity(severity)),
             ]
@@ -37,7 +37,7 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
             self.assertTrue(vra.assess())
 
     def test_high_sev_vul_with_med_sev_wl_should_assess_dirty(self):
-        whitelist = Whitelist(Severity('medium'))
+        whitelist = Whitelist(Severity('medium'), [])
 
         vulnerabilities = [
             Vulnerability('CVE-0000-0000', Severity('High')),

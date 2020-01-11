@@ -7,12 +7,28 @@ import jsonschema
 from . import jsonschemas
 from .models import Severity
 from .models import Vulnerability
+from .models import WhitelistVulnerability
 from .models import Whitelist
 
 _logger = logging.getLogger(__name__)
 
 _json_scheme = 'json://'
 _file_scheme = 'file://'
+
+
+def _read_whitelist_from_json_doc(whitelist_as_json_doc):
+    whitelist_vulnerabilities = []
+    for whitelist_vulnerability_as_json_doc in whitelist_as_json_doc.get('vulnerabilities', []):
+        whitelist_vulnerability = WhitelistVulnerability(
+            whitelist_vulnerability_as_json_doc['cveId'],
+            whitelist_vulnerability_as_json_doc['rationale'])
+        whitelist_vulnerabilities.append(whitelist_vulnerability)
+
+    whitelist = Whitelist(Severity(
+        whitelist_as_json_doc['ignoreSevertiesAtOrBelow']),
+        whitelist_vulnerabilities)
+
+    return whitelist
 
 
 def read_whitelist(filename_or_json):
@@ -33,8 +49,7 @@ def read_whitelist(filename_or_json):
         try:
             whitelist_as_json_doc = json.loads(filename_or_json[len(_json_scheme):])
             jsonschema.validate(whitelist_as_json_doc, jsonschemas.whitelist)
-            whitelist = Whitelist(Severity(whitelist_as_json_doc['ignoreSevertiesAtOrBelow']))
-            return whitelist
+            return _read_whitelist_from_json_doc(whitelist_as_json_doc)
         except Exception:
             _logger.error("Looked like JSON but guess not :-( - %s\n", filename_or_json)
             return None
@@ -44,9 +59,7 @@ def read_whitelist(filename_or_json):
             with open(filename_or_json[len(_file_scheme):], 'r', encoding='utf-8') as f:
                 whitelist_as_json_doc = json.load(f)
                 jsonschema.validate(whitelist_as_json_doc, jsonschemas.whitelist)
-                ignore_severties_at_or_below = Severity(whitelist_as_json_doc['ignoreSevertiesAtOrBelow'])
-                whitelist = Whitelist(ignore_severties_at_or_below)
-                return whitelist
+                return _read_whitelist_from_json_doc(whitelist_as_json_doc)
         except Exception as ex:
             _logger.error("Could not read whitelist from '%s' - %s\n", filename_or_json, ex)
             return None
