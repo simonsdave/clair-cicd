@@ -62,12 +62,28 @@ class WhitelistVulnerabilityTestCase(unittest.TestCase):
 
 class WhitelistTestCase(unittest.TestCase):
 
-    def test_ctr(self):
+    def test_ctr_no_vulnerabilities(self):
         ignore_severities_at_or_below = Severity('high')
         vulnerabilities = []
         whitelist = Whitelist(ignore_severities_at_or_below, vulnerabilities)
         self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
         self.assertEqual(whitelist.vulnerabilities, vulnerabilities)
+        self.assertEqual(whitelist.vulnerabilities_by_cve_id, {})
+
+    def test_ctr_with_vulnerabilities(self):
+        ignore_severities_at_or_below = Severity('high')
+        vulnerabilities = [
+            WhitelistVulnerability(uuid.uuid4().hex, uuid.uuid4().hex),
+            WhitelistVulnerability(uuid.uuid4().hex, uuid.uuid4().hex),
+            WhitelistVulnerability(uuid.uuid4().hex, uuid.uuid4().hex),
+            WhitelistVulnerability(uuid.uuid4().hex, uuid.uuid4().hex),
+            WhitelistVulnerability(uuid.uuid4().hex, uuid.uuid4().hex),
+        ]
+        vulnerabilities_by_cve_id = {vulnerability.cve_id: vulnerability for vulnerability in vulnerabilities}
+        whitelist = Whitelist(ignore_severities_at_or_below, vulnerabilities)
+        self.assertEqual(whitelist.ignore_severities_at_or_below, ignore_severities_at_or_below)
+        self.assertEqual(whitelist.vulnerabilities, vulnerabilities)
+        self.assertEqual(whitelist.vulnerabilities_by_cve_id, vulnerabilities_by_cve_id)
 
 
 class VulnerabilityTestCase(unittest.TestCase):

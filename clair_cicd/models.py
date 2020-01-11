@@ -50,7 +50,11 @@ class Whitelist(object):
         object.__init__(self)
 
         self.ignore_severities_at_or_below = ignore_severities_at_or_below
-        self.vulnerabilities = vulnerabilities
+        self.vulnerabilities_by_cve_id = {vulnerability.cve_id: vulnerability for vulnerability in vulnerabilities}
+
+    @property
+    def vulnerabilities(self):
+        return list(self.vulnerabilities_by_cve_id.values())
 
 
 class Vulnerability(object):
