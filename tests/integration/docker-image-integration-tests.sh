@@ -2,6 +2,24 @@
 
 SCRIPT_DIR_NAME="$( cd "$( dirname "$0" )" && pwd )"
 
+assert_appears_in_output() {
+    STDOUT=${1:-}
+    PATTERN=${2:-}
+
+    if grep --quiet "${PATTERN}" "${STDOUT}"; then
+        return 0
+    fi
+
+    echo ""
+    echo "${FUNCNAME[1]} assert_appears_in_output failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    echo "Pattern not found >>>${PATTERN}<<<"
+    echo "${FUNCNAME[1]} assert_appears_in_output failed - >>>>>>>>>>>>>>>>>>>>>>"
+    cat "${STDOUT}"
+    echo "${FUNCNAME[1]} assert_appears_in_output failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+
+    return 1
+}
+
 test_assess_image_risk_dot_sh_no_command_line_args() {
     CLAIR_DOCKER_IMAGE=${1:-}
     CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
@@ -20,7 +38,9 @@ test_assess_image_risk_dot_sh_no_command_line_args() {
         --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
         alpine:3.4 \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Assessment ends - pass"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -54,7 +74,9 @@ test_assess_image_risk_dot_sh_inline_whitelist_command_line_args() {
         --whitelist 'json://{"ignoreSevertiesAtOrBelow": "medium"}' \
         alpine:3.4 \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Assessment ends - pass"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -88,7 +110,9 @@ test_assess_image_risk_dot_sh_file_whitelist_command_line_args() {
         --whitelist "file://${SCRIPT_DIR_NAME}/data/whitelists/ignore-medium.json" \
         alpine:3.4 \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Assessment ends - pass"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -118,7 +142,9 @@ test_assess_vulnerabilities_risk_dot_py_no_command_line_args() {
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Usage: assess-vulnerabilities-risk.py"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -149,9 +175,11 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore()
         --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist 'json://{"ignoreSevertiesAtOrBelow": "high"}' \
+        "/vulnerabilities/contains-high-severity" --log info --whitelist 'json://{"ignoreSevertiesAtOrBelow": "high"}' \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Vulnerability CVE-2016-4074 @ severity high less than or equal to whitelist severity @ high - pass"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -182,9 +210,11 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_high_ignore() {
         --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist 'file:///whitelists/ignore-high.json' \
+        "/vulnerabilities/contains-high-severity" --log info --whitelist 'file:///whitelists/ignore-high.json' \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Vulnerability CVE-2016-4074 @ severity high less than or equal to whitelist severity @ high - pass"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -215,9 +245,11 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_medium_ignore
         --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist 'json://{"ignoreSevertiesAtOrBelow": "medium"}' \
+        "/vulnerabilities/contains-high-severity" --log info --whitelist 'json://{"ignoreSevertiesAtOrBelow": "medium"}' \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Vulnerability CVE-2016-4074 @ severity high greater than whitelist severity @ medium - fail"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -248,9 +280,11 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_medium_ignore()
         --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist 'file:///whitelists/ignore-medium.json' \
+        "/vulnerabilities/contains-high-severity" --log info --whitelist 'file:///whitelists/ignore-medium.json' \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Vulnerability CVE-2016-4074 @ severity high greater than whitelist severity @ medium - fail"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -281,9 +315,11 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_medium_ignore_p
         --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist 'file:///whitelists/ignore-medium-and-below-plus-ignore-CVE-2016-4074.json' \
+        "/vulnerabilities/contains-high-severity" --log info --whitelist 'file:///whitelists/ignore-medium-and-below-plus-ignore-CVE-2016-4074.json' \
         >& "${STDOUT}"; then
-        EXIT_CODE=0
+
+        assert_appears_in_output "${STDOUT}" "Vulnerability CVE-2016-4074 in whitelist - pass"
+        EXIT_CODE=$?
     else
         EXIT_CODE=1
 
@@ -331,21 +367,31 @@ docker create \
     -v /whitelists \
     --name "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
     alpine:3.4 \
-    /bin/true \
+    mkdir /bin/true \
     > /dev/null
 
-find "${SCRIPT_DIR_NAME}/data/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
-    docker cp -a "${FILENAME}" "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}:/vulnerabilities"
-done
+if ! docker cp -a "${SCRIPT_DIR_NAME}/data/vulnerabilities" "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}:/"; then
+    echo "error"
+    exit 1
+fi
 
-find "${SCRIPT_DIR_NAME}/data/whitelists" -name '*.json' | while IFS='' read -r FILENAME; do
-    docker cp -a "${FILENAME}" "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}:/whitelists"
-done
+if ! docker cp -a "${SCRIPT_DIR_NAME}/data/whitelists" "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}:/"; then
+    echo "error"
+    exit 1
+fi
 
+#
+# test_wrapper function will update these environment variables
+# so we can generate a reasonable status message after running
+# all the integration tests
+#
 NUMBER_TESTS_RUN=0
 NUMBER_TEST_SUCCESSES=0
 NUMBER_TEST_FAILURES=0
 
+#
+# all the setup is done - time to run some tests!
+#
 test_wrapper test_assess_image_risk_dot_sh_no_command_line_args \
     "${CLAIR_DOCKER_IMAGE}" \
     "${CLAIR_DATABASE_DOCKER_IMAGE}"
@@ -381,13 +427,21 @@ test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_me
     "${CLAIR_DOCKER_IMAGE}" \
     "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}"
 
+#
+# all the tests are complete - generate a reasonable status message
+#
 echo ""
 echo "Successfully completed ${NUMBER_TESTS_RUN} integration tests. ${NUMBER_TEST_SUCCESSES} successes. ${NUMBER_TEST_FAILURES} failures."
 
-# :TRICKY: see comment above
+#
+# cleanup ...  :TRICKY: see comment above
+#
 docker kill "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" >& /dev/null
 docker rm "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" >& /dev/null
 
+#
+# and we're done:-)
+#
 if [[ "${NUMBER_TEST_FAILURES}" != "0" ]]; then
     exit 1
 fi
