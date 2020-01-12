@@ -85,7 +85,7 @@ test_assess_image_risk_dot_sh_file_whitelist_command_line_args() {
         --no-pull \
         --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
         --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
-        --whitelist "file://${SCRIPT_DIR_NAME}/data/whitelist-ignore-medium.json" \
+        --whitelist "file://${SCRIPT_DIR_NAME}/data/whitelists/ignore-medium.json" \
         alpine:3.4 \
         >& "${STDOUT}"; then
         EXIT_CODE=0
@@ -182,7 +182,7 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_high_ignore() {
         --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist 'file:///whitelists/whitelist-ignore-high.json' \
+        "/vulnerabilities" --log info --whitelist 'file:///whitelists/ignore-high.json' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
     else
@@ -248,7 +248,7 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_medium_ignore()
         --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
         --entrypoint assess-vulnerabilities-risk.py \
         "${CLAIR_DOCKER_IMAGE}" \
-        "/vulnerabilities" --log info --whitelist 'file:///whitelists/whitelist-ignore-medium.json' \
+        "/vulnerabilities" --log info --whitelist 'file:///whitelists/ignore-medium.json' \
         >& "${STDOUT}"; then
         EXIT_CODE=0
     else
@@ -338,7 +338,7 @@ find "${SCRIPT_DIR_NAME}/data/vulnerabilities/contains-high-severity" -name '*.j
     docker cp -a "${FILENAME}" "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}:/vulnerabilities"
 done
 
-find "${SCRIPT_DIR_NAME}/data" -name '*.json' | while IFS='' read -r FILENAME; do
+find "${SCRIPT_DIR_NAME}/data/whitelists" -name '*.json' | while IFS='' read -r FILENAME; do
     docker cp -a "${FILENAME}" "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}:/whitelists"
 done
 
