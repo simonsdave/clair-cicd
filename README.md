@@ -331,7 +331,9 @@ so all these need to be available in the environment running ```clair-cicd```
 ## :TODO: to get to V1.0
 
 * supplying whitelist via a file does not work!
-* assessor should use whitelist vulnerabilities
+* need integration tests for vulnerabilities in whitelist
 * main ```README.md``` needs a refresh
-  * be sure to check examples in main README.md work as indicated
+  * illustrate vulnerabilities in whitelist
+  * check examples in main README.md work as indicated
+* cut-release.sh needs to work - right .cut-release*.sh files around?
 * publish ```clair-cicd``` to PyPI

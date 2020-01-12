@@ -5,6 +5,7 @@ from ..models import Severity
 from ..models import Vulnerability
 from ..assessor import VulnerabilitiesRiskAssessor
 from ..models import Whitelist
+from ..models import WhitelistVulnerability
 
 
 class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
@@ -45,3 +46,23 @@ class VulnerabilitiesRiskAssessorTestCase(unittest.TestCase):
 
         vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
         self.assertFalse(vra.assess())
+
+    def test_high_sev_vul_whitelisted_with_med_sev_wl_should_assess_clean(self):
+        whitelist = Whitelist(Severity('medium'), [])
+
+        vulnerabilities = [
+            Vulnerability('CVE-0000-0000', Severity('High')),
+        ]
+
+        vra = VulnerabilitiesRiskAssessor(whitelist, vulnerabilities)
+        self.assertFalse(vra.assess())
+
+        new_whitelist = Whitelist(
+            whitelist.ignore_severities_at_or_below,
+            [
+                WhitelistVulnerability(vulnerabilities[0].cve_id, 'reason = because i can!!!'),
+            ]
+        )
+
+        new_vra = VulnerabilitiesRiskAssessor(new_whitelist, vulnerabilities)
+        self.assertTrue(new_vra.assess())
