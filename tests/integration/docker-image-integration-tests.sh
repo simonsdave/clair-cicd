@@ -265,6 +265,39 @@ test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_medium_ignore()
     return "${EXIT_CODE}"
 }
 
+test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_medium_ignore_plus_ignore_specific_vulnerability() {
+    CLAIR_DOCKER_IMAGE=${1:-}
+    VULNERABILITIES_AND_WHITELISTS_CONTAINER=${2:-}
+
+    # :ODD: Normally you'd expect the line below to be something like
+    # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
+    # is not shared from OS X and is not known to Docker" was generated
+    # and could not figure out what the problem and hence the current
+    # implementation.
+    STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
+
+    if docker run \
+        --rm \
+        --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
+        --entrypoint assess-vulnerabilities-risk.py \
+        "${CLAIR_DOCKER_IMAGE}" \
+        "/vulnerabilities" --log info --whitelist 'file:///whitelists/ignore-medium-and-below-plus-ignore-CVE-2016-4074.json' \
+        >& "${STDOUT}"; then
+        EXIT_CODE=0
+    else
+        EXIT_CODE=1
+
+        echo ""
+        echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
+    fi
+
+    rm -f "${STDOUT}"
+
+    return "${EXIT_CODE}"
+}
+
 test_wrapper() {
     TEST_FUNCTION_NAME=${1:-}
     shift
@@ -290,7 +323,7 @@ CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
 # tests will work on CircleCI - see link below for pattern overview
 # https://circleci.com/docs/2.0/building-docker-images/#mounting-folders
 #
-VULNERABILITIES_AND_WHITELISTS_CONTAINER=vulnerabilities-$(openssl rand -hex 8)
+VULNERABILITIES_AND_WHITELISTS_CONTAINER=vul-and-wl-$(openssl rand -hex 8)
 # explict pull to create opportunity to swallow stdout
 docker pull alpine:3.4 > /dev/null
 docker create \
@@ -341,6 +374,10 @@ test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_
     "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}"
 
 test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_medium_ignore \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}"
+
+test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_file_whitelist_medium_ignore_plus_ignore_specific_vulnerability \
     "${CLAIR_DOCKER_IMAGE}" \
     "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}"
 
