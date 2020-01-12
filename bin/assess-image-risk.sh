@@ -224,7 +224,10 @@ echo_if_verbose "$(ts) successfully started clair container '${CLAIR_CONTAINER}'
 #
 if [[ $VULNERABILITY_WHITELIST == file://* ]]; then
     VULNERABILITY_WHITELIST_IN_CONTAINER=/tmp/whitelist.json
-    docker cp "${VULNERABILITY_WHITELIST/file:\/\//}" "${CLAIR_CONTAINER}:${VULNERABILITY_WHITELIST_IN_CONTAINER}"
+    if ! docker cp "${VULNERABILITY_WHITELIST/file:\/\//}" "${CLAIR_CONTAINER}:${VULNERABILITY_WHITELIST_IN_CONTAINER}"; then
+        echo "$(ts) error copying whitelist from '${VULNERABILITY_WHITELIST/file:\/\//}' to '${CLAIR_CONTAINER}:${VULNERABILITY_WHITELIST_IN_CONTAINER}'" >&2
+        exit 1
+    fi
     VULNERABILITY_WHITELIST=file://${VULNERABILITY_WHITELIST_IN_CONTAINER}
 fi
 
