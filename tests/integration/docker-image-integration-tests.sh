@@ -80,15 +80,12 @@ test_assess_image_risk_dot_sh_file_whitelist_command_line_args() {
     # implementation.
     STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
 
-    WHITELIST=$(mktemp 2> /dev/null || mktemp -t DAS)
-    echo '{"ignoreSevertiesAtOrBelow": "medium"}' > "${WHITELIST}"
-
     if "$(repo-root-dir.sh)/bin/assess-image-risk.sh" \
         -v \
         --no-pull \
         --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
         --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
-        --whitelist "file://${WHITELIST}" \
+        --whitelist "file://${SCRIPT_DIR_NAME}/data/whitelist-ignore-medium.json" \
         alpine:3.4 \
         >& "${STDOUT}"; then
         EXIT_CODE=0
@@ -101,7 +98,6 @@ test_assess_image_risk_dot_sh_file_whitelist_command_line_args() {
         echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
     fi
 
-    rm -f "${WHITELIST}"
     rm -f "${STDOUT}"
 
     return "${EXIT_CODE}"
@@ -237,7 +233,7 @@ docker create \
     alpine:3.4 \
     /bin/true \
     > /dev/null
-find "${SCRIPT_DIR_NAME}/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
+find "${SCRIPT_DIR_NAME}/data/vulnerabilities/contains-high-severity" -name '*.json' | while IFS='' read -r FILENAME; do
     docker cp -a "${FILENAME}" "${VULNERABILITIES_CONTAINER}:/vulnerabilities"
 done
 
