@@ -360,9 +360,3 @@ so all these need to be available in the environment running ```clair-cicd```
 * [26 Jul '16 - Injecting security into Continuous Delivery](https://www.oreilly.com/learning/injecting-security-into-continuous-delivery)
 * [5 Jun '16 - <— Shifting Security to the Left](http://www.devsecops.org/blog/2016/5/20/-security)
 * [Five Secrets and Two Common “Gotchas” of Vulnerability Scanning](https://www.kennasecurity.com/resources/secrets-gotchas-of-vuln-scanning)
-
-## :TODO: to get to V1.0
-
-* main ```README.md``` needs a refresh
-* cut-release.sh needs to work - right .cut-release*.sh files around?
-* publish ```clair-cicd``` to PyPI
