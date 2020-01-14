@@ -7,7 +7,7 @@
 [![PyPI](https://img.shields.io/pypi/v/clair-cicd.svg?style=flat)](https://pypi.python.org/pypi/clair-cicd)
 [![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd)
-[![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd)
+[![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/master)
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 [![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 
