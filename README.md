@@ -11,18 +11,14 @@
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 [![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 
-```
-Repo Status = this repo is a WIP but starting to show some promise!
-```
-
 [Clair](https://github.com/coreos/clair),
 [released by CoreOS in Nov '16](https://coreos.com/blog/vulnerability-analysis-for-containers/),
 is a very effective tool for statically analyzing docker images
-and assessing images against known vulnerabilities.
+to determine which known vulnerabilities exist in the images.
 Integrating Clair into a CI/CD pipeline:
 
 1. is complex (believe this is partly a documentation challenge)
-1. creates performance problems (building the Postgres vulnerabilities database is slow)
+1. creates performance problems (building the Clair required Postgres database of vulnerabilities is slow)
 1. in and of itself is insufficient from a risk assessment point of view because once vulnerabilities
 are identified there's a lack of prescriptive guidance on how to act on
 the identified vulnerabilities
@@ -31,18 +27,16 @@ This repo was created to address the above challenges.
 
 ## Background
 
-The roots of this repo center around the belief that:
+The roots of this repo center around the following beliefs:
 
-* [Clair](https://github.com/coreos/clair) can be a very effective
-foundation for the automated assessment of Docker image
-vulnerabilities when inserted into the CI/CD pipeline
-* services should be run in Docker containers and thus a CI/CD
-pipeline should be focused on the automated generation, assessment
+* when inserted into a CI/CD pipeline [Clair](https://github.com/coreos/clair)
+can be a very effective foundation for the automated assessment of Docker image
+vulnerability risk
+* services should be run in Docker containers and thus CI/CD
+pipelines should be focused on the automated generation, assessment
 and ultimately deployment of Docker images
 * understanding and assessing the risk profile of services is important
 ie. security is important
-* risk is assessed differently for docker images that could find their
-way to *production* vs docker images that will only ever be used in *development*
 * Docker images should **not** be pushed to a Docker registry until
 their risk profile is understood (this is an important one)
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
@@ -51,40 +45,36 @@ out a change
 * there should be a clear division of responsibilities between
 those who create a docker image (service engineer) and those who
 determine the risk of vulnerabilities in a docker image (security analyst)
-* the risk assessment process must generate evidence which
+* the risk assessment process should generate evidence which
 can be used to understand the risk assessment decision
-
-## Key Concepts
-
-* docker image
-* vulnerabilities
-* static vulnerability analysis
-* vulnerability whitelist
 
 ## Key Participants
 
 * service engineer - responsible for implementing a service that is packaged
 in a docker image
-* security analyst - responsible for defining whitelists
+* security analyst - responsible for defining whitelists which are consumed
+by ```clair_cicd``` to influence Docker image risk assessment decisions
 
 ## How to Use
 
 ### Getting Started
 
-To start using ```clair-cicd```
+To start using ```clair-cicd```,
 a service engineer inserts a single line of code into a service's CI pipeline.
 The single line of code runs the shell script [assess-image-risk.sh](bin/assess-image-risk.sh).
-Part of the CI pipeline's responsibility is to build the docker image ```username/repo:tag```
-and then push ```username/repo:tag``` to a docker registry.
-The single line of ```clair-cicd``` code should appear after ```username/repo:tag```
-is built and tested but before ```username/repo:tag``` is pushed to a docker registry.
+Part of the CI pipeline's responsibility is to build the docker image
+and then push that docker image to a docker registry.
+The single line of ```clair-cicd``` code should appear after the docker image
+is built and tested but before the docker image is pushed to a docker registry.
 
 In this simple case, [assess-image-risk.sh](bin/assess-image-risk.sh) returns a zero
-exit status if ```username/repo:tag``` contains no known vulnerabilities
-above a medium severity. If ```username/repo:tag``` contains
+exit status if the docker image contains no known vulnerabilities
+above a medium severity. If the docker image contains
 any known vulnerabilities with a severity higher than medium, [assess-image-risk.sh](bin/assess-image-risk.sh)
 returns a non-zero exit status and the build fails
-ie. the build should fail before ```username/repo:tag``` is pushed to a docker registry.
+ie. the build should fail before the docker image is pushed to a docker registry.
+
+The example illustrates what's described about for the [alpine:3.4 docker image](https://hub.docker.com/_/alpine?tab=tags).
 
 ```bash
 ~> curl -s -L \
