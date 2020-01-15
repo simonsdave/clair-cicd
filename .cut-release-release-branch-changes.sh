@@ -13,6 +13,8 @@ RELEASE_BRANCH=${1:-}
 
 REPO_ROOT_DIR=$(repo-root-dir.sh)
 
+# README.md -------------------------------------------------------------------
+
 #
 # badges
 #
@@ -50,6 +52,15 @@ sed -i '' \
     -e \
     "s|(bin|(https://github.com/simonsdave/clair-cicd/blob/${RELEASE_BRANCH}/bin|g" \
     "${REPO_ROOT_DIR}/README.md"
+
+# bin/assess-image-risk.sh ----------------------------------------------------
+
+sed -i '' \
+    -e \
+    "s|CLAIR_CICD_VERSION=latest|CLAIR_CICD_VERSION=${RELEASE_BRANCH}|g" \
+    "${REPO_ROOT_DIR}/bin/assess-image-risk.sh"
+
+# -----------------------------------------------------------------------------
 
 rm -f "${REPO_ROOT_DIR}/README.rst"
 build-readme-dot-rst.sh
