@@ -5,9 +5,9 @@
 ![PythonVersions](https://img.shields.io/pypi/pyversions/clair-cicd.svg?style=flat)
 ![status](https://img.shields.io/pypi/status/clair-cicd.svg?style=flat)
 [![PyPI](https://img.shields.io/pypi/v/clair-cicd.svg?style=flat)](https://pypi.python.org/pypi/clair-cicd)
-[![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
-[![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
-[![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/master)
+[![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=release-1.0.0)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=release-1.0.0)
+[![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/release-1.0.0)
+[![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/release-1.0.0/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/release-1.0.0)
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 [![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 
@@ -61,16 +61,16 @@ by ```clair_cicd``` to influence Docker image risk assessment decisions
 
 To start using ```clair-cicd```,
 a service engineer inserts a single line of code into a service's CI pipeline.
-The single line of code runs the shell script [assess-image-risk.sh](bin/assess-image-risk.sh).
+The single line of code runs the shell script [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh).
 Part of the CI pipeline's responsibility is to build the docker image
 and then push that docker image to a docker registry.
 The single line of ```clair-cicd``` code should appear after the docker image
 is built and tested but before the docker image is pushed to a docker registry.
 
-In this simple case, [assess-image-risk.sh](bin/assess-image-risk.sh) returns a zero
+In this simple case, [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh) returns a zero
 exit status if the docker image contains no known vulnerabilities
 above a medium severity. If the docker image contains
-any known vulnerabilities with a severity higher than medium, [assess-image-risk.sh](bin/assess-image-risk.sh)
+any known vulnerabilities with a severity higher than medium, [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh)
 returns a non-zero exit status and the build fails
 ie. the build should fail before the docker image is pushed to a docker registry.
 
@@ -138,7 +138,7 @@ When specified as a JSON doc, this whitelist would be:
 }
 ```
 
-By default, [assess-image-risk.sh](bin/assess-image-risk.sh)
+By default, [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh)
 returns a non-zero exit status if any vulnerabilities are identified
 in the image with a severity higher than medium. The medium is
 derived from the default vulnerability whitelist.
@@ -294,7 +294,7 @@ branches, etc)
 
 There are 3 moving pieces:
 
-1. [assess-image-risk.sh](bin/assess-image-risk.sh) is bash script which does
+1. [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh) is bash script which does
 the heavy lifting to co-ordinate
 the interaction of the 2 other moving pieces
 1. [Clair's](https://github.com/coreos/clair) vulnerability database
@@ -311,18 +311,18 @@ docker image which is based on the docker image [quay.io/coreos/clair](https://q
 which packages up [Clair](https://github.com/coreos/clair)
 
 From the samples at the start of this doc you'll see the approach of
-curl'ing the latest release of [assess-image-risk.sh](bin/assess-image-risk.sh)
-into a localy run bash shell. [assess-image-risk.sh](bin/assess-image-risk.sh)
+curl'ing the latest release of [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh)
+into a localy run bash shell. [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh)
 then spins up a container using the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/). Another container is then run
 using [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 with the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container
-being able to talk with the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) container. Once the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container is running, [assess-image-risk.sh](bin/assess-image-risk.sh) [docker exec's]() [this bash script](dockerfiles/clair/assess-image-risk.sh)
+being able to talk with the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) container. Once the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container is running, [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh) [docker exec's]() [this bash script](dockerfiles/clair/assess-image-risk.sh)
 which does the actual risk assessment.
 
 Armed with the understanding of how ```clair-cicd``` works you'll
-appreciate that the ability to execute [assess-image-risk.sh](bin/assess-image-risk.sh)
+appreciate that the ability to execute [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh)
 is what defines the requirements for the execution
-environment. [assess-image-risk.sh](bin/assess-image-risk.sh) is a bash script used to launch
+environment. [assess-image-risk.sh](https://github.com/simonsdave/clair-cicd/blob/release-1.0.0/bin/assess-image-risk.sh) is a bash script used to launch
 the risk assessment process and as such it's this script which defines the bulk of
 the assumptions/requirements for ```clair-cicd``` - the script uses docker, sed and openssl
 so all these need to be available in the environment running ```clair-cicd```
