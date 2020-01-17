@@ -1,7 +1,7 @@
 #
 # this is the package version number
 #
-__version__ = '0.6.0'
+__version__ = '1.0.0'
 
 #
 # a few different components in this project need to make
