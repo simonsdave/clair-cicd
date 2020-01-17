@@ -321,15 +321,11 @@ which does the actual risk assessment.
 
 Armed with the understanding of how ```clair-cicd``` works you'll
 appreciate that the ability to execute [assess-image-risk.sh](bin/assess-image-risk.sh)
-is what defines the requirements for the execution environment
-
-* [assess-image-risk.sh](bin/assess-image-risk.sh) is a bash script used to launch
+is what defines the requirements for the execution
+environment. [assess-image-risk.sh](bin/assess-image-risk.sh) is a bash script used to launch
 the risk assessment process and as such it's this script which defines the bulk of
 the assumptions/requirements for ```clair-cicd``` - the script uses docker, sed and openssl
 so all these need to be available in the environment running ```clair-cicd```
-* :TODO: which docker versions are supported?
-
-??? why use latest release?
 
 ## References
 
