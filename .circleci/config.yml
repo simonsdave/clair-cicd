@@ -37,6 +37,9 @@ jobs:
           name: Lint Shell Scripts
           command: run-shelllint.sh
       - run:
+          name: Lint Markdown Files
+          command: run-markdownlint.sh
+      - run:
           name: Lint YAML Files
           command: run-yamllint.sh
       - run:
