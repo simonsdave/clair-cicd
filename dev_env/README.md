@@ -1,6 +1,6 @@
 # Development Environment
 
-```clair-cicd``` users [dev-env](https://github.com/simonsdave/dev-env)
+The project uses [dev-env](https://github.com/simonsdave/dev-env)
 to create development and CI environments. Below are the instructions
 for spinning up a development environment and running unit the unit tests.
 These instructions have been tested on various flavors of macOS.

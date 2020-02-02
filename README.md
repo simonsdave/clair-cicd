@@ -6,7 +6,7 @@
 ![status](https://img.shields.io/pypi/status/clair-cicd.svg?style=flat)
 [![PyPI](https://img.shields.io/pypi/v/clair-cicd.svg?style=flat)](https://pypi.python.org/pypi/clair-cicd)
 [![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
-[![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
+[![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd/tree/master.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
 [![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/master)
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 [![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
@@ -18,10 +18,12 @@ to determine which known vulnerabilities exist in the images.
 Integrating Clair into a CI/CD pipeline:
 
 1. is complex (believe this is partly a documentation challenge)
-1. creates performance problems (building the Clair required Postgres database of vulnerabilities is slow)
-1. in and of itself is insufficient from a risk assessment point of view because once vulnerabilities
-are identified there's a lack of prescriptive guidance on how to act on
-the identified vulnerabilities
+1. creates performance problems (building the Clair required Postgres database
+   of vulnerabilities is slow)
+1. in and of itself is insufficient from a risk assessment point of view
+   because once vulnerabilities
+   are identified there's a lack of prescriptive guidance on how to act on
+   the identified vulnerabilities
 
 This repo was created to address the above challenges.
 
@@ -30,30 +32,30 @@ This repo was created to address the above challenges.
 The roots of this repo center around the following beliefs:
 
 * when inserted into a CI/CD pipeline [Clair](https://github.com/coreos/clair)
-can be a very effective foundation for the automated assessment of Docker image
-vulnerability risk
+  can be a very effective foundation for the automated assessment of Docker image
+  vulnerability risk
 * services should be run in Docker containers and thus CI/CD
-pipelines should be focused on the automated generation, assessment
-and ultimately deployment of Docker images
+  pipelines should be focused on the automated generation, assessment
+  and ultimately deployment of Docker images
 * understanding and assessing the risk profile of services is important
-ie. security is important
+  ie. security is important
 * Docker images should **not** be pushed to a Docker registry until
-their risk profile is understood (this is an important one)
+  their risk profile is understood (this is an important one)
 * the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
-between code commit and automated (CD) deployment begins rolling
-out a change
+  between code commit and automated (CD) deployment begins rolling
+  out a change
 * there should be a clear division of responsibilities between
-those who create a docker image (service engineer) and those who
-determine the risk of vulnerabilities in a docker image (security analyst)
+  those who create a docker image (service engineer) and those who
+  determine the risk of vulnerabilities in a docker image (security analyst)
 * the risk assessment process should generate evidence which
-can be used to understand the risk assessment decision
+  can be used to understand the risk assessment decision
 
 ## Key Participants
 
 * service engineer - responsible for implementing a service that is packaged
-in a docker image
+  in a docker image
 * security analyst - responsible for defining whitelists which are consumed
-by ```clair_cicd``` to influence Docker image risk assessment decisions
+  by ```clair_cicd``` to influence Docker image risk assessment decisions
 
 ## How to Use
 
@@ -287,28 +289,28 @@ with statements like ```Vulnerability CVE-2019-13627 in whitelist - pass```
 
 * maintained by security analyst **not** service engineer
 * checked into source code control and appropriate change
-management processes are used to make changes (code reviews, feature
-branches, etc)
+  management processes are used to make changes (code reviews, feature
+  branches, etc)
 
 ## How it Works + Requirements/Assumptions
 
 There are 3 moving pieces:
 
 1. [assess-image-risk.sh](bin/assess-image-risk.sh) is bash script which does
-the heavy lifting to co-ordinate
-the interaction of the 2 other moving pieces
+   the heavy lifting to co-ordinate
+   the interaction of the 2 other moving pieces
 1. [Clair's](https://github.com/coreos/clair) vulnerability database
-which is packaged inside the docker image
-[simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) -
-a [CircleCI](https://circleci.com/) cron job
-is used to rebuild
-[simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/)
-3 days per week to ensure
-the vulnerability database is current
+   which is packaged inside the docker image
+   [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) -
+   a [CircleCI](https://circleci.com/) cron job
+   is used to rebuild
+   [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/)
+   3 days per week to ensure
+   the vulnerability database is current
 1. a set of Python and Bash risk assessment scripts packaged in the
-[simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
-docker image which is based on the docker image [quay.io/coreos/clair](https://quay.io/repository/coreos/clair)
-which packages up [Clair](https://github.com/coreos/clair)
+   [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
+   docker image which is based on the docker image [quay.io/coreos/clair](https://quay.io/repository/coreos/clair)
+   which packages up [Clair](https://github.com/coreos/clair)
 
 From the samples at the start of this doc you'll see the approach of
 curl'ing the latest release of [assess-image-risk.sh](bin/assess-image-risk.sh)
@@ -316,7 +318,7 @@ into a localy run bash shell. [assess-image-risk.sh](bin/assess-image-risk.sh)
 then spins up a container using the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/). Another container is then run
 using [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 with the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container
-being able to talk with the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) container. Once the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container is running, [assess-image-risk.sh](bin/assess-image-risk.sh) [docker exec's]() [this bash script](dockerfiles/clair/assess-image-risk.sh)
+being able to talk with the [simonsdave/clair-database](https://hub.docker.com/r/simonsdave/clair-database/) container. Once the [simonsdave/clair-cicd-clair](https://hub.docker.com/r/simonsdave/clair-cicd-clair/) container is running, [assess-image-risk.sh](bin/assess-image-risk.sh) docker exec's [this bash script](dockerfiles/clair/assess-image-risk.sh)
 which does the actual risk assessment.
 
 Armed with the understanding of how ```clair-cicd``` works you'll

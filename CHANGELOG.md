@@ -8,11 +8,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-* Nothing
+* add markdown lint in CI pipeline
 
 ### Changed
 
-* Nothing
+* dev-env v0.6.3 -> v0.6.5
 
 ### Removed
 
@@ -36,65 +36,65 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- [Circle CI](https://circleci.com/) builds docker images for master branch
-every Monday, Wednesday and Friday at ~03:00 UTC
+* [Circle CI](https://circleci.com/) builds docker images for master branch
+  every Monday, Wednesday and Friday at ~03:00 UTC
 
 ### Changed
 
-- clair v2.0.6 -> v2.1.2
-- flake8 3.7.5 -> 3.7.6
-- jsonschema 2.6.0 -> 3.0.1
-- dev-env 0.5.14 -> 0.6.3
-- [Travis CI](https://travis-ci.org/) -> [Circle CI](https://circleci.com/)
+* clair v2.0.6 -> v2.1.2
+* flake8 3.7.5 -> 3.7.6
+* jsonschema 2.6.0 -> 3.0.1
+* dev-env 0.5.14 -> 0.6.3
+* [Travis CI](https://travis-ci.org/) -> [Circle CI](https://circleci.com/)
 
 ### Removed
 
-- removed ```kill-and-remove-all-docker-containers.sh``` since that command is now available from ```dev-env```
+* removed ```kill-and-remove-all-docker-containers.sh``` since that command is now available from ```dev-env```
 
 ## [0.4.0] - [2018-09-29]
 
 ### Added
 
-- Nothing
+* Nothing
 
 ### Changed
 
-- pep8 -> pycodestyle
-- clair v2.0.1 -> v2.0.6
+* pep8 -> pycodestyle
+* clair v2.0.1 -> v2.0.6
 
 ### Removed
 
-- Nothing
+* Nothing
 
 ## [0.3.0] - [2017-09-22]
 
 ### Added
 
-- Nothing
+* Nothing
 
 ### Changed
 
-- Clair 1.2.6 -> 2.0.1
+* Clair 1.2.6 -> 2.0.1
 
 ### Removed
 
-- Nothing
+* Nothing
 
 ## [0.2.0] - [2017-09-19]
 
 ### Added
 
-- ...
+* ...
 
 ### Changed
 
-- Now using Clair 1.2.6
-- added ```-np``` (no docker image pull) command line option to ```assess-image-risk.sh```
+* Now using Clair 1.2.6
+* added ```-np``` (no docker image pull) command line option to ```assess-image-risk.sh```
 
 ### Removed
 
-- ...
+* ...
 
 ## [0.1.0] - [2015-05-14]
 
-- initial release
+* initial release
