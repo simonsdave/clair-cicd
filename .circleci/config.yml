@@ -7,7 +7,7 @@ executors:
       DOCKER_CLAIR_TEMP_IMAGE: simonsdave/clair-cicd-clair:bindle
       DOCKER_DATABASE_TEMP_IMAGE: simonsdave/clair-cicd-database:bindle
     docker:
-      - image: simonsdave/bionic-dev-env:v0.6.3
+      - image: simonsdave/bionic-dev-env:v0.6.5
 
 jobs:
   build_test_and_deploy:
@@ -35,27 +35,30 @@ jobs:
           command: run-bandit.sh
       - run:
           name: Lint Shell Scripts
-          command: run-shelllint.sh
+          command: run-shelllint.sh --verbose
       - run:
           name: Lint Markdown Files
-          command: run-markdownlint.sh
+          command: run-markdownlint.sh --verbose
       - run:
           name: Lint YAML Files
-          command: run-yamllint.sh
+          command: run-yamllint.sh --verbose
       - run:
           name: Lint JSON Files
-          command: run-jsonlint.sh
+          command: run-jsonlint.sh --verbose
       - run:
           name: Scan repo for passwords, private keys, etc.
           command: run-repo-security-scanner.sh
       - run:
-          name: Run unit tests
+          name: Run Unit Tests
           command: run-unit-tests.sh
       - run:
           name: Upload Unit Test Coverage Data to Codecov
           command: codecov
       - run:
-          name: Build python packages
+          name: Build README.rst
+          command: build-readme-dot-rst.sh
+      - run:
+          name: Build Python Packages
           command: build-python-package.sh
       - setup_remote_docker
       - run:
