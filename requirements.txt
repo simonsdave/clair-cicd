@@ -2,7 +2,7 @@
 -e .
 # the packages below are required for development & testing
 flake8==3.7.9
-mock==3.0.5
+mock==4.0.0
 nose==1.3.7
 nose-cov==1.6
 pudb>=2015.4.1
