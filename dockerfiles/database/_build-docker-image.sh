@@ -76,16 +76,17 @@ CLAIR_DATABASE_IMAGE_NAME=${1:-}
 
 # https://quay.io/repository/coreos/clair?tab=tags
 CLAIR_VERSION=$(grep '^__clair_version__' "$(repo-root-dir.sh)/$(repo.sh -u)/__init__.py" | sed -e "s|^.*=[[:space:]]*['\"]||g" | sed -e "s|['\"].*$||g")
-CLAIR_IMAGE_NAME=quay.io/coreos/clair:$CLAIR_VERSION
+CLAIR_IMAGE_NAME=quay.io/coreos/clair:${CLAIR_VERSION}
 CLAIR_CONTAINER_NAME=clair-$(openssl rand -hex 8)
 CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
-DATABASE_SERVER_DOCKER_IMAGE=postgres:9.5.2
+POSTGRES_VERSION=$(grep '^__postgres_version__' "$(repo-root-dir.sh)/$(repo.sh -u)/__init__.py" | sed -e "s|^.*=[[:space:]]*['\"]||g" | sed -e "s|['\"].*$||g")
+POSTGRES_DOCKER_IMAGE=postgres:${POSTGRES_VERSION}
 
-ts_echo "pulling database server docker image ${DATABASE_SERVER_DOCKER_IMAGE}"
+ts_echo "pulling database server docker image ${POSTGRES_DOCKER_IMAGE}"
 
-if ! docker pull "${DATABASE_SERVER_DOCKER_IMAGE}" >& /dev/null; then
-    ts_echo_stderr "error pulling database server docker image ${DATABASE_SERVER_DOCKER_IMAGE}"
+if ! docker pull "${POSTGRES_DOCKER_IMAGE}" >& /dev/null; then
+    ts_echo_stderr "error pulling database server docker image ${POSTGRES_DOCKER_IMAGE}"
     exit 1
 fi
 
@@ -97,7 +98,7 @@ docker \
     --name "${CLAIR_DATABASE_CONTAINER_NAME}" \
     -e 'PGDATA=/var/lib/postgresql/data-non-volume' \
     -d \
-    ${DATABASE_SERVER_DOCKER_IMAGE} \
+    "${POSTGRES_DOCKER_IMAGE}" \
     > /dev/null
 ts_echo "successfully started database server container"
 
@@ -112,7 +113,7 @@ do
 done
 echo ''
 
-ts_echo "successfully started database server from docker image '${DATABASE_SERVER_DOCKER_IMAGE}'"
+ts_echo "successfully started database server from docker image '${POSTGRES_DOCKER_IMAGE}'"
 
 ts_echo -n "creating database "
 
