@@ -7,7 +7,7 @@ executors:
       DOCKER_CLAIR_TEMP_IMAGE: simonsdave/clair-cicd-clair:bindle
       DOCKER_DATABASE_TEMP_IMAGE: simonsdave/clair-cicd-database:bindle
     docker:
-      - image: simonsdave/bionic-dev-env:v0.6.5
+      - image: simonsdave/bionic-dev-env:v0.6.6
 
 jobs:
   build_test_and_deploy:

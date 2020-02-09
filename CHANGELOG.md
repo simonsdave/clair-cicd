@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 * mock 3.0.5 -> 4.0.0
+* dev-env 0.6.5 -> 0.6.6
 
 ### Removed
 
