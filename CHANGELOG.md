@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-* mock 3.0.5 -> 4.0.0
+* mock 3.0.5 -> 4.0.1
 * dev-env 0.6.5 -> 0.6.6
 * centralized specification of postgres version # in ```clair_cicd/__init.py```
 * postgres 9.5.2 -> 12.1
