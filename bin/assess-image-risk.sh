@@ -40,7 +40,7 @@ VULNERABILITY_WHITELIST='json://{"ignoreSevertiesAtOrBelow": "medium"}'
 #
 # :TODO: how do we ensure Clair version and database version are the same?
 #
-CLAIR_CICD_VERSION=latest
+CLAIR_CICD_VERSION=release-1.0.2
 CLAIR_DATABASE_IMAGE=simonsdave/clair-cicd-database:${CLAIR_CICD_VERSION}
 CLAIR_VERSION=$(docker run --rm "${CLAIR_DATABASE_IMAGE}" /bin/bash -c 'echo ${CLAIR_VERSION}')
 CLAIR_IMAGE=simonsdave/clair-cicd-clair:${CLAIR_CICD_VERSION}
