@@ -5,10 +5,12 @@ export DEV_ENV_DOCKER_IMAGE=simonsdave/clair-cicd-xenial-dev-env:build
 if [ -d ./env ]; then
     source ./env/bin/activate
 else
+    python3.7 -m pip install virtualenv
+
     virtualenv env
     source ./env/bin/activate
 
-    pip install --upgrade pip
+    python3.7 -m pip install --upgrade pip
 
     DEV_ENV_VERSION=$(cat ./dev_env/dev-env-version.txt)
     if [ "${DEV_ENV_VERSION}" == "latest" ]; then DEV_ENV_VERSION=master; fi
@@ -18,6 +20,6 @@ else
     ./dev_env/build-docker-image.sh "${DEV_ENV_DOCKER_IMAGE}"
 fi
 
-export PATH="$PWD/bin":$PATH
+export PATH="${PWD}/bin":$PATH
 
 popd > /dev/null

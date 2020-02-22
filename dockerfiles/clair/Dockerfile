@@ -18,5 +18,5 @@ RUN mkdir -p /tmp/download \
 COPY assess-image-risk.sh /usr/local/bin/assess-image-risk.sh
 
 COPY package.tar.gz /tmp/package.tar.gz
-RUN pip3 install /tmp/package.tar.gz
+RUN python3.7 -m pip install /tmp/package.tar.gz
 RUN rm /tmp/package.tar.gz
