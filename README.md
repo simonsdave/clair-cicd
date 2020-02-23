@@ -285,12 +285,9 @@ with statements like ```Vulnerability CVE-2019-13627 in whitelist - pass```
 ~>
 ```
 
-#### Responsibilities
+ITO whitelists it's worth seeing issue #7 which says:
 
-* maintained by security analyst **not** service engineer
-* checked into source code control and appropriate change
-  management processes are used to make changes (code reviews, feature
-  branches, etc)
+> When specifying the whitelist for ```assess-image-risk.sh``` with the ```--whitelist``` command line argument, should support ```https://``` scheme in addition to the existing ```json://```, ```file://``` schemes. Why is this important? Ideally whitelists should be maintained by a security analyst not a service engineer. This means that whitelists should be maintained in another repo with appropriate change management process. The ```json://``` and ```file://``` schemes are fine for maintaining whitelists in the same repo is service code. However, it would be better to maintain whitelists in a repo that is readonly for service engineers and editable only by security analysts who could apply appropriate change management processes are used to make changes (code reviews, feature  branches, etc).
 
 ## How it Works + Requirements/Assumptions
 
