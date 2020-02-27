@@ -2,14 +2,12 @@
 
 ![Maintained](https://img.shields.io/maintenance/yes/2020.svg)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
-![PythonVersions](https://img.shields.io/pypi/pyversions/clair-cicd.svg?style=flat)
-![status](https://img.shields.io/pypi/status/clair-cicd.svg?style=flat)
-[![PyPI](https://img.shields.io/pypi/v/clair-cicd.svg?style=flat)](https://pypi.python.org/pypi/clair-cicd)
+[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 [![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd/tree/master.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
 [![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/master)
-[![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 [![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
+[![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 
 [Clair](https://github.com/coreos/clair),
 [released by CoreOS in Nov '16](https://coreos.com/blog/vulnerability-analysis-for-containers/),
