@@ -6,8 +6,8 @@
 [![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd/tree/master.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
 [![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/master)
-[![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
-[![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair%20cicd%20database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
+[![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair--cicd--clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
+[![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair--cicd--database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 
 [Clair](https://github.com/coreos/clair),
 [released by CoreOS in Nov '16](https://coreos.com/blog/vulnerability-analysis-for-containers/),
