@@ -1,6 +1,6 @@
 FROM quay.io/coreos/clair:v2.1.2
 
-MAINTAINER Dave Simons
+LABEL maintainer="Dave Simons"
 
 RUN apk add --no-cache curl jq bash python3 tzdata \
     && cp /usr/share/zoneinfo/Canada/Eastern /etc/localtime
