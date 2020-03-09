@@ -25,6 +25,17 @@ sed -i '' \
     "s|?branch=master|?branch=${RELEASE_BRANCH}|g" \
     "${REPO_ROOT_DIR}/README.md"
 
+# CodeFactor
+sed -i '' \
+    -e \
+    "s|/badge/master|/badge/${RELEASE_BRANCH}|g" \
+    "${REPO_ROOT_DIR}/README.md"
+
+sed -i '' \
+    -e \
+    "s|/overview/master|/overview/${RELEASE_BRANCH}|g" \
+    "${REPO_ROOT_DIR}/README.md"
+
 # CircleCI
 sed -i '' \
     -e \

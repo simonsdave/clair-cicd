@@ -4,6 +4,7 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 [![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
+[![CodeFactor](https://www.codefactor.io/repository/github/simonsdave/clair-cicd/badge/master)](https://www.codefactor.io/repository/github/simonsdave/clair-cicd/overview/master)
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd/tree/master.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
 [![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/master)
 [![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair--cicd--clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
