@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-* Nothing
+* mock 4.0.1 -> 4.0.2
 
 ### Removed
 
