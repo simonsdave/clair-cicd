@@ -1,6 +1,6 @@
 pushd "$(git rev-parse --show-toplevel)" > /dev/null
 
-export DEV_ENV_DOCKER_IMAGE=simonsdave/clair-cicd-xenial-dev-env:build
+export DEV_ENV_DOCKER_IMAGE=simonsdave/clair-cicd-dev-env:build
 
 if [ -d ./env ]; then
     source ./env/bin/activate
@@ -12,14 +12,11 @@ else
 
     python3.7 -m pip install --upgrade pip
 
-    DEV_ENV_VERSION=$(cat ./dev_env/dev-env-version.txt)
-    if [ "${DEV_ENV_VERSION}" == "latest" ]; then DEV_ENV_VERSION=master; fi
-    curl -s -L https://raw.githubusercontent.com/simonsdave/dev-env/${DEV_ENV_VERSION}/bin/install-dev-env.sh | bash -s --
-    unset DEV_ENV_VERSION
+    curl -s -L https://raw.githubusercontent.com/simonsdave/dev-env/master/bin/install-dev-env.sh | bash -s --
 
     ./dev_env/build-docker-image.sh "${DEV_ENV_DOCKER_IMAGE}"
 fi
 
-export PATH="${PWD}/bin":$PATH
+export PATH="${PWD}/bin":${PATH}
 
-popd > /dev/null
+popd

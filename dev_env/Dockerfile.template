@@ -1,4 +1,4 @@
-FROM simonsdave/bionic-dev-env:%DEV_ENV_VERSION%
+FROM %CIRCLE_CI_EXECUTOR%
 
 LABEL maintainer="Dave Simons"
 
