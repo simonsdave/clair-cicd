@@ -15,7 +15,6 @@ jobs:
     executor: dev-env
     steps:
       - checkout
-      - run: check-consistent-dev-env-version.sh --verbose
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}
