@@ -185,17 +185,19 @@ ts_echo "successfully created clair container"
 ts_echo -n "waiting for vulnerabilities database update to finish "
 while true
 do
-    if docker logs "${CLAIR_CONTAINER_NAME}" | grep "update finished" >& /dev/null; then
+    if docker logs "${CLAIR_CONTAINER_NAME}" | grep --no-messages 'update finished'; then
         break
     fi
 
-    if docker logs "${CLAIR_CONTAINER_NAME}" | grep "an error occured" >& /dev/null; then
-        echo ""
-        ts_echo_stderr "error during vulnerabilities database update try 'docker logs ${CLAIR_CONTAINER_NAME}'"
-        ts_echo_stderr "------------------------------------------------------------"
-        docker logs "${CLAIR_CONTAINER_NAME}"
-        ts_echo_stderr "------------------------------------------------------------"
-        exit 1
+    if docker logs "${CLAIR_CONTAINER_NAME}" | grep --no-messages 'an error occured'; then
+        if ! docker logs "${CLAIR_CONTAINER_NAME}" | grep --no-messages 'an error occured.*received 404 code downloading'; then
+            echo ""
+            ts_echo_stderr "error during vulnerabilities database update try 'docker logs ${CLAIR_CONTAINER_NAME}'"
+            ts_echo_stderr "------------------------------------------------------------"
+            docker logs "${CLAIR_CONTAINER_NAME}"
+            ts_echo_stderr "------------------------------------------------------------"
+            exit 1
+        fi
     fi
 
     echo -n "."
