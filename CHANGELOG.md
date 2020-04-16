@@ -12,8 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-* when the vulnerability database is being built and an error occurs fetching a vulnerability
-  update, that error is now ignore vs before where the database build would fail
+* when the vulnerability database is being built and an error occurs fetching
+  vulnerabilities for a particular namespace, the error is now ignored vs before
+  where the entire database build would fail
 * after the vulnerability database is built a summary of the vulnerabilities
   is written to stdout
 * mock 4.0.1 -> 4.0.2

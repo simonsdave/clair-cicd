@@ -206,6 +206,18 @@ do
 done
 echo ""
 
+# make sure the namespaces for which we didn't get vulnerabilities is really clear
+if docker logs "${CLAIR_CONTAINER_NAME}" | grep 'an error occured.*received 404 code downloading' >& /dev/null; then
+    ts_echo "------------------------------------------------------------"
+    ts_echo "failed to retrieve vulnerabilities for following namespaces"
+    ts_echo "------------------------------------------------------------"
+    docker logs "${CLAIR_CONTAINER_NAME}" | grep 'an error occured.*received 404 code downloading'
+    ts_echo "------------------------------------------------------------"
+else
+    ts_echo "successfully retrieved vulnerabilities for all namespaces"
+fi
+
+# sanity check on the # of vulnerabilities we did retrieve
 ts_echo "------------------------------------------------------------"
 ts_echo "Vulnerability Summary"
 ts_echo "------------------------------------------------------------"
@@ -216,6 +228,10 @@ docker \
     sh -c 'psql -U postgres -d clair -c "SELECT n.name AS namespace, count(*) AS number_vulnerabilities FROM vulnerability AS v, namespace AS n WHERE v.namespace_id = n.id group by n.name order by n.name"'
 
 ts_echo "------------------------------------------------------------"
+
+ts_echo -n "vulnerabilities database update finish"
+
+# :TODO: describe what's happening in this next section
 
 docker kill "${CLAIR_CONTAINER_NAME}" > /dev/null
 docker rm "${CLAIR_CONTAINER_NAME}" > /dev/null
