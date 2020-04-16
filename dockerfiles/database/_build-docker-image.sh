@@ -123,13 +123,13 @@ do
     docker \
         exec \
         "${CLAIR_DATABASE_CONTAINER_NAME}" \
-        sh -c 'echo "create database clair" | psql -U postgres' \
+        sh -c 'psql -U postgres -c "create database clair"' \
         >& /dev/null
 
     if docker \
         exec \
          "${CLAIR_DATABASE_CONTAINER_NAME}" \
-         sh -c 'echo "\list" | psql -U postgres' |& \
+         sh -c 'psql -U postgres -c "\list"' |& \
          grep '^\s*clair' \
          >& /dev/null;
     then
