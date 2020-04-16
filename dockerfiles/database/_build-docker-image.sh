@@ -142,6 +142,7 @@ do
     sleep 3
 done
 if [ "$i" == "${MAX_NUM_DATABASE_CREATE_ATTEMPTS}" ]; then
+    echo ""
     ts_echo "error creating database"
     exit 1
 fi
