@@ -206,6 +206,17 @@ do
 done
 echo ""
 
+ts_echo "------------------------------------------------------------"
+ts_echo "Vulnerability Summary"
+ts_echo "------------------------------------------------------------"
+
+docker \
+    exec \
+    "${CLAIR_DATABASE_CONTAINER_NAME}" \
+    sh -c 'psql -U postgres -d clair -c "SELECT n.name AS namespace, count(*) AS number_vulnerabilities FROM vulnerability AS v, namespace AS n WHERE v.namespace_id = n.id group by n.name order by n.name"'
+
+ts_echo "------------------------------------------------------------"
+
 docker kill "${CLAIR_CONTAINER_NAME}" > /dev/null
 docker rm "${CLAIR_CONTAINER_NAME}" > /dev/null
 
