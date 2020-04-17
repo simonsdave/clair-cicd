@@ -27,6 +27,7 @@ ts_echo_stderr() {
 
 create_clair_config_container() {
     local CLAIR_VERSION=${1:-}
+    local POSTGRES_DB=${2:-}
 
     local CLAIR_CONFIG_DIR
     CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
@@ -41,14 +42,14 @@ create_clair_config_container() {
         "https://raw.githubusercontent.com/coreos/clair/${CLAIR_VERSION}/config.example.yaml"
 
     # postgres connection string details
-    # http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
+    # http://www.postgresql.org/docs/12.1/static/libpq-connect.html#LIBPQ-CONNSTRING
     sed \
         -i \
-        -e 's|source:.*$|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
+        -e "s|source:.*$|source: postgresql://postgres@clair-database:5432/${POSTGRES_DB}?sslmode=disable|g" \
         "${CLAIR_CONFIG_YAML}"
 
     local DUMMY_CONTAINER_NAME
-    DUMMY_CONTAINER_NAME=$(python3.7 -c "import uuid; print(uuid.uuid4().hex)")
+    DUMMY_CONTAINER_NAME=$(openssl rand -hex 8)
 
     # explict pull to create opportunity to swallow stdout
     docker pull alpine:3.4 > /dev/null
@@ -82,6 +83,7 @@ CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
 POSTGRES_VERSION=$(grep '^__postgres_version__' "$(repo-root-dir.sh)/$(repo.sh -u)/__init__.py" | sed -e "s|^.*=[[:space:]]*['\"]||g" | sed -e "s|['\"].*$||g")
 POSTGRES_DOCKER_IMAGE=postgres:${POSTGRES_VERSION}
+POSTGRES_DB=clair
 
 ts_echo "pulling database server docker image ${POSTGRES_DOCKER_IMAGE}"
 
@@ -96,7 +98,8 @@ ts_echo "starting database server container '${CLAIR_DATABASE_CONTAINER_NAME}'"
 docker \
     run \
     --name "${CLAIR_DATABASE_CONTAINER_NAME}" \
-    -e 'PGDATA=/var/lib/postgresql/data-non-volume' \
+    -e "PGDATA=/var/lib/postgresql/data-non-volume" \
+    -e "POSTGRES_DB=${POSTGRES_DB}" \
     -d \
     "${POSTGRES_DOCKER_IMAGE}" \
     > /dev/null
@@ -120,17 +123,11 @@ ts_echo -n "creating database "
 MAX_NUM_DATABASE_CREATE_ATTEMPTS=10
 for i in $(seq 1 ${MAX_NUM_DATABASE_CREATE_ATTEMPTS})
 do
-    docker \
-        exec \
-        "${CLAIR_DATABASE_CONTAINER_NAME}" \
-        sh -c 'psql -U postgres -c "create database clair"' \
-        >& /dev/null
-
     if docker \
         exec \
          "${CLAIR_DATABASE_CONTAINER_NAME}" \
-         sh -c 'psql -U postgres -c "\list"' |& \
-         grep '^\s*clair' \
+         sh -c "psql -U postgres -c '\list'" |& \
+         grep "^\s*${POSTGRES_DB}" \
          >& /dev/null;
     then
         echo ""
@@ -163,7 +160,7 @@ ts_echo "pulled clair image '${CLAIR_IMAGE_NAME}'"
 # create clair configuration that will point clair @ the database we just created
 #
 ts_echo "creating clair configuration container"
-CLAIR_CONFIG_CONTAINER_NAME=$(create_clair_config_container "${CLAIR_VERSION}")
+CLAIR_CONFIG_CONTAINER_NAME=$(create_clair_config_container "${CLAIR_VERSION}" "${POSTGRES_DB}")
 ts_echo "created clair configuration container '${CLAIR_CONFIG_CONTAINER_NAME}'"
 
 ts_echo "creating clair container '${CLAIR_CONTAINER_NAME}'"
@@ -225,7 +222,7 @@ ts_echo "------------------------------------------------------------"
 docker \
     exec \
     "${CLAIR_DATABASE_CONTAINER_NAME}" \
-    sh -c 'psql -U postgres -d clair -c "SELECT n.name AS namespace, count(*) AS number_vulnerabilities FROM vulnerability AS v, namespace AS n WHERE v.namespace_id = n.id group by n.name order by n.name"'
+    sh -c "psql -U postgres -d ${POSTGRES_DB} -c 'SELECT n.name AS namespace, count(*) AS number_vulnerabilities FROM vulnerability AS v, namespace AS n WHERE v.namespace_id = n.id group by n.name order by n.name'"
 
 ts_echo "------------------------------------------------------------"
 
