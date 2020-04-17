@@ -226,7 +226,7 @@ docker \
 
 ts_echo "------------------------------------------------------------"
 
-ts_echo -n "vulnerabilities database update finish"
+ts_echo "vulnerabilities database update finish"
 
 # :TODO: describe what's happening in this next section
 
