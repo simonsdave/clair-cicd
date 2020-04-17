@@ -28,6 +28,7 @@ ts_echo_stderr() {
 create_clair_config_container() {
     local CLAIR_VERSION=${1:-}
     local POSTGRES_DB=${2:-}
+    local POSTGRES_USER=${3:-}
 
     local CLAIR_CONFIG_DIR
     CLAIR_CONFIG_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
@@ -45,7 +46,7 @@ create_clair_config_container() {
     # http://www.postgresql.org/docs/12.1/static/libpq-connect.html#LIBPQ-CONNSTRING
     sed \
         -i \
-        -e "s|source:.*$|source: postgresql://postgres@clair-database:5432/${POSTGRES_DB}?sslmode=disable|g" \
+        -e "s|source:.*$|source: postgresql://${POSTGRES_USER}@clair-database:5432/${POSTGRES_DB}?sslmode=disable|g" \
         "${CLAIR_CONFIG_YAML}"
 
     local DUMMY_CONTAINER_NAME
@@ -83,7 +84,11 @@ CLAIR_DATABASE_CONTAINER_NAME=clair-database-$(openssl rand -hex 8)
 
 POSTGRES_VERSION=$(grep '^__postgres_version__' "$(repo-root-dir.sh)/$(repo.sh -u)/__init__.py" | sed -e "s|^.*=[[:space:]]*['\"]||g" | sed -e "s|['\"].*$||g")
 POSTGRES_DOCKER_IMAGE=postgres:${POSTGRES_VERSION}
+# see "Environment Variables" in https://github.com/docker-library/docs/blob/master/postgres/README.md
+# to understand how these next few variables are used
 POSTGRES_DB=clair
+POSTGRES_USER=postgres
+PGDATA=/var/lib/postgresql/data-non-volume
 
 ts_echo "pulling database server docker image ${POSTGRES_DOCKER_IMAGE}"
 
@@ -98,7 +103,7 @@ ts_echo "starting database server container '${CLAIR_DATABASE_CONTAINER_NAME}'"
 docker \
     run \
     --name "${CLAIR_DATABASE_CONTAINER_NAME}" \
-    -e "PGDATA=/var/lib/postgresql/data-non-volume" \
+    -e "PGDATA=${PGDATA}" \
     -e "POSTGRES_DB=${POSTGRES_DB}" \
     -d \
     "${POSTGRES_DOCKER_IMAGE}" \
@@ -126,7 +131,7 @@ do
     if docker \
         exec \
          "${CLAIR_DATABASE_CONTAINER_NAME}" \
-         sh -c "psql -U postgres -c '\list'" |& \
+         sh -c "psql -U ${POSTGRES_USER} -c '\list'" |& \
          grep "^\s*${POSTGRES_DB}" \
          >& /dev/null;
     then
@@ -160,7 +165,7 @@ ts_echo "pulled clair image '${CLAIR_IMAGE_NAME}'"
 # create clair configuration that will point clair @ the database we just created
 #
 ts_echo "creating clair configuration container"
-CLAIR_CONFIG_CONTAINER_NAME=$(create_clair_config_container "${CLAIR_VERSION}" "${POSTGRES_DB}")
+CLAIR_CONFIG_CONTAINER_NAME=$(create_clair_config_container "${CLAIR_VERSION}" "${POSTGRES_DB}" "${POSTGRES_USER}")
 ts_echo "created clair configuration container '${CLAIR_CONFIG_CONTAINER_NAME}'"
 
 ts_echo "creating clair container '${CLAIR_CONTAINER_NAME}'"
@@ -222,7 +227,7 @@ ts_echo "------------------------------------------------------------"
 docker \
     exec \
     "${CLAIR_DATABASE_CONTAINER_NAME}" \
-    sh -c "psql -U postgres -d ${POSTGRES_DB} -c 'SELECT n.name AS namespace, count(*) AS number_vulnerabilities FROM vulnerability AS v, namespace AS n WHERE v.namespace_id = n.id group by n.name order by n.name'"
+    sh -c "psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c 'SELECT n.name AS namespace, count(*) AS number_vulnerabilities FROM vulnerability AS v, namespace AS n WHERE v.namespace_id = n.id group by n.name order by n.name'"
 
 ts_echo "------------------------------------------------------------"
 
@@ -238,7 +243,7 @@ docker rmi "${CLAIR_DATABASE_IMAGE_NAME}" >& /dev/null
 docker \
     commit \
     --change "ENV CLAIR_VERSION ${CLAIR_VERSION}" \
-    --change 'ENV PGDATA /var/lib/postgresql/data-non-volume' \
+    --change "ENV PGDATA ${PGDATA}" \
     --change='CMD ["postgres"]' \
     --change='EXPOSE 5432' \
     --change='ENTRYPOINT ["/docker-entrypoint.sh"]' \
