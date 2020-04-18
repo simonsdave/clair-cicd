@@ -48,7 +48,7 @@ CLAIR_IMAGE=simonsdave/clair-cicd-clair:${CLAIR_CICD_VERSION}
 while true
 do
     case "$(echo "${1:-}" | tr "[:upper:]" "[:lower:]")" in
-        -v)
+        -v|--verbose)
             shift
             VERBOSE=1
             IMAGE_ASSESS_RISK_VERBOSE_FLAG=-v

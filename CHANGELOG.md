@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   where the entire database build would fail
 * after the vulnerability database is built a summary of the vulnerabilities
   is written to stdout
+* ```assess-image-risk.sh``` now accepts command line argument ```--verbose``` as well as ```-v```
 * mock 4.0.1 -> 4.0.2
 * dev-env 0.6.7 -> 0.6.10
 
