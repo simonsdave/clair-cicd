@@ -252,9 +252,10 @@ Note use of the ```file://``` prefix to indicate the whitelist is contained in a
 ~>
 ```
 
-Whitelists can also contain vulnerabilities. The example below illustrates
-this capability. If you add the ```-v``` (verbose) flag to ```assess-image-risk.sh```
-you see exactly how the vulnerabilities impact the risk assessment
+Specific vulnerabilities can also be whitelisted.
+The example below illustrates this capability.
+If you add the ```-v``` (verbose) flag to ```assess-image-risk.sh```
+you see exactly how whitelisted vulnerabilities impact the risk assessment
 with statements like ```Vulnerability CVE-2019-13627 in whitelist - pass```
 
 ```bash
