@@ -12,7 +12,7 @@
 
 [Clair](https://github.com/coreos/clair),
 [released by CoreOS in Nov '16](https://coreos.com/blog/vulnerability-analysis-for-containers/),
-is a very effective tool for statically analyzing docker images
+is a very effective tool for [statically analyzing](https://en.wikipedia.org/wiki/Static_program_analysis) docker images
 to determine which known vulnerabilities exist in the images.
 Integrating Clair into a CI/CD pipeline:
 
@@ -30,9 +30,9 @@ This repo was created to address the above challenges.
 
 The roots of this repo center around the following beliefs:
 
-* when inserted into a CI/CD pipeline [Clair](https://github.com/coreos/clair)
-  can be a very effective foundation for the automated assessment of Docker image
-  vulnerability risk
+* when inserted into a CI/CD pipeline, [Clair](https://github.com/coreos/clair)
+  can be a very effective foundation for automating the risk assessment of Docker image
+  vulnerabilities
 * services should be run in Docker containers and thus CI/CD
   pipelines should be focused on the automated generation, assessment
   and ultimately deployment of Docker images
@@ -40,9 +40,8 @@ The roots of this repo center around the following beliefs:
   ie. security is important
 * Docker images should **not** be pushed to a Docker registry until
   their risk profile is understood (this is an important one)
-* the CI/CD pipeline has to be fast. how fast? ideally < 5 minutes
-  between code commit and automated (CD) deployment begins rolling
-  out a change
+* CI/CD pipelines should to be fast. how fast? ideally < 5 minutes
+  between code commit and automated deployment begins
 * there should be a clear division of responsibilities between
   those who create a docker image (service engineer) and those who
   determine the risk of vulnerabilities in a docker image (security analyst)
