@@ -91,6 +91,14 @@ fi
 DOCKER_IMAGE_TO_ANALYZE=${1:-}
 
 #
+# make sure the docker image actually exists
+#
+if [[ "2" != "$(docker images "${DOCKER_IMAGE_TO_ANALYZE}" | wc -l)" ]]; then
+    echo "Can't find docker image '${DOCKER_IMAGE_TO_ANALYZE}'" >&2
+    exit 1
+fi
+
+#
 # pull image and spin up clair database
 #
 if [ "0" -eq "${NO_PULL_DOCKER_IAMGES:-0}" ]; then

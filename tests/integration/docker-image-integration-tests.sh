@@ -20,6 +20,41 @@ assert_appears_in_output() {
     return 1
 }
 
+test_assess_image_risk_dot_sh_invalid_docker_image_name() {
+    CLAIR_DOCKER_IMAGE=${1:-}
+    CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
+
+    # :ODD: Normally you'd expect the line below to be something like
+    # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
+    # is not shared from OS X and is not known to Docker" was generated
+    # and could not figure out what the problem and hence the current
+    # implementation.
+    STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
+
+    if ! "$(repo-root-dir.sh)/bin/assess-image-risk.sh" \
+        -v \
+        --no-pull \
+        --clair-docker-image "${CLAIR_DOCKER_IMAGE}" \
+        --clair-database-docker-image "${CLAIR_DATABASE_DOCKER_IMAGE}" \
+        'dave-was:here' \
+        >& "${STDOUT}"; then
+
+        assert_appears_in_output "${STDOUT}" "Can't find docker image"
+        EXIT_CODE=0
+    else
+        EXIT_CODE=1
+
+        echo ""
+        echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
+    fi
+
+    rm -f "${STDOUT}"
+
+    return "${EXIT_CODE}"
+}
+
 test_assess_image_risk_dot_sh_no_command_line_args() {
     CLAIR_DOCKER_IMAGE=${1:-}
     CLAIR_DATABASE_DOCKER_IMAGE=${2:-}
@@ -392,6 +427,10 @@ NUMBER_TEST_FAILURES=0
 #
 # all the setup is done - time to run some tests!
 #
+test_wrapper test_assess_image_risk_dot_sh_invalid_docker_image_name \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${CLAIR_DATABASE_DOCKER_IMAGE}"
+
 test_wrapper test_assess_image_risk_dot_sh_no_command_line_args \
     "${CLAIR_DOCKER_IMAGE}" \
     "${CLAIR_DATABASE_DOCKER_IMAGE}"
