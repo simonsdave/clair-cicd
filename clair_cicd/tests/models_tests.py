@@ -35,6 +35,17 @@ class SeverityTestCase(unittest.TestCase):
         self.assertFalse(Severity('high') <= Severity('low'))
         self.assertTrue(Severity('low') <= Severity('high'))
 
+    def test_gt(self):
+        self.assertTrue(Severity('high') > Severity('medium'))
+        self.assertFalse(Severity('medium') > Severity('medium'))
+        self.assertTrue(Severity('high') > Severity('low'))
+
+    def test_ge(self):
+        self.assertTrue(Severity('high') >= Severity('medium'))
+        self.assertTrue(Severity('medium') >= Severity('medium'))
+        self.assertFalse(Severity('low') >= Severity('high'))
+        self.assertTrue(Severity('high') >= Severity('low'))
+
     def test_eq(self):
         self.assertTrue(Severity('medium') == Severity('medium'))
         self.assertFalse(Severity('high') == Severity('low'))

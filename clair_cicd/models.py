@@ -25,6 +25,12 @@ class Severity(object):
     def __le__(self, other):
         return self.severity <= other.severity
 
+    def __gt__(self, other):
+        return self.severity > other.severity
+
+    def __ge__(self, other):
+        return self.severity >= other.severity
+
     def __eq__(self, other):
         return self.severity == other.severity
 
