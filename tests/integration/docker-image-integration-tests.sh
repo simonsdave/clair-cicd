@@ -194,6 +194,41 @@ test_assess_vulnerabilities_risk_dot_py_no_command_line_args() {
     return "${EXIT_CODE}"
 }
 
+test_assess_vulnerabilities_risk_dot_py_medium_risk_default_whitelist() {
+    CLAIR_DOCKER_IMAGE=${1:-}
+    VULNERABILITIES_AND_WHITELISTS_CONTAINER=${2:-}
+
+    # :ODD: Normally you'd expect the line below to be something like
+    # "STDOUT=$(mktemp)" but when that was used the error "The path /var/<something>
+    # is not shared from OS X and is not known to Docker" was generated
+    # and could not figure out what the problem and hence the current
+    # implementation.
+    STDOUT=${SCRIPT_DIR_NAME}/stdout.txt
+
+    if docker run \
+        --rm \
+        --volumes-from "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}" \
+        --entrypoint assess-vulnerabilities-risk.py \
+        "${CLAIR_DOCKER_IMAGE}" \
+        "/vulnerabilities/contains-medium-severity" --log info \
+        >& "${STDOUT}"; then
+
+        # assert_appears_in_output "${STDOUT}" "Vulnerability CVE-2016-4074 @ severity high less than or equal to whitelist severity @ high - pass"
+        EXIT_CODE=$?
+    else
+        EXIT_CODE=1
+
+        echo ""
+        echo "${FUNCNAME[0]} failed - >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" 
+        cat "${STDOUT}"
+        echo "${FUNCNAME[0]} failed - <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" 
+    fi
+
+    rm -f "${STDOUT}"
+
+    return "${EXIT_CODE}"
+}
+
 test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore() {
     CLAIR_DOCKER_IMAGE=${1:-}
     VULNERABILITIES_AND_WHITELISTS_CONTAINER=${2:-}
@@ -445,6 +480,10 @@ test_wrapper test_assess_image_risk_dot_sh_file_whitelist_command_line_args \
 
 test_wrapper test_assess_vulnerabilities_risk_dot_py_no_command_line_args \
     "${CLAIR_DOCKER_IMAGE}"
+
+test_wrapper test_assess_vulnerabilities_risk_dot_py_medium_risk_default_whitelist \
+    "${CLAIR_DOCKER_IMAGE}" \
+    "${VULNERABILITIES_AND_WHITELISTS_CONTAINER}"
 
 test_wrapper test_assess_vulnerabilities_risk_dot_py_high_risk_inline_whitelist_high_ignore \
     "${CLAIR_DOCKER_IMAGE}" \

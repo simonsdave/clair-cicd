@@ -14,7 +14,6 @@ import time
 
 from clair_cicd import __version__ as clair_cicd_version, io
 from clair_cicd.assessor import VulnerabilitiesRiskAssessor
-from clair_cicd.models import Whitelist
 
 
 _logger = logging.getLogger(__name__)
@@ -107,12 +106,9 @@ if __name__ == '__main__':
     #
     # read all the various bits we need into memory
     #
-    if clo.whitelist is None:
-        whitelist = Whitelist({'ignoreSevertiesAtOrBelow': 'medium'})
-    else:
-        whitelist = io.read_whitelist(clo.whitelist)
-        if whitelist is None:
-            sys.exit(1)
+    whitelist = io.read_whitelist(clo.whitelist if clo.whitelist else 'json://{"ignoreSevertiesAtOrBelow": "medium"}')
+    if whitelist is None:
+        sys.exit(1)
 
     vulnerabilities = io.read_vulnerabilities(cla[0])
     if vulnerabilities is None:
