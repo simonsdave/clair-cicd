@@ -12,8 +12,7 @@ import re
 import sys
 import time
 
-import clair_cicd
-from clair_cicd import io
+from clair_cicd import __version__ as clair_cicd_version, io
 from clair_cicd.assessor import VulnerabilitiesRiskAssessor
 from clair_cicd.models import Whitelist
 
@@ -52,7 +51,7 @@ class CommandLineParser(optparse.OptionParser):
             self,
             'usage: %prog [options] <vulnerabilities directory>',
             description='cli to analyze results of Clair identified vulnerabilities',
-            version='%%prog %s' % clair_cicd.__version__,
+            version='%%prog %s' % clair_cicd_version,
             option_class=CommandLineOption)
 
         default = None
