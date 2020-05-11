@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.7
 # -*- coding: utf-8 -*-
 """This script analyzes Clair generated vulnerabilities.
 The script is intended to be incorporated into a CI process
