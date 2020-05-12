@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 * add [CodeFactor](https://www.codefactor.io/) badge to main ```README.md```
+* add [LGTM](https://lgtm.com) badges to main ```README.md```
 
 ### Changed
 
