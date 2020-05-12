@@ -20,8 +20,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   is written to stdout
 * ```assess-image-risk.sh``` now accepts command line argument ```--verbose``` as well as ```-v```
 * mock 4.0.1 -> 4.0.2
-* dev-env 0.6.7 -> 0.6.10
+* ```dev-env``` 0.6.7 -> 0.6.10
 * fix ```assess-vulnerabilities-risk.py``` when whitelist wasn't specified
+* depend on ```dev-env``` for dev packages rather than referencing explicitly in ```requirements.txt```
 
 ### Removed
 
