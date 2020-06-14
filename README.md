@@ -329,6 +329,7 @@ so all these need to be available in the environment running ```clair-cicd```
 
 ## References
 
+* [20 May '20 - Security scanners for Python and Docker: from code to dependencies](https://pythonspeed.com/articles/docker-python-security-scan/)
 * [29 Jan '20 - What Is DevSecOps, and How Is It Different from DevOps?](https://research.g2.com/insights/what-is-devsecops-and-how-is-it-different-from-devops)
 * [1 Oct '18 - Baking Compliance in your CI/CD Pipeline](https://thenewstack.io/baking-compliance-in-your-ci-cd-pipeline)
 * [11 Sep '18 - What is DevSecOps?](https://medium.com/@aditi.chaudhry92/what-is-devsecops-cb14cfd457b2)
