@@ -10,7 +10,7 @@ __version__ = '1.0.3'
 #
 # see https://quay.io/repository/coreos/clair?tab=tags
 #
-__clair_version__ = 'v2.1.4'
+__clair_version__ = 'v2.1.5'
 
 #
 # Given the Clair version is declared above might as well
