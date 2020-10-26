@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 * add [CodeFactor](https://www.codefactor.io/) badge to main ```README.md```
 * add [LGTM](https://lgtm.com) badges to main ```README.md```
+* add CircleCI docker executor [authenticated pull](https://circleci.com/docs/2.0/private-images/)
 
 ### Changed
 

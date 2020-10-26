@@ -8,6 +8,9 @@ executors:
       DOCKER_DATABASE_TEMP_IMAGE: simonsdave/clair-cicd-database:bindle
     docker:
       - image: simonsdave/bionic-dev-env:v0.6.11
+        auth:
+          username: $DOCKER_EXECUTOR_DOCKERHUB_USERNAME
+          password: $DOCKER_EXECUTOR_DOCKERHUB_PASSWORD
 
 jobs:
   build_test_and_deploy:
@@ -85,7 +88,9 @@ workflows:
   commit:
     jobs:
       - build_test_and_deploy:
-          context: clair-cicd
+          context:
+            - clair-cicd
+            - docker-executor
   three_days_per_week:
     triggers:
       - schedule:
@@ -97,4 +102,6 @@ workflows:
                 - master
     jobs:
       - build_test_and_deploy:
-          context: clair-cicd
+          context:
+            - clair-cicd
+            - docker-executor
