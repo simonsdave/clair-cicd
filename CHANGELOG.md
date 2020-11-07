@@ -26,7 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * ```dev-env``` 0.6.7 -> 0.6.11
 * fix ```assess-vulnerabilities-risk.py``` when whitelist wasn't specified
 * depend on ```dev-env``` for dev packages rather than referencing explicitly in ```requirements.txt```
-* clair 2.1.2 -> 2.1.5
+* ```clair``` 2.1.2 -> 2.1.6
 
 ### Removed
 
