@@ -97,11 +97,11 @@ def read_vulnerabilities(directory_name):
     vulnerabilities_by_cve_id = {}
 
     for filename in filenames:
+        absolute_filename = os.path.join(directory_name, filename)
+        _logger.info("Looking for vulnerabilities in '%s'", absolute_filename)
+
         try:
             vulnerabilities_in_layer_by_cve_id = {}
-
-            absolute_filename = os.path.join(directory_name, filename)
-            _logger.info("Looking for vulnerabilities in '%s'", absolute_filename)
 
             with open(absolute_filename, 'r', encoding='utf-8') as fp:
                 features = json.load(fp).get('Layer', {}).get('Features', [])
@@ -122,8 +122,8 @@ def read_vulnerabilities(directory_name):
                 absolute_filename)
 
             vulnerabilities_by_cve_id.update(vulnerabilities_in_layer_by_cve_id)
-        except Exception:
-            _logger.error("Could not read vulnerabilities from '%s'", absolute_filename)
+        except Exception as ex:
+            _logger.error("Could not read vulnerabilities from '%s' - %s", absolute_filename, ex)
             return None
 
     _logger.info(
