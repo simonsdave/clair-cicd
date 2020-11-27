@@ -93,7 +93,7 @@ DOCKER_IMAGE_TO_ANALYZE=${1:-}
 #
 # make sure the docker image actually exists
 #
-if [[ "2" != "$(docker images "${DOCKER_IMAGE_TO_ANALYZE}" | wc -l)" ]]; then
+if [[ "2" != "$(docker images "${DOCKER_IMAGE_TO_ANALYZE}" | wc -l | xargs)" ]]; then
     echo "Can't find docker image '${DOCKER_IMAGE_TO_ANALYZE}'" >&2
     exit 1
 fi
