@@ -2,6 +2,7 @@ class Severity(object):
 
     # these labels need to be in order of increasing severity
     _severity_as_strs = [
+        'unknown',
         'negligible',
         'low',
         'medium',

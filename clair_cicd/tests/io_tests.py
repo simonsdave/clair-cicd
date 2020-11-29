@@ -126,6 +126,14 @@ class ReadVulnerabilitiesTestCase(unittest.TestCase):
         vulnerabilities = read_vulnerabilities(directory_name)
         self.assertIsNone(vulnerabilities)
 
+    def test_unknown_severity(self):
+        directory_name = os.path.join(
+            os.path.dirname(__file__),
+            'vulnerabilities',
+            'unknown-severity')
+        vulnerabilities = read_vulnerabilities(directory_name)
+        self.assertIsNotNone(vulnerabilities)
+
     def test_happy_path(self):
         directory_name = os.path.join(
             os.path.dirname(__file__),

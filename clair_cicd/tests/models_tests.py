@@ -11,6 +11,7 @@ class SeverityTestCase(unittest.TestCase):
 
     def test_str(self):
         severities_as_strs = [
+            'unknown',
             'medium',
             ' Medium',
             'high  ',
@@ -25,6 +26,8 @@ class SeverityTestCase(unittest.TestCase):
         hash(severity)
 
     def test_lt(self):
+        self.assertTrue(Severity('unknown') < Severity('negligible'))
+        self.assertTrue(Severity('negligible') < Severity('low'))
         self.assertTrue(Severity('medium') < Severity('high'))
         self.assertFalse(Severity('medium') < Severity('medium'))
         self.assertTrue(Severity('low') < Severity('high'))

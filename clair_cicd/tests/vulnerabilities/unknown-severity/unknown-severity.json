@@ -1,0 +1,33 @@
+{
+  "Layer": {
+    "Name": "003c023998a592c3602eb872bdd12d6af3b765cf5ec899320487ae2d8b5ee0e2",
+    "NamespaceName": "ubuntu:14.04",
+    "ParentName": "50645d6066d46cb0a6a83916ca5af256976c9668fe03366e1b6d690c90e568f8",
+    "IndexedByVersion": 2,
+    "Features": [
+      {
+        "Name": "harfbuzz",
+        "NamespaceName": "ubuntu:14.04",
+        "Version": "0.9.27-1ubuntu1",
+        "Vulnerabilities": [
+          {
+            "Name": "CVE-2016-2052",
+            "NamespaceName": "ubuntu:14.04",
+            "Description": "Multiple unspecified vulnerabilities in HarfBuzz before 1.0.6, as used in Google Chrome before 48.0.2564.82, allow attackers to cause a denial of service or possibly have other impact via crafted data, as demonstrated by a buffer over-read resulting from an inverted length check in hb-ot-font.cc, a different issue than CVE-2015-8947.",
+            "Link": "http://people.ubuntu.com/~ubuntu-security/cve/CVE-2016-2052",
+            "Severity": "unknown",
+            "Metadata": {
+              "NVD": {
+                "CVSSv2": {
+                  "Score": 6.8,
+                  "Vectors": "AV:N/AC:M/Au:N/C:P/I:P"
+                }
+              }
+            }
+          }
+        ],
+        "AddedBy": "afacfe3e09e83753452fe6a907b59e83d4624d3a75775f41b6d50d44dce98504"
+      }
+    ]
+  }
+}
