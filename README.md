@@ -1,6 +1,6 @@
 # clair-cicd
 
-![Maintained](https://img.shields.io/maintenance/yes/2020.svg)
+![Maintained](https://img.shields.io/maintenance/yes/2021.svg)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 [![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
