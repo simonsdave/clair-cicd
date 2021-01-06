@@ -11,18 +11,13 @@ fi
 
 DOCKER_IMAGE=${1:-}
 
-TEMP_DOCKERFILE=$(mktemp 2> /dev/null || mktemp -t DAS)
-sed \
-    -e "s|%CIRCLE_CI_EXECUTOR%|$(get-circle-ci-executor.sh)|g" \
-    < "${SCRIPT_DIR_NAME}/Dockerfile.template" \
-    > "${TEMP_DOCKERFILE}"
-
 CONTEXT_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t DAS)
 pushd "$(repo-root-dir.sh)" > /dev/null && tar zcf "${CONTEXT_DIR}/package.tar.gz" . && popd > /dev/null
 
 docker build \
     -t "${DOCKER_IMAGE}" \
-    --file "${TEMP_DOCKERFILE}" \
+    --file "${SCRIPT_DIR_NAME}/Dockerfile" \
+    --build-arg "CIRCLE_CI_EXECUTOR=$(get-circle-ci-executor.sh)" \
     "${CONTEXT_DIR}"
 
 rm -rf "${CONTEXT_DIR}"
