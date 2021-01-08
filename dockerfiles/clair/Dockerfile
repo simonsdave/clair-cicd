@@ -1,4 +1,6 @@
-FROM quay.io/coreos/clair:v2.1.2
+ARG CLAIR_VERSION
+
+FROM quay.io/coreos/clair:$CLAIR_VERSION
 
 LABEL maintainer="Dave Simons"
 
