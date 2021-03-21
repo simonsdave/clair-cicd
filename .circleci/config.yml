@@ -7,7 +7,7 @@ executors:
       DOCKER_CLAIR_TEMP_IMAGE: simonsdave/clair-cicd-clair:bindle
       DOCKER_DATABASE_TEMP_IMAGE: simonsdave/clair-cicd-database:bindle
     docker:
-      - image: simonsdave/bionic-dev-env:v0.6.11
+      - image: simonsdave/bionic-dev-env:v0.6.14
         auth:
           username: $DOCKER_EXECUTOR_DOCKERHUB_USERNAME
           password: $DOCKER_EXECUTOR_DOCKERHUB_PASSWORD
