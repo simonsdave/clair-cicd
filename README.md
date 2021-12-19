@@ -333,6 +333,8 @@ so all these need to be available in the environment running ```clair-cicd```
 * [5 Aug '20 - How to do vulnerability management with Docker and CI/CD](https://circleci.com/blog/how-to-do-vulnerability-management-with-docker-and-ci-cd/)
 * [20 May '20 - Security scanners for Python and Docker: from code to dependencies](https://pythonspeed.com/articles/docker-python-security-scan/)
 * [29 Jan '20 - What Is DevSecOps, and How Is It Different from DevOps?](https://research.g2.com/insights/what-is-devsecops-and-how-is-it-different-from-devops)
+* [26 Dec '19 - CoreOS Clair — Part 2: Installation & Integration](https://medium.com/paloit/coreos-clair-part-2-installation-integration-558ec664cece)
+* [4 Oct '19 - CoreOS Clair — Part 1: Container Image Scanning](https://medium.com/paloit/container-image-scanning-with-coreos-clair-part-1-17152d6a8421)
 * [1 Oct '18 - Baking Compliance in your CI/CD Pipeline](https://thenewstack.io/baking-compliance-in-your-ci-cd-pipeline)
 * [11 Sep '18 - What is DevSecOps?](https://medium.com/@aditi.chaudhry92/what-is-devsecops-cb14cfd457b2)
 * [20 Jun '18 - Where in the DevOps cycle do you do security?](https://opensource.com/article/18/6/where-cycle-security-devops)
