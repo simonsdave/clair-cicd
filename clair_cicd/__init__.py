@@ -10,7 +10,7 @@ __version__ = '1.0.3'
 #
 # see https://quay.io/repository/coreos/clair?tab=tags
 #
-__clair_version__ = 'v2.1.6'
+__clair_version__ = 'v4.3.5'
 
 #
 # Given the Clair version is declared above might as well
@@ -22,4 +22,4 @@ __clair_version__ = 'v2.1.6'
 #   http://www.postgresql.org/docs/9.5/static/libpq-connect.html#LIBPQ-CONNSTRING
 #   https://www.postgresql.org/docs/12/libpq-connect.html#LIBPQ-CONNSTRING
 #
-__postgres_version__ = '12.1'
+__postgres_version__ = '14.1'
