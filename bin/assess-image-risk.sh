@@ -154,7 +154,7 @@ sed \
     -e 's|source:.*$|source: postgresql://postgres@clair-database:5432/clair?sslmode=disable|g' \
     "${CLAIR_CONFIG_YAML}"
 
-CLAIR_CONFIG_IMAGE=alpine:3.4
+CLAIR_CONFIG_IMAGE=alpine:3.15
 
 # explict pull to create opportunity to swallow stdout
 docker pull "${CLAIR_CONFIG_IMAGE}" > /dev/null
