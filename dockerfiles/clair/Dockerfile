@@ -1,10 +1,8 @@
-ARG CLAIR_VERSION
-
-FROM quay.io/coreos/clair:$CLAIR_VERSION
+FROM alpine:3.15.0
 
 LABEL maintainer="Dave Simons"
 
-RUN apk add --no-cache curl jq bash python3 tzdata \
+RUN apk add --no-cache curl jq bash python3 py3-pip tzdata \
     && cp /usr/share/zoneinfo/Canada/Eastern /etc/localtime
 
 # :TODO: tie this version to the version in CircleCI
@@ -17,8 +15,9 @@ RUN mkdir -p /tmp/download \
     && mv /tmp/download/docker/docker /usr/local/bin/ \
     && rm -rf /tmp/download
 
+# :TODO: why isn't assess-image-risk.sh part of the clair-cicd distribution?
 COPY assess-image-risk.sh /usr/local/bin/assess-image-risk.sh
 
 COPY package.tar.gz /tmp/package.tar.gz
-RUN python3.7 -m pip install /tmp/package.tar.gz
+RUN python3 -m pip install /tmp/package.tar.gz
 RUN rm /tmp/package.tar.gz

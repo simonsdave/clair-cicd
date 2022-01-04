@@ -188,7 +188,7 @@ ts_echo "successfully created clair container"
 ts_echo -n "waiting for vulnerabilities database update to finish "
 while true
 do
-    if docker logs "${CLAIR_CONTAINER_NAME}" | grep 'update finished' >& /dev/null; then
+    if docker logs "${CLAIR_CONTAINER_NAME}" | grep 'starting background updates' >& /dev/null; then
         break
     fi
 
@@ -227,7 +227,7 @@ ts_echo "------------------------------------------------------------"
 docker \
     exec \
     "${CLAIR_DATABASE_CONTAINER_NAME}" \
-    sh -c "psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c 'SELECT n.name AS namespace, count(*) AS number_vulnerabilities FROM vulnerability AS v, namespace AS n WHERE v.namespace_id = n.id group by n.name order by n.name'"
+    sh -c "psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c 'select dist_name, count(*) from vuln group by dist_name order by dist_name'"
 
 ts_echo "------------------------------------------------------------"
 
