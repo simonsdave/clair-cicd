@@ -85,23 +85,33 @@ jobs:
               ./dockerfiles/database/tag-and-push-docker-image.sh "${DOCKER_DATABASE_TEMP_IMAGE}" "v${CIRCLE_BRANCH##release-}" "${DOCKER_PASSWORD}"
             fi
 
+#
+# ~> curl \
+#      -s \
+#      --header "Circle-Token: ${PERSONAL_API_TOKEN}" \
+#      -X POST \
+#      --header 'Content-Type: application/json' \
+#      --data-raw '{
+#          "name": "Three Days Per Week Rebuild",
+#          "description": "Three Days Per Week Rebuild",
+#          "attribution-actor": "system",
+#          "parameters": {
+#              "branch": "master"
+#          },
+#          "timetable": {
+#              "per-hour": 1,
+#              "hours-of-day": [23],
+#              "days-of-week": ["MON", "WED", "FRI"]
+#          }
+#     }' \
+#     --header 'Accept: application/json' \
+#     https://circleci.com/api/v2/project/gh/simonsdave/clair-cicd/schedule | \
+#     jq .
+# ~>
+#
 workflows:
   version: 2
-  commit:
-    jobs:
-      - build_test_and_deploy:
-          context:
-            - clair-cicd
-            - docker-executor
-  three_days_per_week:
-    triggers:
-      - schedule:
-          # https://crontab.guru/ is super useful in decoding the value of the cron key
-          cron: "0 3 * * 1,3,5"
-          filters:
-            branches:
-              only:
-                - master
+  on_commit_or_schedule_trigger:
     jobs:
       - build_test_and_deploy:
           context:

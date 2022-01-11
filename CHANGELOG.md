@@ -28,6 +28,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * depend on ```dev-env``` for dev packages rather than referencing explicitly in ```requirements.txt```
 * ```clair``` 2.1.2 -> 2.1.6
 * ```jsonschema``` 3.2.0 -> 4.3.3
+* start using [CircleCI Scheduled Pipelines](https://circleci.com/docs/2.0/scheduled-pipelines)
+  instead of scheduled workflows
 
 ### Removed
 
