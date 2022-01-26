@@ -31,6 +31,9 @@ jobs:
             - ./env
           key: v1-dependencies-{{ checksum "requirements.txt" }}
       - run:
+          name: Run pip check
+          command: run-pip-check.sh
+      - run:
           name: Lint Python Files
           command: run-flake8.sh
       - run:
