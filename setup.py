@@ -59,7 +59,7 @@ setup(
         'bin/assess-vulnerabilities-risk.py',
     ],
     install_requires=[
-        'jsonschema==4.4.0',
+        'jsonschema==4.5.1',
     ],
     dependency_links=[
     ],
