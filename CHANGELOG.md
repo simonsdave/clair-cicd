@@ -31,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * ```jsonschema``` 3.2.0 -> 4.16.0
 * start using [CircleCI Scheduled Pipelines](https://circleci.com/docs/2.0/scheduled-pipelines)
   instead of scheduled workflows
+* CircleCI setup_remote_docker version 19.03.13 -> 20.10.17
 
 ### Removed
 

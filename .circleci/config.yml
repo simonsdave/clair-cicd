@@ -66,8 +66,9 @@ jobs:
       - run:
           name: Build Python Packages
           command: build-python-package.sh
+      # https://circleci.com/docs/building-docker-images/#docker-version
       - setup_remote_docker:
-          version: 19.03.13
+          version: 20.10.17
       - run:
           name: Build Docker Images
           command: |
