@@ -3,7 +3,6 @@
 ![Maintained](https://img.shields.io/maintenance/yes/2022.svg)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
-[![Requirements](https://requires.io/github/simonsdave/clair-cicd/requirements.svg?branch=master)](https://requires.io/github/simonsdave/clair-cicd/requirements/?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/simonsdave/clair-cicd/badge/master)](https://www.codefactor.io/repository/github/simonsdave/clair-cicd/overview/master)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/simonsdave/clair-cicd.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/simonsdave/clair-cicd/context:python)
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd/tree/master.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
