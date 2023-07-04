@@ -325,6 +325,7 @@ so all these need to be available in the environment running ```clair-cicd```
 
 ## References
 
+* [12 May '22 - Identify known Vulnerabilities in Docker Image using Clair](https://tbhaxor.com/find-vulnerabilities-in-docker-image-using-clair/)
 * [1 Nov '20 - A Practical Introduction to Container Security](https://cloudberry.engineering/article/practical-introduction-container-security/)
 * [5 Aug '20 - How to do vulnerability management with Docker and CI/CD](https://circleci.com/blog/how-to-do-vulnerability-management-with-docker-and-ci-cd/)
 * [20 May '20 - Security scanners for Python and Docker: from code to dependencies](https://pythonspeed.com/articles/docker-python-security-scan/)
