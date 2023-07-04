@@ -1,13 +1,10 @@
 # clair-cicd
 
-![Maintained](https://img.shields.io/maintenance/yes/2022.svg)
+![Maintained](https://img.shields.io/maintenance/yes/2023.svg)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
-[![CodeFactor](https://www.codefactor.io/repository/github/simonsdave/clair-cicd/badge/master)](https://www.codefactor.io/repository/github/simonsdave/clair-cicd/overview/master)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/simonsdave/clair-cicd.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/simonsdave/clair-cicd/context:python)
 [![CircleCI](https://circleci.com/gh/simonsdave/clair-cicd/tree/master.svg?style=shield)](https://circleci.com/gh/simonsdave/clair-cicd/tree/master)
 [![codecov](https://codecov.io/gh/simonsdave/clair-cicd/branch/master/graph/badge.svg)](https://codecov.io/gh/simonsdave/clair-cicd/branch/master)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/simonsdave/clair-cicd.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/simonsdave/clair-cicd/alerts/)
 [![docker-simonsdave/clair-cicd-clair](https://img.shields.io/badge/docker-simonsdave%2Fclair--cicd--clair-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-clair/)
 [![docker-simonsdave/clair-cicd-database](https://img.shields.io/badge/docker-simonsdave%2Fclair--cicd--database-blue.svg)](https://hub.docker.com/r/simonsdave/clair-cicd-database/)
 
