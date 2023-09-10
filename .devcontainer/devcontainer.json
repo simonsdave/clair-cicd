@@ -9,7 +9,7 @@
 		"ghcr.io/devcontainers-contrib/features/circleci-cli:1": {},
 		"ghcr.io/devcontainers-contrib/features/yamllint:2": {},
 		"ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {}
-	}
+	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
